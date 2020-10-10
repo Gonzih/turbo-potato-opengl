@@ -1,55 +1,41 @@
 #include<stdio.h>
-#include<termios.h>
-#include<unistd.h>
 #include<iostream>
+#include<ncurses.h>
 
 using namespace std;
 
-// From https://stackoverflow.com/questions/1798511/how-to-avoid-pressing-enter-with-getchar-for-reading-a-single-character-only
-class DisableInputBufferWrapper {
-public:
-    DisableInputBufferWrapper() {
-        // tcgetattr gets the parameters of the current terminal
-        // STDIN_FILENO will tell tcgetattr that it should write the settings
-        // of stdin to oldt
-        tcgetattr( STDIN_FILENO, &oldt);
-        // now the settings will be copied
-        newt = oldt;
-        // ICANON normally takes care that one line at a time will be processed
-        // that means it will return if it sees a "\n" or an EOF or an EOL
-        newt.c_lflag &= ~(ICANON);
-        // Disassocaite input from output
-        newt.c_lflag &= ~(ICANON | ECHO); 
-        // Those new settings will be set to STDIN
-        // TCSANOW tells tcsetattr to change attributes immediately.
-        tcsetattr( STDIN_FILENO, TCSANOW, &newt);
-    }
-    ~DisableInputBufferWrapper() {
-        tcsetattr( STDIN_FILENO, TCSANOW, &oldt);
-    }
-private:
-    struct termios oldt, newt;
-};
+int y0, x0, nlines, ncols;
 
 int main() {
-    DisableInputBufferWrapper _;
-    int c;
+    y0 = 0;
+    x0 = 0;
+    nlines = 20;
+    ncols = 80;
 
-    cout << "hello" << endl;
+    initscr();
+    cbreak();
+    noecho();
+    keypad(stdscr, TRUE);
+    nodelay(stdscr, TRUE);
+    clear();
 
-    while ((c= getchar())!= 'e') {
-        switch(c) {
-            case 65:
-                cout  << "Up" << endl;//key up
+    /* WINDOW * win = newwin(nlines, ncols, y0, x0); */
+
+    refresh();
+
+    for(;;) {
+        switch(getch()) {
+            case KEY_UP:
+                cout << endl << "Up" << endl;
                 break;
-            case 66:
-                cout  << "Down" << endl;   // key down
+            case KEY_DOWN:
+                cout << endl << "Down" << endl;   // key down
                 break;
-            case 67:
-                cout << "Right" << endl;  // key right
+            case KEY_RIGHT:
+                cout << endl << "Right" << endl;  // key right
                 break;
-            case 68:
-                cout << "Left" << endl;  // key left
+            case KEY_LEFT:
+                cout << endl << "Left" << endl;  // key left
                 break;
         }
     }
