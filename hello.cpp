@@ -4,7 +4,25 @@
 
 #include "window.hpp"
 
+/*
+ * Game class
+ * Map class, generate map via random rectangles
+ * Render cycle
+ * Player class
+ * Render player
+ * ???
+ * Profit
+ */
+
 using namespace std;
+
+void init_curses() {
+    initscr();
+    cbreak();
+    noecho();
+    keypad(stdscr, TRUE);
+    nodelay(stdscr, TRUE);
+}
 
 int y0, x0, nlines, ncols;
 
@@ -14,11 +32,7 @@ int main() {
     nlines = 2;
     ncols = 8;
 
-    initscr();
-    cbreak();
-    noecho();
-    keypad(stdscr, TRUE);
-    nodelay(stdscr, TRUE);
+    init_curses();
 
     auto win = Window(ncols, nlines, x0, y0);
 
