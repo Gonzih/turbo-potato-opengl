@@ -1,41 +1,41 @@
-#include<stdio.h>
-#include<iostream>
-#include<ncurses.h>
+#include <stdio.h>
+#include <iostream>
+#include <ncurses.h>
+
+#include "window.hpp"
 
 using namespace std;
 
 int y0, x0, nlines, ncols;
 
 int main() {
-    y0 = 0;
-    x0 = 0;
-    nlines = 20;
-    ncols = 80;
+    y0 = 10;
+    x0 = 10;
+    nlines = 2;
+    ncols = 8;
 
     initscr();
     cbreak();
     noecho();
     keypad(stdscr, TRUE);
     nodelay(stdscr, TRUE);
-    clear();
 
-    /* WINDOW * win = newwin(nlines, ncols, y0, x0); */
-
-    refresh();
+    auto win = Window(ncols, nlines, x0, y0);
 
     for(;;) {
-        switch(getch()) {
+        int c = getch();
+        switch(c) {
             case KEY_UP:
-                cout << endl << "Up" << endl;
+                win.print("Up", 0, 0);
                 break;
             case KEY_DOWN:
-                cout << endl << "Down" << endl;
+                win.print("Down", 0, 0);
                 break;
             case KEY_RIGHT:
-                cout << endl << "Right" << endl;
+                win.print("Right", 0, 0);
                 break;
             case KEY_LEFT:
-                cout << endl << "Left" << endl;
+                win.print("Left", 0, 0);
                 break;
         }
     }
