@@ -29,13 +29,13 @@ int main() {
                 cout << endl << "Up" << endl;
                 break;
             case KEY_DOWN:
-                cout << endl << "Down" << endl;   // key down
+                cout << endl << "Down" << endl;
                 break;
             case KEY_RIGHT:
-                cout << endl << "Right" << endl;  // key right
+                cout << endl << "Right" << endl;
                 break;
             case KEY_LEFT:
-                cout << endl << "Left" << endl;  // key left
+                cout << endl << "Left" << endl;
                 break;
         }
     }
