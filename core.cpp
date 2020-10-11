@@ -32,5 +32,6 @@ int main() {
 
     game.loop();
 
+    exit(0);
     return 0;
 }

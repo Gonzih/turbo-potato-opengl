@@ -1,3 +1,6 @@
+#ifndef TP_WINDOW_H
+#define TP_WINDOW_H
+
 #include <ncurses.h>
 
 class Window {
@@ -12,7 +15,7 @@ class Window {
         };
 
         void print(std::string line, int x, int y) {
-            wmove(win, x, y);
+            wmove(win, y, x);
             waddstr(win, line.c_str());
             wrefresh(win);
         }
@@ -26,13 +29,13 @@ class Window {
         }
 
         void render_char(char ch, int x, int y) {
-            wmove(win, x, y);
+            wmove(win, y, x);
             waddch(win, ch);
-            wrefresh(win);
         }
 
         virtual ~Window() {
             delwin(win);
-            refresh();
         };
 };
+
+#endif

@@ -16,11 +16,13 @@ class Game {
 
         void render() {
             main_win.erase();
+
             for (int i = 0; i < map.get_width(); i++) {
                 for (int j = 0; j < map.get_height(); j++) {
                     main_win.render_char(map.at(i, j), i, j);
                 }
             }
+
             main_win.refresh();
         }
 
