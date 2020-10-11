@@ -2,6 +2,7 @@
 #include <iostream>
 #include <ncurses.h>
 
+#include "random.hpp"
 #include "game.hpp"
 
 /*
@@ -25,6 +26,7 @@ void init_curses() {
 
 int main() {
     init_curses();
+    rand_init();
 
     int nh, nw;
     getmaxyx(stdscr, nh, nw);

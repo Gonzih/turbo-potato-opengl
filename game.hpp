@@ -32,19 +32,15 @@ class Game {
                 int c = getch();
                 switch(c) {
                     case KEY_UP:
-                        main_win.erase();
                         main_win.print("Up", 0, 0);
                         break;
                     case KEY_DOWN:
-                        main_win.erase();
                         main_win.print("Down", 0, 0);
                         break;
                     case KEY_RIGHT:
-                        main_win.erase();
                         main_win.print("Right", 0, 0);
                         break;
                     case KEY_LEFT:
-                        main_win.erase();
                         main_win.print("Left", 0, 0);
                         break;
                 }
