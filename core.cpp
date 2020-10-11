@@ -21,13 +21,14 @@ void init_curses() {
     cbreak();
     noecho();
     keypad(stdscr, TRUE);
-    nodelay(stdscr, TRUE);
 }
 
 int main() {
     init_curses();
 
-    auto game = Game(20, 20);
+    int nh, nw;
+    getmaxyx(stdscr, nh, nw);
+    auto game = Game(nw, nh);
 
     game.loop();
 
