@@ -22,6 +22,7 @@ void init_curses() {
     cbreak();
     noecho();
     keypad(stdscr, TRUE);
+    curs_set(0);
 }
 
 int main() {

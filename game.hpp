@@ -2,17 +2,35 @@
 
 #include "map.hpp"
 #include "window.hpp"
+#include "character.hpp"
 
 class Game {
     private:
+        int screen_w, screen_h;
         Map map;
         Window main_win;
+        Player player;
 
     public:
         Game(int screen_w, int screen_h) :
+            screen_w(screen_w),
+            screen_h(screen_h),
             map(screen_w, screen_h),
-            main_win(screen_w, screen_h, 0, 0)
-        { };
+            main_win(screen_w, screen_h, 0, 0),
+            player(0, 0)
+        {
+            init_player_pos();
+        };
+
+        void init_player_pos() {
+            auto player_pos =  map.get_random_empty_coords();
+            player.move_to(player_pos);
+        }
+
+        void regen_map() {
+            map = Map(screen_w, screen_h);
+            init_player_pos();
+        }
 
         void render() {
             main_win.erase();
@@ -23,6 +41,8 @@ class Game {
                 }
             }
 
+            main_win.render_char('@', player.get_x(), player.get_y());
+
             main_win.refresh();
         }
 
@@ -32,16 +52,19 @@ class Game {
                 int c = getch();
                 switch(c) {
                     case KEY_UP:
-                        main_win.print("Up", 0, 0);
+                        player.move(MovementDirection::Up);
                         break;
                     case KEY_DOWN:
-                        main_win.print("Down", 0, 0);
+                        player.move(MovementDirection::Down);
                         break;
                     case KEY_RIGHT:
-                        main_win.print("Right", 0, 0);
+                        player.move(MovementDirection::Right);
                         break;
                     case KEY_LEFT:
-                        main_win.print("Left", 0, 0);
+                        player.move(MovementDirection::Left);
+                        break;
+                    case KEY_ENTER:
+                        regen_map();
                         break;
                 }
             }
