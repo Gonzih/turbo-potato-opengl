@@ -13,8 +13,22 @@ class Window {
 
         void print(std::string line, int x, int y) {
             wmove(win, x, y);
-            wrefresh(win);
             waddstr(win, line.c_str());
+            wrefresh(win);
+        }
+
+        void erase() {
+            werase(win);
+        }
+
+        void refresh() {
+            wrefresh(win);
+        }
+
+        void render_char(char ch, int x, int y) {
+            wmove(win, x, y);
+            waddch(win, ch);
+            wrefresh(win);
         }
 
         virtual ~Window() {

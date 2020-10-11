@@ -1,20 +1,20 @@
 default: run
 
 clean:
-	rm -f ./hello
+	rm -f ./core
 
 build: clean
-	clang++ -lncurses $(shell pkg-config --cflags ncurses) -o hello hello.cpp
-	chmod +x ./hello
+	clang++ -lncurses $(shell pkg-config --cflags ncurses) -o core core.cpp
+	chmod +x ./core
 
 build-nix:
 	nix-shell shell.nix --run 'make build'
 
 run: build
-	./hello
+	./core
 
 run-nix: build-nix
-	./hello
+	./core
 
 shell:
 	nix-shell shell.nix
