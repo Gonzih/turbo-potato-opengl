@@ -28,7 +28,7 @@ class Window {
             wrefresh(win);
         }
 
-        void render_char(char ch, int x, int y) {
+        void render_char(int ch, int x, int y) {
             wmove(win, y, x);
             waddch(win, ch);
         }

@@ -4,6 +4,8 @@
 #include "window.hpp"
 #include "character.hpp"
 
+#define PLAYER_CHARACTER '@' | A_BLINK
+
 class Game {
     private:
         int screen_w, screen_h;
@@ -41,7 +43,7 @@ class Game {
                 }
             }
 
-            main_win.render_char('@', player.get_x(), player.get_y());
+            main_win.render_char(PLAYER_CHARACTER, player.get_x(), player.get_y());
 
             main_win.refresh();
         }
