@@ -29,8 +29,7 @@ class Window {
         }
 
         void render_char(int ch, int x, int y) {
-            wmove(win, y, x);
-            waddch(win, ch);
+            mvwaddch(win, y, x, ch);
         }
 
         virtual ~Window() {
