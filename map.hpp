@@ -18,10 +18,10 @@ class Rect {
             return y1 - y0 / 2;
         }
 
-        void render(std::vector<std::vector<char> > * map) {
+        void render(std::vector<std::vector<char> > &map) {
             for (int x = x0; x < x1; x++) {
                 for (int y = y0; y < y1; y++) {
-                    (*map)[x][y] = EMPTY_SPACE_CHARACTER;
+                    map[x][y] = EMPTY_SPACE_CHARACTER;
                 }
             }
         }
@@ -56,7 +56,7 @@ class Map {
 
             for (i = 0; i < nrect; i++) {
                 auto rect = gen_rect(width/4, height/4);
-                rect.render(&map);
+                rect.render(map);
                 rects[i] = rect;
             }
 
@@ -92,8 +92,8 @@ class Map {
                 tunnel_y.x0 = r1_x-1;
                 tunnel_y.x1 = r1_x+1;
 
-                tunnel_x.render(&map);
-                tunnel_y.render(&map);
+                tunnel_x.render(map);
+                tunnel_y.render(map);
             }
         }
 
