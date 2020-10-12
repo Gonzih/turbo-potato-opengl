@@ -11,11 +11,11 @@ class Rect {
         int x0, y0, x1, y1;
 
         int center_x() {
-            return x1 - x0 / 2;
+            return ((x1 - x0) / 2) + x0;
         }
 
         int center_y() {
-            return y1 - y0 / 2;
+            return ((y1 - y0) / 2) + y0;
         }
 
         void render(std::vector<std::vector<char> > &map) {
