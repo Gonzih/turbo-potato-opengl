@@ -1,25 +1,25 @@
 CXX = clang++
-LDFLAGS += -lfmt $(shell pkg-config --cflags fmt)
-LDFLAGS += -lncurses $(shell pkg-config --cflags ncurses)
-LDFLAGS += -lspdlog $(shell pkg-config --cflags spdlog)
+LDFLAGS += -v
+LDFLAGS += $(shell pkg-config --libs --cflags fmt spdlog ncurses)
+BIN_NAME = core
 
 default: run
 
 clean:
-	rm -f ./core
+	rm -f ./$(BIN_NAME)
 
 build: clean
-	$(CXX) $(LDFLAGS) -o core core.cpp
-	chmod +x ./core
+	$(CXX) $(LDFLAGS) -o $(BIN_NAME) src/*.cpp
+	chmod +x ./$(BIN_NAME)
 
 build-nix:
 	nix-shell shell.nix --run 'make build'
 
 run: build
-	./core
+	./$(BIN_NAME)
 
 run-nix: build-nix
-	./core
+	./$(BIN_NAME)
 
 shell:
 	nix-shell shell.nix

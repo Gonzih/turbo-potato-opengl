@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <iostream>
 #include <ncurses.h>
-#include <spdlog/spdlog.h>
+
+#include "spdlog/spdlog.h"
 
 #include "random.hpp"
 #include "game.hpp"

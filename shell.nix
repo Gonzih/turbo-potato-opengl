@@ -5,7 +5,7 @@ in pkgs.clangStdenv.mkDerivation rec {
   LIBCLANG_PATH="${pkgs.llvmPackages.libclang}/lib";
   nativeBuildInputs = [ pkgs.pkg-config ];
   buildInputs = with pkgs; [
-    stdenv
+    clangStdenv
     spdlog
     fmt
     clang
