@@ -1,5 +1,12 @@
 CXX = clang++
-LDFLAGS += $(shell pkg-config --libs --cflags spdlog ncurses fmt)
+
+DISTRO=$(shell sh -c "cat /etc/*-release | grep DISTRIB_ID | sed 's/.*=//'")
+LDFLAGS += -lncurses
+LDFLAGS +=$(shell pkg-config --libs spdlog)
+ifeq ($(DISTRO), Arch)
+	LDFLAGS += $(shell pkg-config --cflags spdlog)
+endif
+
 BIN_NAME = core
 
 default: run
