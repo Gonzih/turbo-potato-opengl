@@ -7,6 +7,7 @@ in pkgs.clangStdenv.mkDerivation rec {
   buildInputs = with pkgs; [
     stdenv
     spdlog
+    fmt
     clang
     ncurses
   ];
