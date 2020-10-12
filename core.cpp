@@ -1,9 +1,11 @@
 #include <stdio.h>
 #include <iostream>
 #include <ncurses.h>
+#include <spdlog/spdlog.h>
 
 #include "random.hpp"
 #include "game.hpp"
+#include "logging.hpp"
 
 /*
  * Game class
@@ -26,11 +28,13 @@ void init_curses() {
 }
 
 int main() {
+    logging_init(spdlog::level::info);
     init_curses();
     rand_init();
 
     int nh, nw;
     getmaxyx(stdscr, nh, nw);
+    logger->info("Starting game with width={} height={}", nw, nh);
     auto game = Game(nw, nh);
 
     game.loop();

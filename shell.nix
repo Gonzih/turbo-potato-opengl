@@ -6,6 +6,7 @@ in pkgs.clangStdenv.mkDerivation rec {
   nativeBuildInputs = [ pkgs.pkg-config ];
   buildInputs = with pkgs; [
     stdenv
+    spdlog
     clang
     ncurses
   ];

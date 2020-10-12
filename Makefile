@@ -1,10 +1,15 @@
+CXX = clang++
+LDFLAGS += -lfmt $(shell pkg-config --cflags fmt)
+LDFLAGS += -lncurses $(shell pkg-config --cflags ncurses)
+LDFLAGS += -lspdlog $(shell pkg-config --cflags spdlog)
+
 default: run
 
 clean:
 	rm -f ./core
 
 build: clean
-	clang++ -lncurses $(shell pkg-config --cflags ncurses) -o core core.cpp
+	$(CXX) $(LDFLAGS) -o core core.cpp
 	chmod +x ./core
 
 build-nix:
