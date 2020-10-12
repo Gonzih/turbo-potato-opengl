@@ -1,7 +1,5 @@
 CXX = clang++
-# LDFLAGS += -v
-LDFLAGS += -l fmt
-LDFLAGS += $(shell pkg-config --libs --cflags spdlog ncurses)
+LDFLAGS += $(shell pkg-config --libs --cflags spdlog ncurses fmt)
 BIN_NAME = core
 
 default: run
