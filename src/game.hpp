@@ -8,7 +8,7 @@
 #include "logging.hpp"
 
 #define PLAYER_CHARACTER '@' | A_BLINK
-#define LIGHT_RADIUS 11.5
+#define LIGHT_RADIUS 15
 
 class Game {
     private:

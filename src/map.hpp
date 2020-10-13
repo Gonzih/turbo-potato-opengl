@@ -17,53 +17,46 @@ enum LightLevel {
 
 class LightMap {
     private:
-        std::vector<std::vector<LightLevel> > light_map;
-        double distance(std::pair<int, int> a, std::pair<int, int> b) {
-            return sqrt(pow(double(a.first - b.first), 2.0) + pow(double(a.second - b.second), 2.0));
-        };
+        std::vector<std::vector<LightLevel>> light_map;
 
-        bool los(std::pair<int, int> a, std::pair<int, int> b, std::vector<std::vector<char> > &map) {
-            auto [ax, ay] = a;
-            auto [bx, by] = b;
-            /* std::pair<int, int> target; */
+        // Implementation based on this pseudo code http://www.roguebasin.com/index.php?title=Eligloscode
+        void calc_fov(float x, float y, int w, int h, std::pair<int, int> camera_pos, std::vector<std::vector<char>> &map, int light_radius) {
+            auto [camera_x, camera_y] = camera_pos;
 
-            double vx, vy, ox, oy, l;
-            int i;
-            vx = ax - bx;
-            vy = ay - by;
-            ox = (double)ax * 0.5;
-            oy = (double)ay * 0.5;
-            l = sqrt(vx*vx+vy*vy);
-            vx /= l;
-            vy /= l;
+            int i, tx, ty;
+            float ox, oy;
+            ox = (float)camera_x * 0.5f;
+            oy = (float)camera_y * 0.5f;
 
-            for (i=0;i<(int)l;i++) {
-                if (map[(int)ox][(int)oy] == WALL_CHARACTER) {
-                    return false;
+            for (i = 0; i < light_radius; i++) {
+                tx = (int)ox;
+                ty = (int)oy;
+
+                if (!(tx > 0 && tx < w && ty > 0 && ty < h)) {
+                    return;
                 }
 
-                ox += vx;
-                oy += vy;
-            }
+                light_map[tx][ty] = LightLevel::Visible;
 
-            return true;
+                if (map[tx][ty] == WALL_CHARACTER) {
+                    return;
+                }
+
+                ox += x;
+                oy += y;
+            }
         }
     public:
-        LightMap(std::pair<int, int> camera_pos, int w, int h, std::vector<std::vector<char> > &map, double light_radius)
-        : light_map(std::vector<std::vector<LightLevel> >(w, std::vector<LightLevel>(h, LightLevel::Dim)))
+        LightMap(std::pair<int, int> camera_pos, int w, int h, std::vector<std::vector<char>> &map, float light_radius)
+        : light_map(std::vector<std::vector<LightLevel>>(w, std::vector<LightLevel>(h, LightLevel::Dim)))
         {
-            auto [cx, cy] = camera_pos;
-            int ilr = int(light_radius + 1.0);
-            std::pair<int, int> target;
+            float x, y;
 
-            for (int x = std::max(0, cx - ilr); x < std::min(w, cx + ilr); x++) {
-                for (int y = std::max(0, cy - ilr); y < std::min(h, cy + ilr); y++) {
-                    target = std::make_pair(x, y);
+            for (int i = 0; i < 360; i++) {
+                x = cos((float)i*0.01745f);
+                y = sin((float)i*0.01745f);
 
-                    if (los(target, camera_pos, map) && distance(target, camera_pos) < light_radius) {
-                        light_map[x][y] = LightLevel::Visible;
-                    }
-                }
+                calc_fov(x, y, w, h, camera_pos, map, light_radius);
             }
         };
 
@@ -192,7 +185,7 @@ class Map {
             }
         }
 
-        LightMap generate_light_map(std::pair<int, int> camera_pos, double light_radius) {
+        LightMap generate_light_map(std::pair<int, int> camera_pos, int light_radius) {
             return LightMap(camera_pos, width, height, map, light_radius);
         };
 };
