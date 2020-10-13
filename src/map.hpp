@@ -39,7 +39,7 @@ class LightMap {
 
             for (i=0;i<(int)l;i++) {
                 if (map[(int)ox][(int)oy] == WALL_CHARACTER) {
-                    /* return false; */
+                    return false;
                 }
 
                 ox += vx;
@@ -66,6 +66,10 @@ class LightMap {
                 }
             }
         };
+
+        bool visible(int x, int y) {
+            return light_level(x, y) == LightLevel::Visible;
+        }
 
         LightLevel light_level(int x, int y) {
             return light_map[x][y];
@@ -152,6 +156,7 @@ class Map {
         }
 
         void generate_maze() {
+            nrect = rand_int(8, 16);
             logger->info("Maze number of rectangles={}", nrect);
             std::vector<Rect> rects;
 

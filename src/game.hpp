@@ -50,15 +50,8 @@ class Game {
                 for (int j = 0; j < map.get_height(); j++) {
                     c = map.at(i, j);
 
-                    switch (light_map.light_level(i, j)) {
-                        case LightLevel::Visible:
-                            break;
-                        case LightLevel::Dim:
-                            c |= A_DIM;
-                            break;
-                        case LightLevel::Invisible:
-                            break;
-                    };
+                    if (!light_map.visible(i, j))
+                        c |= A_DIM;
 
                     main_win.render_char(c, i, j);
                 }
