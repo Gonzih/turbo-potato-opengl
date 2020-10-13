@@ -8,15 +8,6 @@
 #include "game.hpp"
 #include "logging.hpp"
 
-/*
- * Game class
- * Map class, generate map via random rectangles
- * Render cycle
- * Player class
- * Render player
- * ???
- * Profit
- */
 
 using namespace std;
 

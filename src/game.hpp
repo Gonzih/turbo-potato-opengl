@@ -5,6 +5,7 @@
 #include "character.hpp"
 
 #define PLAYER_CHARACTER '@' | A_BLINK
+#define LIGHT_RADIUS 11.5
 
 class Game {
     private:
@@ -37,9 +38,25 @@ class Game {
         void render() {
             main_win.erase();
 
+            auto light_map = map.generate_light_map(player.get_pos(), LIGHT_RADIUS);
+            char c;
+
             for (int i = 0; i < map.get_width(); i++) {
                 for (int j = 0; j < map.get_height(); j++) {
-                    main_win.render_char(map.at(i, j), i, j);
+                    c = map.at(i, j);
+
+                    switch (light_map.light_level(i, j)) {
+                        case LightLevel::Visible:
+                            break;
+                        case LightLevel::Dim:
+                            c |= A_DIM;
+                            break;
+                        case LightLevel::Invisible:
+                            c = ' ';
+                            break;
+                    };
+
+                    main_win.render_char(c, i, j);
                 }
             }
 

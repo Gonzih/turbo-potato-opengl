@@ -1,12 +1,71 @@
 #include <algorithm>
 #include <vector>
 #include <utility>
+#include <math.h>
 
 #include "random.hpp"
 #include "logging.hpp"
 
 #define WALL_CHARACTER '#'
 #define EMPTY_SPACE_CHARACTER ' '
+
+enum LightLevel {
+    Invisible,
+    Dim,
+    Visible
+};
+
+class LightMap {
+    private:
+        std::vector<std::vector<LightLevel> > light_map;
+        double distance(std::pair<int, int> a, std::pair<int, int> b) {
+            return sqrt(pow(double(a.first - b.first), 2.0) + pow(double(a.second - b.second), 2.0));
+        };
+
+        bool los(std::pair<int, int> a, std::pair<int, int> b, std::vector<std::vector<char> > &map) {
+            auto [ax, ay] = a;
+            auto [bx, by] = b;
+            std::pair<int, int> target;
+
+            for (int x = std::min(ax, bx); x < std::max(ax, bx); x++) {
+                for (int y = std::min(ay, by); y < std::max(ay, by); y++) {
+                    target = std::make_pair(x, y);
+
+                    if (map[x][y] == WALL_CHARACTER &&
+                        (distance(a, b) == distance(a, target) + distance(target, b))) {
+                        /* return false; */
+                    }
+                }
+            }
+
+            return true;
+        }
+    public:
+        LightMap(std::pair<int, int> camera_pos, int w, int h, std::vector<std::vector<char> > &map, double light_radius)
+        : light_map(std::vector<std::vector<LightLevel> >(w, std::vector<LightLevel>(h, LightLevel::Invisible)))
+        {
+            auto [cx, cy] = camera_pos;
+            int ilr = int(light_radius + 1.0);
+            std::pair<int, int> target;
+
+            for (int x = std::max(0, cx - ilr); x < std::min(w, cx + ilr); x++) {
+                for (int y = std::max(0, cy - ilr); y < std::min(h, cy + ilr); y++) {
+                    target = std::make_pair(x, y);
+                    if (los(camera_pos, target, map)) {
+                        if (distance(camera_pos, target) == light_radius) {
+                            light_map[x][y] = LightLevel::Dim;
+                        } else {
+                            light_map[x][y] = LightLevel::Visible;
+                        }
+                    }
+                }
+            }
+        };
+
+        LightLevel light_level(int x, int y) {
+            return light_map[x][y];
+        };
+};
 
 class Rect {
     public:
@@ -122,4 +181,8 @@ class Map {
                 }
             }
         }
+
+        LightMap generate_light_map(std::pair<int, int> camera_pos, double light_radius) {
+            return LightMap(camera_pos, width, height, map, light_radius);
+        };
 };

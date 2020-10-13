@@ -45,6 +45,8 @@ class Player: public Character {
         }
 
         const CharacterType type() { return CharacterType::CharacterPlayer; }
+
+        const std::pair<int, int> get_pos() { return pos; };
         const int get_x() { return pos.first; };
         const int get_y() { return pos.second; };
 };
