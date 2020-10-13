@@ -19,8 +19,8 @@ class Rect {
             return ((y1 - y0) / 2) + y0;
         }
 
-        void add_tunnel_to_existing(std::vector<std::vector<char> > &map,
-                std::vector<Rect> &existing_rects) {
+        void add_tunnel_to_existing(std::vector<std::vector<char>> &map,
+                std::vector<Rect> &existing_rects, int tunnel_size) {
             if (existing_rects.size() > 1) {
                 Rect rect = existing_rects.back();
                 Rect tunnel_x;
@@ -56,7 +56,7 @@ class Rect {
             }
         }
 
-        void render(std::vector<std::vector<char> > &map) {
+        void render(std::vector<std::vector<char>> &map) {
             // renders the rectangle on the map
             for (int x = x0; x < x1; x++) {
                 for (int y = y0; y < y1; y++) {
