@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <vector>
 #include <utility>
 
@@ -20,38 +21,35 @@ class Rect {
         }
 
         void add_tunnel_to_existing(std::vector<std::vector<char>> &map,
-                std::vector<Rect> &existing_rects, int tunnel_size) {
-            if (existing_rects.size() > 1) {
+                std::vector<Rect> &existing_rects) {
+            if (existing_rects.size() > 0) {
+                // Decide which rectangle to connect to
+                // Rect rect = existing_rects[rand_int(0, existing_rects.size()) - 1]; // FIXATSOMEPOINT: segfaults
                 Rect rect = existing_rects.back();
+
+                // Calculate centers and sort
+                int centers_x[2] = { center_x(), rect.center_x() };
+                int centers_y[2] = { center_y(), rect.center_y() };
+                // hacky fix this is needed to handle different types of elbows -| and |-
+                int tunnel_y_x_index = ((centers_x[0] > centers_x[1]) && (centers_y[0] > centers_y[1])) ? 1 : 0;
+                if (centers_x[0] > centers_x[1])
+                    std::swap(centers_x[0], centers_x[1]);
+                if (centers_y[0] > centers_y[1])
+                    std::swap(centers_y[0], centers_y[1]);
+
+                // Make the horizontal part of the tunnel
                 Rect tunnel_x;
-                Rect tunnel_y;
-
-                int r0_x = center_x();
-                int r0_y = center_y();
-                int r1_x = rect.center_x();
-                int r1_y = rect.center_y();
-
-                if (r0_x < r1_x) {
-                    tunnel_x.x0 = r0_x;
-                    tunnel_x.x1 = r1_x;
-                } else {
-                    tunnel_x.x0 = r1_x;
-                    tunnel_x.x1 = r0_x;
-                }
-                tunnel_x.y0 = r0_y-1;
-                tunnel_x.y1 = r0_y+1;
-
-                if (r0_y < r1_y) {
-                    tunnel_y.y0 = r0_y;
-                    tunnel_y.y1 = r1_y;
-                } else {
-                    tunnel_y.y0 = r1_y;
-                    tunnel_y.y1 = r0_y;
-                }
-                tunnel_y.x0 = r1_x-1;
-                tunnel_y.x1 = r1_x+1;
-
+                tunnel_x.x0 = centers_x[0];
+                tunnel_x.y0 = centers_y[0]-1;
+                tunnel_x.x1 = centers_x[1];
+                tunnel_x.y1 = centers_y[0]+1;
                 tunnel_x.render(map);
+                // Make the vertical part of the tunnel
+                Rect tunnel_y;
+                tunnel_y.x0 = centers_x[tunnel_y_x_index] - 1;
+                tunnel_y.y0 = centers_y[0];
+                tunnel_y.x1 = centers_x[tunnel_y_x_index] + 1;
+                tunnel_y.y1 = centers_y[1];
                 tunnel_y.render(map);
             }
         }
@@ -71,7 +69,7 @@ class Map {
         int width;
         int height;
         std::vector<std::vector<char>> map;
-        int nrect = rand_int(5, 15);
+        int nrect = 2;
         std::vector<Rect> rects;
 
         Rect gen_rect(int size_w_limit, int size_h_limit) {
