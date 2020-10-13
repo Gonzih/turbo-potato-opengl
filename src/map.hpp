@@ -25,24 +25,32 @@ class LightMap {
         bool los(std::pair<int, int> a, std::pair<int, int> b, std::vector<std::vector<char> > &map) {
             auto [ax, ay] = a;
             auto [bx, by] = b;
-            std::pair<int, int> target;
+            /* std::pair<int, int> target; */
 
-            for (int x = std::min(ax, bx); x < std::max(ax, bx); x++) {
-                for (int y = std::min(ay, by); y < std::max(ay, by); y++) {
-                    target = std::make_pair(x, y);
+            double vx, vy, ox, oy, l;
+            int i;
+            vx = ax - bx;
+            vy = ay - by;
+            ox = (double)ax * 0.5;
+            oy = (double)ay * 0.5;
+            l = sqrt(vx*vx+vy*vy);
+            vx /= l;
+            vy /= l;
 
-                    if (map[x][y] == WALL_CHARACTER &&
-                        (distance(a, b) == distance(a, target) + distance(target, b))) {
-                        /* return false; */
-                    }
+            for (i=0;i<(int)l;i++) {
+                if (map[(int)ox][(int)oy] == WALL_CHARACTER) {
+                    /* return false; */
                 }
+
+                ox += vx;
+                oy += vy;
             }
 
             return true;
         }
     public:
         LightMap(std::pair<int, int> camera_pos, int w, int h, std::vector<std::vector<char> > &map, double light_radius)
-        : light_map(std::vector<std::vector<LightLevel> >(w, std::vector<LightLevel>(h, LightLevel::Invisible)))
+        : light_map(std::vector<std::vector<LightLevel> >(w, std::vector<LightLevel>(h, LightLevel::Dim)))
         {
             auto [cx, cy] = camera_pos;
             int ilr = int(light_radius + 1.0);
@@ -51,12 +59,9 @@ class LightMap {
             for (int x = std::max(0, cx - ilr); x < std::min(w, cx + ilr); x++) {
                 for (int y = std::max(0, cy - ilr); y < std::min(h, cy + ilr); y++) {
                     target = std::make_pair(x, y);
-                    if (los(camera_pos, target, map)) {
-                        if (distance(camera_pos, target) == light_radius) {
-                            light_map[x][y] = LightLevel::Dim;
-                        } else {
-                            light_map[x][y] = LightLevel::Visible;
-                        }
+
+                    if (los(target, camera_pos, map) && distance(target, camera_pos) < light_radius) {
+                        light_map[x][y] = LightLevel::Visible;
                     }
                 }
             }

@@ -15,6 +15,7 @@ void init_curses() {
     initscr();
     cbreak();
     noecho();
+    nodelay(stdscr, TRUE);
     keypad(stdscr, TRUE);
     curs_set(0);
 }

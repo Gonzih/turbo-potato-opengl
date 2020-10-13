@@ -1,8 +1,11 @@
 #include <ncurses.h>
+/* #include <chrono> */
+/* #include <thread> */
 
 #include "map.hpp"
 #include "window.hpp"
 #include "character.hpp"
+#include "logging.hpp"
 
 #define PLAYER_CHARACTER '@' | A_BLINK
 #define LIGHT_RADIUS 11.5
@@ -31,7 +34,9 @@ class Game {
         }
 
         void regen_map() {
-            map = Map(screen_w, screen_h);
+            logger->info("Regenerating map");
+            Map newmap(screen_w, screen_h);
+            map = newmap;
             init_player_pos();
         }
 
@@ -39,7 +44,7 @@ class Game {
             main_win.erase();
 
             auto light_map = map.generate_light_map(player.get_pos(), LIGHT_RADIUS);
-            char c;
+            int c;
 
             for (int i = 0; i < map.get_width(); i++) {
                 for (int j = 0; j < map.get_height(); j++) {
@@ -52,7 +57,6 @@ class Game {
                             c |= A_DIM;
                             break;
                         case LightLevel::Invisible:
-                            c = ' ';
                             break;
                     };
 
@@ -82,7 +86,7 @@ class Game {
                     case KEY_LEFT:
                         player.move(MovementDirection::Left);
                         break;
-                    case KEY_ENTER:
+                    case ' ':
                         regen_map();
                         break;
                 }
