@@ -10,6 +10,26 @@
 #define WALL_CHARACTER '#'
 #define EMPTY_SPACE_CHARACTER ' '
 
+
+class MemoryMap {
+    private:
+        std::vector<std::vector<bool>> memory_map;
+        int width, height;
+    public:
+        MemoryMap(int w, int h)
+        : memory_map(std::vector<std::vector<bool>>(w, std::vector<bool>(h, false))),
+        width(w), height(h)
+        { };
+
+        bool memoized(int x, int y) {
+            return memory_map[x][y];
+        }
+
+        void memoize(int x, int y) {
+            memory_map[x][y] = true;
+        };
+};
+
 enum LightLevel {
     Invisible,
     Dim,

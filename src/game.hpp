@@ -16,6 +16,7 @@ class Game {
         Map map;
         Window main_win;
         Player player;
+        MemoryMap memory_map;
 
     public:
         Game(int screen_w, int screen_h) :
@@ -23,7 +24,8 @@ class Game {
             screen_h(screen_h),
             map(screen_w, screen_h),
             main_win(screen_w, screen_h, 0, 0),
-            player(0, 0)
+            player(0, 0),
+            memory_map(screen_w, screen_h)
         {
             init_player_pos();
         };
@@ -36,8 +38,13 @@ class Game {
 
         void regen_map() {
             logger->info("Regenerating map");
+
             Map newmap(screen_w, screen_h);
             map = newmap;
+
+            MemoryMap newmmap(screen_w, screen_h);
+            memory_map = newmmap;
+
             init_player_pos();
         }
 
@@ -52,10 +59,13 @@ class Game {
                     c = map.at(i, j);
 
                     if (!light_map.visible(i, j)) {
-                        c |= A_DIM;
-
-                        if (c == WALL_CHARACTER)
+                        if (memory_map.memoized(i, j)) {
+                            c |= A_DIM;
+                        } else {
                             c = '.' | A_DIM;
+                        }
+                    } else {
+                        memory_map.memoize(i, j);
                     }
 
                     main_win.render_char(c, i, j);
