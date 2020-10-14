@@ -30,6 +30,7 @@ class Game {
 
         void init_player_pos() {
             auto player_pos =  map.get_random_empty_coords();
+            logger->info("Initializing player at ({}, {})", player_pos.first, player_pos.second);
             player.move_to(player_pos);
         }
 

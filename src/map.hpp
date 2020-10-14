@@ -25,8 +25,8 @@ class LightMap {
 
             int i, tx, ty;
             float ox, oy;
-            ox = (float)camera_x * 0.5f;
-            oy = (float)camera_y * 0.5f;
+            ox = (float)camera_x + 0.5f;
+            oy = (float)camera_y + 0.5f;
 
             for (i = 0; i < light_radius; i++) {
                 tx = (int)ox;
@@ -53,8 +53,8 @@ class LightMap {
             float x, y;
 
             for (int i = 0; i < 360; i++) {
-                x = cos((float)i*0.01745f);
-                y = sin((float)i*0.01745f);
+                x = cos((float)i*0.01745);
+                y = sin((float)i*0.01745);
 
                 calc_fov(x, y, w, h, camera_pos, map, light_radius);
             }
