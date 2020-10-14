@@ -32,7 +32,7 @@ class LightMap {
                 tx = (int)ox;
                 ty = (int)oy;
 
-                if (!(tx > 0 && tx < w && ty > 0 && ty < h)) {
+                if (!(tx >= 0 && tx <= w && ty >= 0 && ty <= h)) {
                     return;
                 }
 
