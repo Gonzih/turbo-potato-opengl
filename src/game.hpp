@@ -51,8 +51,12 @@ class Game {
                 for (int j = 0; j < map.get_height(); j++) {
                     c = map.at(i, j);
 
-                    if (!light_map.visible(i, j))
+                    if (!light_map.visible(i, j)) {
                         c |= A_DIM;
+
+                        if (c == WALL_CHARACTER)
+                            c = '.' | A_DIM;
+                    }
 
                     main_win.render_char(c, i, j);
                 }
@@ -64,25 +68,36 @@ class Game {
         }
 
         void loop() {
+            int c;
+            MovementDirection direction;
+
             for(;;) {
                 render();
-                int c = getch();
+                c = getch();
                 switch(c) {
                     case KEY_UP:
-                        player.move(MovementDirection::Up);
+                        direction = MovementDirection::Up;
                         break;
                     case KEY_DOWN:
-                        player.move(MovementDirection::Down);
+                        direction = MovementDirection::Down;
                         break;
                     case KEY_RIGHT:
-                        player.move(MovementDirection::Right);
+                        direction = MovementDirection::Right;
                         break;
                     case KEY_LEFT:
-                        player.move(MovementDirection::Left);
+                        direction = MovementDirection::Left;
                         break;
                     case ' ':
                         regen_map();
-                        break;
+                        continue;
+                };
+
+                if (direction == MovementDirection::None)
+                    continue;
+
+                if (map.can_move(player.get_pos(), direction)) {
+                    player.move(direction);
+                    direction = MovementDirection::None;
                 }
             }
         }

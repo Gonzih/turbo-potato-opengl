@@ -5,6 +5,7 @@
 
 #include "random.hpp"
 #include "logging.hpp"
+#include "character.hpp"
 
 #define WALL_CHARACTER '#'
 #define EMPTY_SPACE_CHARACTER ' '
@@ -184,6 +185,29 @@ class Map {
                 }
             }
         }
+
+        bool can_move(std::pair<int, int> pos, MovementDirection direction) {
+            switch(direction) {
+                case MovementDirection::Up:
+                    pos.second -= 1;
+                    break;
+                case MovementDirection::Down:
+                    pos.second += 1;
+                    break;
+                case MovementDirection::Left:
+                    pos.first -= 1;
+                    break;
+                case MovementDirection::Right:
+                    pos.first += 1;
+                    break;
+                case MovementDirection::None:
+                    break;
+            };
+
+            auto [x, y] = pos;
+
+            return x >= 0 && y >= 0 && x <= width && y <= height && map[x][y] != WALL_CHARACTER;
+        };
 
         LightMap generate_light_map(std::pair<int, int> camera_pos, int light_radius) {
             return LightMap(camera_pos, width, height, map, light_radius);

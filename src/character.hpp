@@ -1,3 +1,6 @@
+#ifndef TP_CHARACTER_H
+#define TP_CHARACTER_H
+
 #include <utility>
 
 enum CharacterType {
@@ -7,7 +10,7 @@ enum CharacterType {
 };
 
 enum MovementDirection {
-    Up, Down, Left, Right
+    None, Up, Down, Left, Right
 };
 
 class Character {
@@ -41,6 +44,8 @@ class Player: public Character {
                 case MovementDirection::Right:
                     pos.first += 1;
                     break;
+                case MovementDirection::None:
+                    break;
             }
         }
 
@@ -50,3 +55,4 @@ class Player: public Character {
         const int get_x() { return pos.first; };
         const int get_y() { return pos.second; };
 };
+#endif
