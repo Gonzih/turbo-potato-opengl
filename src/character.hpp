@@ -17,7 +17,7 @@ class Character {
     private:
     public:
         Character() {};
-        const CharacterType type() { return CharacterType::NotDefined; }
+        virtual const CharacterType type() { return CharacterType::NotDefined; }
 };
 
 class Player: public Character {

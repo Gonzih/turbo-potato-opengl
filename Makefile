@@ -1,7 +1,7 @@
 CXX = clang++
 
 DISTRO=$(shell sh -c "cat /etc/*-release | grep DISTRIB_ID | sed 's/.*=//'")
-LDFLAGS += -std=c++17
+LDFLAGS += -std=c++2a
 LDFLAGS += -lncurses
 LDFLAGS +=$(shell pkg-config --libs spdlog)
 ifeq ($(DISTRO), Arch)

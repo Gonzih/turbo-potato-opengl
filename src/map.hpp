@@ -46,12 +46,12 @@ class LightMap {
 
             int i, tx, ty;
             float ox, oy;
-            ox = (float)camera_x + 0.5f;
-            oy = (float)camera_y + 0.5f;
+            ox = static_cast<float>(camera_x) + 0.5f;
+            oy = static_cast<float>(camera_y) + 0.5f;
 
             for (i = 0; i < light_radius; i++) {
-                tx = (int)ox;
-                ty = (int)oy;
+                tx = static_cast<int>(ox);
+                ty = static_cast<int>(oy);
 
                 if (!(tx >= 0 && tx <= w && ty >= 0 && ty <= h)) {
                     return;
@@ -71,11 +71,12 @@ class LightMap {
         LightMap(std::pair<int, int> camera_pos, int w, int h, std::vector<std::vector<char>> &map, float light_radius)
         : light_map(std::vector<std::vector<LightLevel>>(w, std::vector<LightLevel>(h, LightLevel::Dim)))
         {
-            float x, y;
+            float x, y, fi;
 
             for (int i = 0; i < 360; i++) {
-                x = cos((float)i*0.01745);
-                y = sin((float)i*0.01745);
+                fi = static_cast<float>(i);
+                x = cos(fi*0.01745f);
+                y = sin(fi*0.01745f);
 
                 calc_fov(x, y, w, h, camera_pos, map, light_radius);
             }
