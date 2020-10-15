@@ -7,7 +7,7 @@
 #include "character.hpp"
 #include "logging.hpp"
 
-#define PLAYER_CHARACTER '@' | A_BLINK
+#define PLAYER_CHARACTER L"🥔"
 #define LIGHT_RADIUS 15
 
 class Game {
@@ -72,7 +72,9 @@ class Game {
                 }
             }
 
-            main_win.render_char(PLAYER_CHARACTER, player.get_x(), player.get_y());
+            main_win.print(PLAYER_CHARACTER,
+                    player.get_x(),
+                    player.get_y());
 
             main_win.refresh();
         }

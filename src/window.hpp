@@ -20,6 +20,12 @@ class Window {
             wrefresh(win);
         }
 
+        void print(std::wstring line, int x, int y) {
+            wmove(win, y, x);
+            waddwstr(win, line.c_str());
+            wrefresh(win);
+        }
+
         void erase() {
             werase(win);
         }

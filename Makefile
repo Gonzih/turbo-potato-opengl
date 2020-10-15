@@ -2,7 +2,7 @@ CXX = clang++
 
 DISTRO=$(shell sh -c "cat /etc/*-release | grep DISTRIB_ID | sed 's/.*=//'")
 LDFLAGS += -std=c++2a
-LDFLAGS += -lncurses
+LDFLAGS += -lncursesw
 
 BIN_NAME = core
 

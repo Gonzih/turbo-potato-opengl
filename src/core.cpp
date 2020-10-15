@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <iostream>
 #include <ncurses.h>
+#include <locale.h>
 
 #include "random.hpp"
 #include "game.hpp"
@@ -12,6 +13,7 @@
 using namespace std;
 
 void curses_init() {
+    setlocale(LC_ALL,"");
     initscr();
     cbreak();
     noecho();
