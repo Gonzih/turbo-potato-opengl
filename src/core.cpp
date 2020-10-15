@@ -1,3 +1,4 @@
+#include <signal.h>
 #include <stdio.h>
 #include <iostream>
 #include <ncurses.h>
@@ -11,7 +12,7 @@
 
 using namespace std;
 
-void init_curses() {
+void curses_init() {
     initscr();
     cbreak();
     noecho();
@@ -20,9 +21,27 @@ void init_curses() {
     curs_set(0);
 }
 
+void sigint_handler_init() {
+   struct sigaction sigIntHandler;
+
+   sigIntHandler.sa_handler = [](int sig) {
+       if (endwin() == ERR) {
+           logger->info("Error releasing ncurse allocations");
+           exit(1);
+       }
+       logger->info("Exited normally");
+       exit(0);
+   };
+   sigemptyset(&sigIntHandler.sa_mask);
+   sigIntHandler.sa_flags = 0;
+
+   sigaction(SIGINT, &sigIntHandler, NULL);
+}
+
 int main() {
     logging_init(spdlog::level::info);
-    init_curses();
+    curses_init();
+    sigint_handler_init();
     rand_init();
 
     int nh, nw;
@@ -32,6 +51,5 @@ int main() {
 
     game.loop();
 
-    exit(0);
     return 0;
 }
