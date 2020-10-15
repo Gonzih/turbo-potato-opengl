@@ -59,7 +59,7 @@ namespace log {
 
     template<typename... Rest>
     void critical(Rest... rest){
-        logger->print("<OMGPANIC>");
+        logger->print("<OMGPANIC> ");
         logger->print(rest...);
         logger->print('\n');
         logger->flush();
