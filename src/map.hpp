@@ -49,7 +49,7 @@ class LightMap {
             ox = static_cast<float>(camera_x) + 0.5f;
             oy = static_cast<float>(camera_y) + 0.5f;
 
-            for (i = 0; i < light_radius; i++) {
+            for (i = 0; i < light_radius; ++i) {
                 tx = static_cast<int>(ox);
                 ty = static_cast<int>(oy);
 
@@ -73,7 +73,7 @@ class LightMap {
         {
             float x, y, fi;
 
-            for (int i = 0; i < 360; i++) {
+            for (int i = 0; i < 360; ++i) {
                 fi = static_cast<float>(i);
                 x = cos(fi*0.01745f);
                 y = sin(fi*0.01745f);
@@ -139,8 +139,8 @@ class Rect {
 
         void render(std::vector<std::vector<char>> &map) {
             // renders the rectangle on the map
-            for (int x = x0; x < x1; x++) {
-                for (int y = y0; y < y1; y++) {
+            for (int x = x0; x < x1; ++x) {
+                for (int y = y0; y < y1; ++y) {
                     map[x][y] = EMPTY_SPACE_CHARACTER;
                 }
             }
@@ -175,7 +175,7 @@ class Map {
             log::info("Maze number of rectangles is", nrect);
             std::vector<Rect> rects;
 
-            for (int i = 0; i < nrect; i++) {
+            for (int i = 0; i < nrect; ++i) {
                 auto rect = gen_rect(width/4, height/4);
                 // renders the rectangle on the map
                 rect.render(map);
