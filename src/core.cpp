@@ -1,4 +1,5 @@
 #include <signal.h>
+#include <string.h>
 #include <stdio.h>
 #include <iostream>
 #include <ncurses.h>
@@ -22,20 +23,27 @@ void curses_init() {
 }
 
 void sigint_handler_init() {
-   struct sigaction sigIntHandler;
+   struct sigaction cleanup;
 
-   sigIntHandler.sa_handler = [](int sig) {
+   cleanup.sa_handler = [](int sig) {
        if (endwin() == ERR) {
            logger->info("Error releasing ncurse allocations");
            exit(1);
        }
-       logger->info("Exited normally");
-       exit(0);
+       if (sig == SIGINT) {
+           logger->info("Exited normally");
+           exit(0);
+       } else {
+           logger->critical("Error: got signal {} {}", sig, strerror(sig));
+           std::cout << strerror(sig) << endl;
+           exit(sig);
+       }
    };
-   sigemptyset(&sigIntHandler.sa_mask);
-   sigIntHandler.sa_flags = 0;
+   sigemptyset(&cleanup.sa_mask);
+   cleanup.sa_flags = 0;
 
-   sigaction(SIGINT, &sigIntHandler, NULL);
+   sigaction(SIGINT, &cleanup, NULL);
+   sigaction(SIGSEGV, &cleanup, NULL);
 }
 
 int main() {
