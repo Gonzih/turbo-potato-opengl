@@ -32,12 +32,12 @@ class Game {
 
         void init_player_pos() {
             auto player_pos =  map.get_random_empty_coords();
-            logger->info("Initializing player at ({}, {})", player_pos.first, player_pos.second);
+            log::info("Initializing player at (x, y)", player_pos.first, player_pos.second);
             player.move_to(player_pos);
         }
 
         void regen_map() {
-            logger->info("Regenerating map");
+            log::info("Regenerating map");
 
             Map newmap(screen_w, screen_h);
             map = newmap;

@@ -172,7 +172,7 @@ class Map {
 
         void generate_maze() {
             nrect = rand_int(8, 16);
-            logger->info("Maze number of rectangles={}", nrect);
+            log::info("Maze number of rectangles is", nrect);
             std::vector<Rect> rects;
 
             for (int i = 0; i < nrect; i++) {
