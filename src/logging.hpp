@@ -18,20 +18,16 @@ namespace log {
                     fstream.open(fname, std::ios::out | std::ios::app);
                 };
 
-                void write(std::string s) {
-                    std::lock_guard<std::mutex> guard(write_mutex);
-                    fstream << s;
-                };
-
                 template<typename First>
                 void print(First first){
                     std::lock_guard<std::mutex> guard(write_mutex);
-                    fstream << first << ' ';
+                    fstream << first;
                 }
 
                 template<typename First, typename... Rest>
                 void print(First first, Rest... rest){
                     print(first);
+                    print(' ');
                     print(rest...);
                 }
 
@@ -55,17 +51,17 @@ namespace log {
 
     template<typename... Rest>
     void info(Rest... rest){
-        logger->write("<INFO> ");
+        logger->print("<INFO> ");
         logger->print(rest...);
-        logger->write("\n");
+        logger->print('\n');
         logger->flush();
     }
 
     template<typename... Rest>
     void critical(Rest... rest){
-        logger->write("<OMGPANIC> ");
+        logger->print("<OMGPANIC>");
         logger->print(rest...);
-        logger->write("\n");
+        logger->print('\n');
         logger->flush();
     }
 }
