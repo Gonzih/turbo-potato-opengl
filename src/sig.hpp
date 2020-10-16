@@ -1,3 +1,8 @@
+#ifndef TP_SIG_H
+#define TP_SIG_H
+
+#include <signal.h>
+#include <string.h>
 #include "logging.hpp"
 
 void sigint_handler_init() {
@@ -23,3 +28,4 @@ void sigint_handler_init() {
    sigaction(SIGINT, &cleanup, NULL);
    sigaction(SIGSEGV, &cleanup, NULL);
 }
+#endif
