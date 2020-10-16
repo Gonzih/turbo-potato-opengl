@@ -17,6 +17,7 @@ class Tile {
         bool memoized = false;
     private:
 };
+const Tile wall_tile {WALL_CHARACTER};
 
 enum LightLevel {
     Invisible,
@@ -179,13 +180,12 @@ class Map {
                 rects.push_back(rect);
             }
         }
-        Tile wall {WALL_CHARACTER};
 
     public:
         Map(int w, int h) :
             width(w),
             height(h),
-            map(std::vector<std::vector<Tile>>(w, std::vector<Tile>(h, wall)))
+            map(std::vector<std::vector<Tile>>(w, std::vector<Tile>(h, wall_tile)))
         {
             generate_maze();
         }
