@@ -24,17 +24,12 @@ class Game {
             screen_h(screen_h),
             map(screen_w, screen_h),
             main_win(screen_w, screen_h, 0, 0),
-            player(0, 0),
+            player(screen_w / 2, screen_h / 2),
             memory_map(screen_w, screen_h)
         {
-            init_player_pos();
+            log::info("Initializing player at (x, y)",
+                    player.get_pos().first,player.get_pos().second);
         };
-
-        void init_player_pos() {
-            auto player_pos =  map.get_random_empty_coords();
-            log::info("Initializing player at (x, y)", player_pos.first, player_pos.second);
-            player.move_to(player_pos);
-        }
 
         void regen_map() {
             log::info("Regenerating map");
@@ -45,7 +40,7 @@ class Game {
             MemoryMap newmmap(screen_w, screen_h);
             memory_map = newmmap;
 
-            init_player_pos();
+            player.move_to(std::make_pair(screen_w / 2, screen_h / 2));
         }
 
         void render() {
