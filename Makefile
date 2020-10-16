@@ -1,6 +1,7 @@
 CXX = clang++
 
 DISTRO=$(shell sh -c "cat /etc/*-release | grep DISTRIB_ID | sed 's/.*=//'")
+CXXFLAGS = -Wall -Werror -g
 LDFLAGS += -std=c++2a
 LDFLAGS += -lncursesw
 
@@ -12,7 +13,7 @@ clean:
 	rm -f ./$(BIN_NAME)
 
 build: clean
-	$(CXX) $(LDFLAGS) -o $(BIN_NAME) src/*.cpp
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $(BIN_NAME) src/*.cpp
 	chmod +x ./$(BIN_NAME)
 
 build-nix:

@@ -10,24 +10,12 @@
 #define WALL_CHARACTER '#'
 #define EMPTY_SPACE_CHARACTER ' '
 
-
-class MemoryMap {
-    private:
-        std::vector<std::vector<bool>> memory_map;
-        int width, height;
+class Tile {
     public:
-        MemoryMap(int w, int h)
-        : memory_map(std::vector<std::vector<bool>>(w, std::vector<bool>(h, false))),
-        width(w), height(h)
-        { };
-
-        bool memoized(int x, int y) {
-            return memory_map[x][y];
-        }
-
-        void memoize(int x, int y) {
-            memory_map[x][y] = true;
-        };
+        Tile(char c_): c(c_) { };
+        char c = WALL_CHARACTER;
+        bool memoized = false;
+    private:
 };
 
 enum LightLevel {
@@ -41,7 +29,7 @@ class LightMap {
         std::vector<std::vector<LightLevel>> light_map;
 
         // Implementation based on this pseudo code http://www.roguebasin.com/index.php?title=Eligloscode
-        void calc_fov(float x, float y, int w, int h, std::pair<int, int> camera_pos, std::vector<std::vector<char>> &map, int light_radius) {
+        void calc_fov(float x, float y, int w, int h, std::pair<int, int> camera_pos, std::vector<std::vector<Tile>> &map, int light_radius) {
             auto [camera_x, camera_y] = camera_pos;
 
             int i, tx, ty;
@@ -59,7 +47,7 @@ class LightMap {
 
                 light_map[tx][ty] = LightLevel::Visible;
 
-                if (map[tx][ty] == WALL_CHARACTER) {
+                if (map[tx][ty].c == WALL_CHARACTER) {
                     return;
                 }
 
@@ -68,7 +56,7 @@ class LightMap {
             }
         }
     public:
-        LightMap(std::pair<int, int> camera_pos, int w, int h, std::vector<std::vector<char>> &map, float light_radius)
+        LightMap(std::pair<int, int> camera_pos, int w, int h, std::vector<std::vector<Tile>> &map, float light_radius)
         : light_map(std::vector<std::vector<LightLevel>>(w, std::vector<LightLevel>(h, LightLevel::Dim)))
         {
             float x, y, fi;
@@ -106,7 +94,7 @@ class Rect {
             return ((y1 - y0) / 2) + y0;
         }
 
-        void add_tunnel_to_existing(std::vector<std::vector<char>> &map,
+        void add_tunnel_to_existing(std::vector<std::vector<Tile>> &map,
                 std::vector<Rect> &existing_rects) {
             if (existing_rects.size() > 0) {
                 // Decide which rectangle to connect to
@@ -140,11 +128,11 @@ class Rect {
             }
         }
 
-        void render(std::vector<std::vector<char>> &map) {
+        void render(std::vector<std::vector<Tile>> &map) {
             // renders the rectangle on the map
             for (int x = x0; x < x1; ++x) {
                 for (int y = y0; y < y1; ++y) {
-                    map[x][y] = EMPTY_SPACE_CHARACTER;
+                    map[x][y].c = EMPTY_SPACE_CHARACTER;
                 }
             }
         }
@@ -154,7 +142,7 @@ class Map {
     private:
         int width;
         int height;
-        std::vector<std::vector<char>> map;
+        std::vector<std::vector<Tile>> map;
         int nrect = 2;
         std::vector<Rect> rects;
 
@@ -191,17 +179,22 @@ class Map {
                 rects.push_back(rect);
             }
         }
+        Tile wall {WALL_CHARACTER};
 
     public:
         Map(int w, int h) :
             width(w),
             height(h),
-            map(std::vector<std::vector<char>>(w, std::vector<char>(h, WALL_CHARACTER)))
-        { generate_maze(); }
+            map(std::vector<std::vector<Tile>>(w, std::vector<Tile>(h, wall)))
+        {
+            generate_maze();
+        }
 
         const int get_width() { return width; }
         const int get_height() { return height; }
-        const char at(int x, int y) { return map[x][y]; }
+        const char at(int x, int y) { return map[x][y].c; }
+        const bool memoized(int x, int y) { return map[x][y].memoized; }
+        void memoize(int x, int y) { map[x][y].memoized = true; }
 
         bool can_move(std::pair<int, int> pos, MovementDirection direction) {
             switch(direction) {
@@ -223,7 +216,7 @@ class Map {
 
             auto [x, y] = pos;
 
-            return x >= 0 && y >= 0 && x <= width && y <= height && map[x][y] != WALL_CHARACTER;
+            return x >= 0 && y >= 0 && x <= width && y <= height && map[x][y].c != WALL_CHARACTER;
         };
 
         LightMap generate_light_map(std::pair<int, int> camera_pos, int light_radius) {

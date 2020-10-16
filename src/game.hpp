@@ -16,7 +16,6 @@ class Game {
         Map map;
         Window main_win;
         Player player;
-        MemoryMap memory_map;
 
     public:
         Game(int screen_w, int screen_h) :
@@ -24,8 +23,7 @@ class Game {
             screen_h(screen_h),
             map(screen_w, screen_h),
             main_win(screen_w, screen_h, 0, 0),
-            player(screen_w / 2, screen_h / 2),
-            memory_map(screen_w, screen_h)
+            player(screen_w / 2, screen_h / 2)
         {
             log::info("Initializing player at (x, y)",
                     player.get_pos().first,player.get_pos().second);
@@ -36,9 +34,6 @@ class Game {
 
             Map newmap(screen_w, screen_h);
             map = newmap;
-
-            MemoryMap newmmap(screen_w, screen_h);
-            memory_map = newmmap;
 
             player.move_to(std::make_pair(screen_w / 2, screen_h / 2));
         }
@@ -54,13 +49,13 @@ class Game {
                     c = map.at(i, j);
 
                     if (!light_map.visible(i, j)) {
-                        if (memory_map.memoized(i, j)) {
+                        if (map.memoized(i, j)) {
                             c |= A_DIM;
                         } else {
                             c = '.' | A_DIM;
                         }
                     } else {
-                        memory_map.memoize(i, j);
+                        map.memoize(i, j);
                     }
 
                     main_win.render_char(c, i, j);
