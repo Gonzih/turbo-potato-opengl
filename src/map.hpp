@@ -29,7 +29,7 @@ class LightMap {
         std::vector<std::vector<LightLevel>> light_map;
 
         // Implementation based on this pseudo code http://www.roguebasin.com/index.php?title=Eligloscode
-        void calc_fov(float x, float y, int w, int h, std::pair<int, int> camera_pos, std::vector<std::vector<Tile>> &map, int light_radius) {
+        void calc_fov(float x, float y, int w, int h, std::pair<int, int> camera_pos, const std::vector<std::vector<Tile>> &map, int light_radius) {
             auto [camera_x, camera_y] = camera_pos;
 
             int i, tx, ty;
@@ -56,7 +56,7 @@ class LightMap {
             }
         }
     public:
-        LightMap(std::pair<int, int> camera_pos, int w, int h, std::vector<std::vector<Tile>> &map, float light_radius)
+        LightMap(std::pair<int, int> camera_pos, int w, int h, const std::vector<std::vector<Tile>> &map, float light_radius)
         : light_map(std::vector<std::vector<LightLevel>>(w, std::vector<LightLevel>(h, LightLevel::Dim)))
         {
             float x, y, fi;
