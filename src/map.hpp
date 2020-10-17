@@ -189,6 +189,17 @@ class Map {
         const bool memoized(int x, int y) { return map[x][y].memoized; }
         void memoize(int x, int y) { map[x][y].memoized = true; }
 
+        std::pair<int, int> get_random_empty_coords() {
+            int x, y;
+            for (;;) {
+                x = rand_int(0, width);
+                y = rand_int(0, height);
+                if (at(x, y) == EMPTY_SPACE_CHARACTER) {
+                    return std::make_pair(x, y);
+                }
+            }
+        }
+
         bool can_move(std::pair<int, int> pos, MovementDirection direction) {
             switch(direction) {
                 case MovementDirection::Up:
