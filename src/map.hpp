@@ -84,9 +84,6 @@ class Rect {
     public:
         int x0, y0, x1, y1;
 
-        Rect() { }
-        Rect(int a0, int b0, int a1, int b1): x0 {a0}, y0 {b0}, x1 {a1}, y1 {b1} { }
-
         int center_x() {
             return ((x1 - x0) / 2) + x0;
         }
@@ -167,13 +164,9 @@ class Map {
             log::info("Maze number of rectangles is", nrect);
             std::vector<Rect> rects;
 
-            // Make the player starting area
-            auto starting_area = Rect(width/2 - 5, height/2 -5, width/2 + 5, height/2 + 5);
-            starting_area.render(map);
-            rects.push_back(starting_area);
-            // Make each subsequent rectangle and connect to existing structure
             for (int i = 0; i < nrect; ++i) {
                 auto rect = gen_rect(width/4, height/4);
+                // renders the rectangle on the map
                 rect.render(map);
                 // connects rectangle to existing rectangles
                 rect.add_tunnel_to_existing(map, rects);
