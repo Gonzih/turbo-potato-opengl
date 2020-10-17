@@ -141,7 +141,7 @@ class Map {
         int width;
         int height;
         std::vector<std::vector<Tile>> map;
-        int nrect = 2;
+        int nrect = rand_int(8, 16);
         std::vector<Rect> rects;
 
         Rect gen_rect(int size_w_limit, int size_h_limit) {
@@ -160,9 +160,7 @@ class Map {
         }
 
         void generate_maze() {
-            nrect = rand_int(8, 16);
             log::info("Maze number of rectangles is", nrect);
-            std::vector<Rect> rects;
 
             for (int i = 0; i < nrect; ++i) {
                 auto rect = gen_rect(width/4, height/4);
