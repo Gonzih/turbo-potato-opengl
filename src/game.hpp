@@ -6,6 +6,7 @@
 #include "window.hpp"
 #include "character.hpp"
 #include "logging.hpp"
+#include "geometry.hpp"
 
 #define PLAYER_CHARACTER L"🥔"
 #define LIGHT_RADIUS 15
@@ -30,7 +31,7 @@ class Game {
 
         void init_player_pos() {
             auto player_pos =  map.get_random_empty_coords();
-            log::info("Initializing player at (x, y)", player_pos.first, player_pos.second);
+            log::info("Initializing player at (x, y)", player_pos.x, player_pos.y);
             player.move_to(player_pos);
         }
 

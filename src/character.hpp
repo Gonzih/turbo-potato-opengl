@@ -2,6 +2,7 @@
 #define TP_CHARACTER_H
 
 #include <utility>
+#include "geometry.hpp"
 
 enum CharacterType {
     NotDefined,
@@ -22,27 +23,27 @@ class Character {
 
 class Player: public Character {
     private:
-        std::pair<int, int> pos;
+        Point pos;
     public:
         Player(int x, int y) : pos(x, y) {};
 
-        void move_to(std::pair<int, int> new_pos) {
+        void move_to(Point new_pos) {
             pos = new_pos;
         }
 
         void move(MovementDirection direction) {
             switch(direction) {
                 case MovementDirection::Up:
-                    pos.second -= 1;
+                    pos.y -= 1;
                     break;
                 case MovementDirection::Down:
-                    pos.second += 1;
+                    pos.y += 1;
                     break;
                 case MovementDirection::Left:
-                    pos.first -= 1;
+                    pos.x -= 1;
                     break;
                 case MovementDirection::Right:
-                    pos.first += 1;
+                    pos.x += 1;
                     break;
                 case MovementDirection::None:
                     break;
@@ -51,8 +52,8 @@ class Player: public Character {
 
         const CharacterType type() { return CharacterType::CharacterPlayer; }
 
-        const std::pair<int, int> get_pos() { return pos; };
-        const int get_x() { return pos.first; };
-        const int get_y() { return pos.second; };
+        const Point get_pos() { return pos; };
+        const int get_x() { return pos.x; };
+        const int get_y() { return pos.y; };
 };
 #endif

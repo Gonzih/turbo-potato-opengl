@@ -6,6 +6,7 @@
 #include "random.hpp"
 #include "logging.hpp"
 #include "character.hpp"
+#include "geometry.hpp"
 
 #define WALL_CHARACTER '#'
 #define EMPTY_SPACE_CHARACTER ' '
@@ -30,13 +31,11 @@ class LightMap {
         std::vector<std::vector<LightLevel>> light_map;
 
         // Implementation based on this pseudo code http://www.roguebasin.com/index.php?title=Eligloscode
-        void calc_fov(float x, float y, int w, int h, std::pair<int, int> camera_pos, const std::vector<std::vector<Tile>> &map, int light_radius) {
-            auto [camera_x, camera_y] = camera_pos;
-
+        void calc_fov(float x, float y, int w, int h, Point camera_pos, const std::vector<std::vector<Tile>> &map, int light_radius) {
             int i, tx, ty;
             float ox, oy;
-            ox = static_cast<float>(camera_x) + 0.5f;
-            oy = static_cast<float>(camera_y) + 0.5f;
+            ox = static_cast<float>(camera_pos.x) + 0.5f;
+            oy = static_cast<float>(camera_pos.y) + 0.5f;
 
             for (i = 0; i < light_radius; ++i) {
                 tx = static_cast<int>(ox);
@@ -57,7 +56,7 @@ class LightMap {
             }
         }
     public:
-        LightMap(std::pair<int, int> camera_pos, int w, int h, const std::vector<std::vector<Tile>> &map, float light_radius)
+        LightMap(Point camera_pos, int w, int h, const std::vector<std::vector<Tile>> &map, float light_radius)
         : light_map(std::vector<std::vector<LightLevel>>(w, std::vector<LightLevel>(h, LightLevel::Dim)))
         {
             float x, y, fi;
@@ -78,62 +77,6 @@ class LightMap {
         LightLevel light_level(int x, int y) {
             return light_map[x][y];
         };
-};
-
-class Rect {
-    public:
-        int x0, y0, x1, y1;
-
-        int center_x() {
-            return ((x1 - x0) / 2) + x0;
-        }
-
-        int center_y() {
-            return ((y1 - y0) / 2) + y0;
-        }
-
-        void add_tunnel_to_existing(std::vector<std::vector<Tile>> &map,
-                std::vector<Rect> &existing_rects) {
-            if (existing_rects.size() > 0) {
-                // Decide which rectangle to connect to
-                // Rect rect = existing_rects[rand_int(0, existing_rects.size()) - 1]; // FIXATSOMEPOINT: segfaults
-                Rect rect = existing_rects.back();
-
-                // Calculate centers and sort
-                int centers_x[2] = { center_x(), rect.center_x() };
-                int centers_y[2] = { center_y(), rect.center_y() };
-                // hacky fix this is needed to handle different types of elbows -| and |-
-                int tunnel_y_x_index = ((centers_x[0] > centers_x[1]) && (centers_y[0] > centers_y[1])) ? 1 : 0;
-                if (centers_x[0] > centers_x[1])
-                    std::swap(centers_x[0], centers_x[1]);
-                if (centers_y[0] > centers_y[1])
-                    std::swap(centers_y[0], centers_y[1]);
-
-                // Make the horizontal part of the tunnel
-                Rect tunnel_x;
-                tunnel_x.x0 = centers_x[0];
-                tunnel_x.y0 = centers_y[0]-1;
-                tunnel_x.x1 = centers_x[1];
-                tunnel_x.y1 = centers_y[0]+1;
-                tunnel_x.render(map);
-                // Make the vertical part of the tunnel
-                Rect tunnel_y;
-                tunnel_y.x0 = centers_x[tunnel_y_x_index] - 1;
-                tunnel_y.y0 = centers_y[0];
-                tunnel_y.x1 = centers_x[tunnel_y_x_index] + 1;
-                tunnel_y.y1 = centers_y[1];
-                tunnel_y.render(map);
-            }
-        }
-
-        void render(std::vector<std::vector<Tile>> &map) {
-            // renders the rectangle on the map
-            for (int x = x0; x < x1; ++x) {
-                for (int y = y0; y < y1; ++y) {
-                    map[x][y].c = EMPTY_SPACE_CHARACTER;
-                }
-            }
-        }
 };
 
 class Map {
@@ -159,15 +102,57 @@ class Map {
             return rect;
         }
 
+        void render(Rect rect) {
+            // renders the rectangle on the map
+            for (int x = rect.x0; x < rect.x1; ++x) {
+                for (int y = rect.y0; y < rect.y1; ++y) {
+                    map[x][y].c = EMPTY_SPACE_CHARACTER;
+                }
+            }
+        }
+
+        void add_tunnel_to_existing(Rect new_rect) {
+            if (rects.size() > 0) {
+                // Decide which rectangle to connect to
+                // Rect rect = existing_rects[rand_int(0, existing_rects.size()) - 1]; // FIXATSOMEPOINT: segfaults
+                Rect rect = rects.back();
+
+                // Calculate centers and sort
+                int centers_x[2] = { center_x(new_rect), center_x(rect) };
+                int centers_y[2] = { center_y(new_rect), center_y(rect) };
+                // hacky fix this is needed to handle different types of elbows -| and |-
+                int tunnel_y_x_index = ((centers_x[0] > centers_x[1]) && (centers_y[0] > centers_y[1])) ? 1 : 0;
+                if (centers_x[0] > centers_x[1])
+                    std::swap(centers_x[0], centers_x[1]);
+                if (centers_y[0] > centers_y[1])
+                    std::swap(centers_y[0], centers_y[1]);
+
+                // Make the horizontal part of the tunnel
+                Rect tunnel_x;
+                tunnel_x.x0 = centers_x[0];
+                tunnel_x.y0 = centers_y[0]-1;
+                tunnel_x.x1 = centers_x[1];
+                tunnel_x.y1 = centers_y[0]+1;
+                render(tunnel_x);
+                // Make the vertical part of the tunnel
+                Rect tunnel_y;
+                tunnel_y.x0 = centers_x[tunnel_y_x_index] - 1;
+                tunnel_y.y0 = centers_y[0];
+                tunnel_y.x1 = centers_x[tunnel_y_x_index] + 1;
+                tunnel_y.y1 = centers_y[1];
+                render(tunnel_y);
+            }
+        }
+
         void generate_maze() {
             log::info("Maze number of rectangles is", nrect);
 
             for (int i = 0; i < nrect; ++i) {
                 auto rect = gen_rect(width/4, height/4);
                 // renders the rectangle on the map
-                rect.render(map);
+                render(rect);
                 // connects rectangle to existing rectangles
-                rect.add_tunnel_to_existing(map, rects);
+                add_tunnel_to_existing(rect);
                 rects.push_back(rect);
             }
         }
@@ -187,30 +172,30 @@ class Map {
         const bool memoized(int x, int y) { return map[x][y].memoized; }
         void memoize(int x, int y) { map[x][y].memoized = true; }
 
-        std::pair<int, int> get_random_empty_coords() {
+        Point get_random_empty_coords() {
             int x, y;
             for (;;) {
                 x = rand_int(0, width);
                 y = rand_int(0, height);
                 if (at(x, y) == EMPTY_SPACE_CHARACTER) {
-                    return std::make_pair(x, y);
+                    return Point(x, y);
                 }
             }
         }
 
-        bool can_move(std::pair<int, int> pos, MovementDirection direction) {
+        bool can_move(Point pos, MovementDirection direction) {
             switch(direction) {
                 case MovementDirection::Up:
-                    pos.second -= 1;
+                    pos.y -= 1;
                     break;
                 case MovementDirection::Down:
-                    pos.second += 1;
+                    pos.y += 1;
                     break;
                 case MovementDirection::Left:
-                    pos.first -= 1;
+                    pos.x -= 1;
                     break;
                 case MovementDirection::Right:
-                    pos.first += 1;
+                    pos.x += 1;
                     break;
                 case MovementDirection::None:
                     break;
@@ -221,7 +206,7 @@ class Map {
             return x >= 0 && y >= 0 && x <= width && y <= height && map[x][y].c != WALL_CHARACTER;
         };
 
-        LightMap generate_light_map(std::pair<int, int> camera_pos, int light_radius) {
+        LightMap generate_light_map(Point camera_pos, int light_radius) {
             return LightMap(camera_pos, width, height, map, light_radius);
         };
 };
