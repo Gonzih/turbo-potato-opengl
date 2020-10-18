@@ -20,11 +20,11 @@ class Game {
 
     public:
         Game(int screen_w, int screen_h) :
-            screen_w(screen_w),
-            screen_h(screen_h),
-            map(screen_w, screen_h),
-            main_win(screen_w, screen_h, 0, 0),
-            player(0, 0)
+            screen_w { screen_w },
+            screen_h { screen_h },
+            map { screen_w, screen_h },
+            main_win { screen_w, screen_h, 0, 0 },
+            player { 0, 0 }
         {
             init_player_pos();
         };
@@ -38,7 +38,7 @@ class Game {
         void regen_map() {
             log::info("Regenerating map");
 
-            Map newmap(screen_w, screen_h);
+            Map newmap { screen_w, screen_h };
             map = newmap;
 
             init_player_pos();

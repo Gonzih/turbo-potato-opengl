@@ -159,9 +159,9 @@ class Map {
 
     public:
         Map(int w, int h) :
-            width(w),
-            height(h),
-            map(std::vector<std::vector<Tile>>(w, std::vector<Tile>(h, wall_tile)))
+            width { w },
+            height { h },
+            map { std::vector<std::vector<Tile>>(w, std::vector<Tile>(h, wall_tile)) }
         {
             generate_maze();
         }

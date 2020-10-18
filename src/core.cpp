@@ -29,7 +29,7 @@ int main() {
     int nh, nw;
     getmaxyx(stdscr, nh, nw);
     log::info("Starting game with width height", nw, nh);
-    auto game = Game(nw, nh);
+    Game game { nw, nh };
 
     game.loop();
 
