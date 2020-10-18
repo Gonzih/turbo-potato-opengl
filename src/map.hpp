@@ -13,7 +13,7 @@
 
 class Tile {
     public:
-        Tile(char c_): c(c_) { };
+        explicit Tile(char c_): c(c_) { };
         char c = WALL_CHARACTER;
         bool memoized = false;
     private:
@@ -56,7 +56,7 @@ class LightMap {
             }
         }
     public:
-        LightMap(Point camera_pos, int w, int h, const std::vector<std::vector<Tile>> &map, float light_radius)
+        explicit LightMap(Point camera_pos, int w, int h, const std::vector<std::vector<Tile>> &map, float light_radius)
         : light_map(std::vector<std::vector<LightLevel>>(w, std::vector<LightLevel>(h, LightLevel::Dim)))
         {
             float x, y, fi;
@@ -158,7 +158,7 @@ class Map {
         }
 
     public:
-        Map(int w, int h) :
+        explicit Map(int w, int h) :
             width { w },
             height { h },
             map { std::vector<std::vector<Tile>>(w, std::vector<Tile>(h, wall_tile)) }

@@ -19,7 +19,7 @@ class Game {
         Player player;
 
     public:
-        Game(int screen_w, int screen_h) :
+        explicit Game(int screen_w, int screen_h) :
             screen_w { screen_w },
             screen_h { screen_h },
             map { screen_w, screen_h },

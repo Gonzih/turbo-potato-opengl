@@ -5,7 +5,7 @@
 class Point {
     public:
         int x, y;
-        Point(int x, int y) : x(x), y(y) {}
+        explicit Point(int x, int y) : x(x), y(y) {}
         Point operator-(Point p)  { return Point(x - p.x, y - p.x); }
         Point operator+(Point p)  { return Point(x + p.x, y + p.x); }
 };
@@ -14,7 +14,7 @@ class Rect {
     public:
         int x0, y0, x1, y1;
         Rect() { }
-        Rect(int x0, int y0, int x1, int y1) {
+        explicit Rect(int x0, int y0, int x1, int y1) {
             assert((x1 > x0) && (y1 > x0));
         }
 };
