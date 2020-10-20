@@ -1,5 +1,4 @@
-#ifndef TP_CHARACTER_H
-#define TP_CHARACTER_H
+#pragma once
 
 #include <utility>
 #include "geometry.hpp"
@@ -56,4 +55,3 @@ class Player: public Character {
         const int get_x() { return pos.x; };
         const int get_y() { return pos.y; };
 };
-#endif

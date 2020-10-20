@@ -1,5 +1,5 @@
-#ifndef TP_LOGGING_H
-#define TP_LOGGING_H
+#pragma once
+
 #include <iostream>
 #include <fstream>
 #include <memory>
@@ -65,5 +65,3 @@ namespace log {
         logger->flush();
     }
 }
-
-#endif

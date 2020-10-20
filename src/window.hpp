@@ -1,5 +1,4 @@
-#ifndef TP_WINDOW_H
-#define TP_WINDOW_H
+#pragma once
 
 #include <ncurses.h>
 
@@ -42,5 +41,3 @@ class Window {
             delwin(win);
         };
 };
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef TP_RANDOM_H
-#define TP_RANDOM_H
+#pragma once
 
 #include <time.h>
 #include <stdlib.h>
@@ -14,5 +13,3 @@ void rand_init() {
 int rand_int(int lower, int upper) {
     return rand() % (upper - lower) + lower;
 }
-
-#endif

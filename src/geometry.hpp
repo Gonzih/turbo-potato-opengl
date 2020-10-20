@@ -1,5 +1,5 @@
-#ifndef TP_GEOMETRY_H
-#define TP_GEOMETRY_H
+#pragma once
+
 #include <assert.h>
 
 class Point {
@@ -22,5 +22,3 @@ class Rect {
 int center_x(Rect r) { return ((r.x1 - r.x0) / 2) + r.x0; }
 int center_y(Rect r) { return ((r.y1 - r.y0) / 2) + r.y0; }
 Point center(Rect r) { return Point(center_x(r), center_y(r)); }
-
-#endif

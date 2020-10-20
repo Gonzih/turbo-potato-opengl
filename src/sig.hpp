@@ -1,5 +1,4 @@
-#ifndef TP_SIG_H
-#define TP_SIG_H
+#pragma once
 
 #include <signal.h>
 #include <string.h>
@@ -28,4 +27,3 @@ void sigint_handler_init() {
    sigaction(SIGINT, &cleanup, NULL);
    sigaction(SIGSEGV, &cleanup, NULL);
 }
-#endif
