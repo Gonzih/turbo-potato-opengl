@@ -38,9 +38,7 @@ namespace ecs
 
     class Component
     {
-    private:
     public:
-        // TODO THINK ABOUT THIS BEING IN PUBLIC
         Entity* entity;
         Component() {  };
         virtual ~Component() {  };

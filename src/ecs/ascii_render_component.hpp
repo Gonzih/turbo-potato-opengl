@@ -22,8 +22,7 @@ namespace ecs::components
         { symbol = s; }
 
         void draw() override {
-            window->print(
-                    symbol,
+            window->print(symbol,
                     entity->get_component<PositionComponent>()->get_x(),
                     entity->get_component<PositionComponent>()->get_y());
         }
