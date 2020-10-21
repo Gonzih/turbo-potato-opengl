@@ -66,19 +66,13 @@ namespace ecs
         virtual ~Entity() {  };
 
         void init()
-        {
-
-        }
+        { }
 
         void update()
-        {
-            for (auto& c : components) c->update();
-        }
+        { for (auto& c : components) c->update(); }
 
         void draw()
-        {
-            for (auto& c : components) c->draw();
-        }
+        { for (auto& c : components) c->draw(); }
 
         bool is_active() const { return active; }
         void destroy() { active = false; }
@@ -95,9 +89,10 @@ namespace ecs
 
             std::shared_ptr<T> c = std::make_shared<T>();
             c->entity = this;
+            c->init();
+
             components[get_component_type_id<T>()] = c;
             component_bit_set.set(get_component_type_id<T>());
-            c->init();
 
             return c;
         }
@@ -184,6 +179,21 @@ namespace ecs
             const Point get_pos() { return pos; };
             const int get_x() { return pos.x; };
             const int get_y() { return pos.y; };
+        };
+
+        class AsciiRenderComponent : public Component
+        {
+        private:
+            std::wstring symbol;
+        public:
+            AsciiRenderComponent() : symbol { L"" } {  };
+            virtual ~AsciiRenderComponent() override {  };
+
+            void set_symbol(std::wstring s)
+            { symbol = s; }
+
+            const std::wstring get_symbol()
+            { return symbol; }
         };
     }
 };

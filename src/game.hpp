@@ -38,6 +38,8 @@ class Game {
         {
             log::info("Initailizing player");
             player->add_component<PositionComponent>();
+            player->add_component<AsciiRenderComponent>();
+            player->get_component<AsciiRenderComponent>()->set_symbol(PLAYER_CHARACTER);
             init_player_pos();
         }
 
@@ -84,7 +86,8 @@ class Game {
                 }
             }
 
-            main_win.print(PLAYER_CHARACTER,
+            main_win.print(
+                    player->get_component<AsciiRenderComponent>()->get_symbol(),
                     player->get_component<PositionComponent>()->get_x(),
                     player->get_component<PositionComponent>()->get_y());
 
