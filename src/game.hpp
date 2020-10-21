@@ -9,6 +9,7 @@
 #include "logging.hpp"
 #include "geometry.hpp"
 #include "ecs.hpp"
+#include "components.hpp"
 
 #define PLAYER_CHARACTER L"🥔"
 #define LIGHT_RADIUS 15
@@ -68,8 +69,10 @@ class Game {
             auto light_map = map.generate_light_map(player_pos, LIGHT_RADIUS);
             int c;
 
-            for (int i = 0; i < map.get_width(); ++i) {
-                for (int j = 0; j < map.get_height(); ++j) {
+            for (int i = 0; i < map.get_width(); ++i)
+            {
+                for (int j = 0; j < map.get_height(); ++j)
+                {
                     c = map.at(i, j);
 
                     if (!light_map.visible(i, j)) {
