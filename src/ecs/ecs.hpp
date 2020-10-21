@@ -40,8 +40,8 @@ namespace ecs
     {
     private:
     public:
+        // TODO THINK ABOUT THIS BEING IN PUBLIC
         Entity* entity;
-
         Component() {  };
         virtual ~Component() {  };
 
@@ -62,7 +62,7 @@ namespace ecs
         virtual ~Entity() {  };
 
         void init()
-        { }
+        { for (auto& c : components) if (c) c->init();  }
 
         void update()
         { for (auto& c : components) if (c) c->update();  }

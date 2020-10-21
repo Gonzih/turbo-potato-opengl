@@ -3,6 +3,7 @@
 #include <memory>
 
 #include "ecs.hpp"
+#include "../window.hpp"
 
 namespace ecs::components
 {
@@ -10,13 +11,22 @@ namespace ecs::components
     {
     private:
         std::wstring symbol;
+        std::shared_ptr<Window> window;
     public:
-        AsciiRenderComponent() : symbol { L"" } {  };
-        AsciiRenderComponent(std::wstring s) : symbol { s } {  };
+        AsciiRenderComponent(std::wstring s, std::shared_ptr<Window> w)
+        : symbol { s }, window { w }
+        {  };
         virtual ~AsciiRenderComponent() override {  };
 
         void set_symbol(std::wstring s)
         { symbol = s; }
+
+        void draw() override {
+            window->print(
+                    symbol,
+                    entity->get_component<PositionComponent>()->get_x(),
+                    entity->get_component<PositionComponent>()->get_y());
+        }
 
         const std::wstring get_symbol()
         { return symbol; }

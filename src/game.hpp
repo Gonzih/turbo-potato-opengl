@@ -20,7 +20,7 @@ class Game
 private:
     int screen_w, screen_h;
     Map map;
-    Window main_win;
+    std::shared_ptr<Window> main_win;
     System system;
     std::shared_ptr<Entity> player;
 
@@ -29,7 +29,7 @@ public:
         screen_w { screen_w },
         screen_h { screen_h },
         map { screen_w, screen_h },
-        main_win { screen_w, screen_h, 0, 0 },
+        main_win { std::make_shared<Window>(screen_w, screen_h, 0, 0) },
         system {  },
         player { system.add_entity() }
     { };
@@ -45,7 +45,7 @@ public:
         log::info("Initializing player at (x, y)", pos.x, pos.y);
 
         player->add_component<PositionComponent>(pos);
-        player->add_component<AsciiRenderComponent>(PLAYER_CHARACTER);
+        player->add_component<AsciiRenderComponent>(PLAYER_CHARACTER, main_win);
     }
 
     void regen_map()
@@ -63,9 +63,7 @@ public:
 
     void render()
     {
-        system.draw();
-
-        main_win.erase();
+        main_win->erase();
 
         auto player_pos = player->get_component<PositionComponent>()->get_pos();
         auto light_map = map.generate_light_map(player_pos, LIGHT_RADIUS);
@@ -87,22 +85,13 @@ public:
                     map.memoize(i, j);
                 }
 
-                main_win.render_char(c, i, j);
+                main_win->render_char(c, i, j);
             }
         }
 
-        for (auto& entity : system.get_entities())
-        {
-            if (entity->has_component<AsciiRenderComponent>() && entity->has_component<AsciiRenderComponent>())
-                main_win.print(
-                        entity->get_component<AsciiRenderComponent>()->get_symbol(),
-                        entity->get_component<PositionComponent>()->get_x(),
-                        entity->get_component<PositionComponent>()->get_y());
+        system.draw();
 
-        }
-
-
-        main_win.refresh();
+        main_win->refresh();
     }
 
     void loop()
