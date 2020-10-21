@@ -14,6 +14,7 @@ namespace ecs
             std::wstring symbol;
         public:
             AsciiRenderComponent() : symbol { L"" } {  };
+            AsciiRenderComponent(std::wstring s) : symbol { s } {  };
             virtual ~AsciiRenderComponent() override {  };
 
             void set_symbol(std::wstring s)

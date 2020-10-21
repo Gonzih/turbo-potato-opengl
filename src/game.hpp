@@ -8,7 +8,6 @@
 #include "window.hpp"
 #include "logging.hpp"
 #include "geometry.hpp"
-#include "ecs/ecs.hpp"
 #include "ecs/components.hpp"
 
 #define PLAYER_CHARACTER L"🥔"
@@ -39,8 +38,7 @@ class Game {
         {
             log::info("Initailizing player");
             player->add_component<PositionComponent>();
-            player->add_component<AsciiRenderComponent>();
-            player->get_component<AsciiRenderComponent>()->set_symbol(PLAYER_CHARACTER);
+            player->add_component<AsciiRenderComponent>(PLAYER_CHARACTER);
             init_player_pos();
         }
 

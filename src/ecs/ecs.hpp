@@ -77,11 +77,10 @@ namespace ecs
             return component_bit_set.test(get_component_type_id<T>());
         }
 
-        template <typename T>
-        std::shared_ptr<T> add_component()
+        template <typename T, typename... TArgs>
+        std::shared_ptr<T> add_component(TArgs&&... mArgs)
         {
-
-            std::shared_ptr<T> c = std::make_shared<T>();
+            std::shared_ptr<T> c = std::make_shared<T>(std::forward<TArgs>(mArgs)...);
             c->entity = this;
             c->init();
 
