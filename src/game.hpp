@@ -6,19 +6,23 @@
 
 #include "map.hpp"
 #include "window.hpp"
-#include "character.hpp"
 #include "logging.hpp"
 #include "geometry.hpp"
+#include "ecs.hpp"
 
 #define PLAYER_CHARACTER L"🥔"
 #define LIGHT_RADIUS 15
+
+using namespace ecs;
+using namespace ecs::components;
 
 class Game {
     private:
         int screen_w, screen_h;
         Map map;
         Window main_win;
-        Player player;
+        System system;
+        std::shared_ptr<Entity> player;
 
     public:
         explicit Game(int screen_w, int screen_h) :
@@ -26,18 +30,26 @@ class Game {
             screen_h { screen_h },
             map { screen_w, screen_h },
             main_win { screen_w, screen_h, 0, 0 },
-            player { 0, 0 }
-        {
-            init_player_pos();
-        };
+            system {  },
+            player { system.add_entity() }
+        { };
 
-        void init_player_pos() {
-            auto player_pos =  map.get_random_empty_coords();
-            log::info("Initializing player at (x, y)", player_pos.x, player_pos.y);
-            player.move_to(player_pos);
+        void init()
+        {
+            log::info("Initailizing player");
+            player->add_component<PositionComponent>();
+            init_player_pos();
         }
 
-        void regen_map() {
+        void init_player_pos()
+        {
+            auto player_pos =  map.get_random_empty_coords();
+            log::info("Initializing player at (x, y)", player_pos.x, player_pos.y);
+            player->get_component<PositionComponent>()->move_to(player_pos);
+        }
+
+        void regen_map()
+        {
             log::info("Regenerating map");
 
             Map newmap { screen_w, screen_h };
@@ -46,10 +58,12 @@ class Game {
             init_player_pos();
         }
 
-        void render() {
+        void render()
+        {
             main_win.erase();
 
-            auto light_map = map.generate_light_map(player.get_pos(), LIGHT_RADIUS);
+            auto player_pos = player->get_component<PositionComponent>()->get_pos();
+            auto light_map = map.generate_light_map(player_pos, LIGHT_RADIUS);
             int c;
 
             for (int i = 0; i < map.get_width(); ++i) {
@@ -71,13 +85,14 @@ class Game {
             }
 
             main_win.print(PLAYER_CHARACTER,
-                    player.get_x(),
-                    player.get_y());
+                    player->get_component<PositionComponent>()->get_x(),
+                    player->get_component<PositionComponent>()->get_y());
 
             main_win.refresh();
         }
 
-        void loop() {
+        void loop()
+        {
             int c;
             MovementDirection direction;
 
@@ -105,8 +120,8 @@ class Game {
                 if (direction == MovementDirection::None)
                     continue;
 
-                if (map.can_move(player.get_pos(), direction)) {
-                    player.move(direction);
+                if (map.can_move(player->get_component<PositionComponent>()->get_pos(), direction)) {
+                    player->get_component<PositionComponent>()->move(direction);
                     direction = MovementDirection::None;
                 }
             }

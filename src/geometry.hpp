@@ -5,7 +5,11 @@
 class Point {
     public:
         int x, y;
+
+        Point() {};
         explicit Point(int x, int y) : x(x), y(y) {}
+        virtual ~Point() {  };
+
         Point operator-(Point p)  { return Point(x - p.x, y - p.x); }
         Point operator+(Point p)  { return Point(x + p.x, y + p.x); }
 };

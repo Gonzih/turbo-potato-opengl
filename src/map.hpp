@@ -7,7 +7,7 @@
 
 #include "random.hpp"
 #include "logging.hpp"
-#include "character.hpp"
+#include "ecs.hpp"
 #include "geometry.hpp"
 
 #define WALL_CHARACTER '#'

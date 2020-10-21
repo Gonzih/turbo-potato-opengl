@@ -31,6 +31,9 @@ int main() {
     log::info("Starting game with width height", nw, nh);
     Game game { nw, nh };
 
+    log::info("Initializing game");
+    game.init();
+    log::info("Starting loop");
     game.loop();
 
     return 0;
