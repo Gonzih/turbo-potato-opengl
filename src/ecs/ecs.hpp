@@ -80,7 +80,7 @@ namespace ecs
         template <typename T, typename... TArgs>
         std::shared_ptr<T> add_component(TArgs&&... mArgs)
         {
-            std::shared_ptr<T> c = std::make_shared<T>(std::forward<TArgs>(mArgs)...);
+            std::shared_ptr<T> c = std::make_shared<T>(mArgs...);
             c->entity = this;
             c->init();
 
