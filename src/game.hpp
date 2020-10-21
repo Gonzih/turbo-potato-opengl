@@ -1,8 +1,7 @@
 #pragma once
 
 #include <ncurses.h>
-/* #include <chrono> */
-/* #include <thread> */
+#include <chrono>
 
 #include "map.hpp"
 #include "window.hpp"
@@ -55,11 +54,16 @@ class Game {
             Map newmap { screen_w, screen_h };
             map = newmap;
 
-            init_player();
+            auto pos =  map.get_random_empty_coords();
+            log::info("Initializing player at (x, y)", pos.x, pos.y);
+
+            player->get_component<PositionComponent>()->move_to(pos);
         }
 
         void render()
         {
+            /* system.draw(); */
+
             main_win.erase();
 
             auto player_pos = player->get_component<PositionComponent>()->get_pos();
@@ -104,8 +108,19 @@ class Game {
         {
             int c;
             MovementDirection direction;
+            std::chrono::time_point<std::chrono::system_clock> then = std::chrono::system_clock::now();
+            std::chrono::time_point<std::chrono::system_clock> now = std::chrono::system_clock::now();
 
             for(;;) {
+                now = std::chrono::system_clock::now();
+                auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(now - then);
+                auto ms = milliseconds.count();
+
+                if (ms > 100) {
+                    /* system.update(); */
+                    then = now;
+                }
+
                 system.collect_garbage();
                 render();
                 c = getch();
