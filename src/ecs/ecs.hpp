@@ -99,8 +99,6 @@ namespace ecs
             auto ptr = components[get_component_type_id<T>()];
             return std::static_pointer_cast<T>(ptr);
         }
-
-
     };
 
     class System
