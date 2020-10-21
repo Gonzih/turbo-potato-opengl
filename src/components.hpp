@@ -8,10 +8,6 @@ namespace ecs
 {
     namespace components
     {
-        // Position component
-        // Handle input component
-        /* class */
-
         class PositionComponent : public Component
         {
         private:
