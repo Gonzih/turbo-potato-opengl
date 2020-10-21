@@ -2,7 +2,8 @@
 
 #include <memory>
 
-#include "geometry.hpp"
+#include "../geometry.hpp"
+#include "movement.hpp"
 
 namespace ecs
 {

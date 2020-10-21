@@ -8,10 +8,6 @@
 #include <iostream>
 #include <algorithm>
 
-enum class MovementDirection {
-    None, Up, Down, Left, Right
-};
-
 namespace ecs
 {
     constexpr std::size_t maxComponents = 32;

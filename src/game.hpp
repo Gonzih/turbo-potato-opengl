@@ -8,8 +8,8 @@
 #include "window.hpp"
 #include "logging.hpp"
 #include "geometry.hpp"
-#include "ecs.hpp"
-#include "components.hpp"
+#include "ecs/ecs.hpp"
+#include "ecs/components.hpp"
 
 #define PLAYER_CHARACTER L"🥔"
 #define LIGHT_RADIUS 15
