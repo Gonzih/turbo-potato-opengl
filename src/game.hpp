@@ -36,17 +36,16 @@ class Game {
 
         void init()
         {
-            log::info("Initailizing player");
-            player->add_component<PositionComponent>();
-            player->add_component<AsciiRenderComponent>(PLAYER_CHARACTER);
-            init_player_pos();
+            init_player();
         }
 
-        void init_player_pos()
+        void init_player()
         {
-            auto player_pos =  map.get_random_empty_coords();
-            log::info("Initializing player at (x, y)", player_pos.x, player_pos.y);
-            player->get_component<PositionComponent>()->move_to(player_pos);
+            auto pos =  map.get_random_empty_coords();
+            log::info("Initializing player at (x, y)", pos.x, pos.y);
+
+            player->add_component<PositionComponent>(pos);
+            player->add_component<AsciiRenderComponent>(PLAYER_CHARACTER);
         }
 
         void regen_map()
@@ -56,7 +55,7 @@ class Game {
             Map newmap { screen_w, screen_h };
             map = newmap;
 
-            init_player_pos();
+            init_player();
         }
 
         void render()
