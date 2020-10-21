@@ -86,10 +86,16 @@ class Game {
                 }
             }
 
-            main_win.print(
-                    player->get_component<AsciiRenderComponent>()->get_symbol(),
-                    player->get_component<PositionComponent>()->get_x(),
-                    player->get_component<PositionComponent>()->get_y());
+            for (auto& entity : system.get_entities())
+            {
+                if (entity->has_component<AsciiRenderComponent>() && entity->has_component<AsciiRenderComponent>())
+                    main_win.print(
+                            entity->get_component<AsciiRenderComponent>()->get_symbol(),
+                            entity->get_component<PositionComponent>()->get_x(),
+                            entity->get_component<PositionComponent>()->get_y());
+
+            }
+
 
             main_win.refresh();
         }
@@ -100,6 +106,7 @@ class Game {
             MovementDirection direction;
 
             for(;;) {
+                system.collect_garbage();
                 render();
                 c = getch();
                 switch(c) {

@@ -108,10 +108,15 @@ namespace ecs
         {
             for (auto& e : entities) e->update();
         }
+
         void draw()
         {
             for (auto& e : entities) e->draw();
         }
+
+        std::vector<std::shared_ptr<Entity>> get_entities() const
+        { return entities; }
+
         void collect_garbage()
         {
             entities.erase(
