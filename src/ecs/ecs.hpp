@@ -8,6 +8,8 @@
 #include <iostream>
 #include <algorithm>
 
+#include "../logging.hpp"
+
 namespace ecs
 {
     constexpr std::size_t maxComponents = 32;
@@ -63,10 +65,10 @@ namespace ecs
         { }
 
         void update()
-        { for (auto& c : components) c->update(); }
+        { for (auto& c : components) if (c) c->update();  }
 
         void draw()
-        { for (auto& c : components) c->draw(); }
+        { for (auto& c : components) if (c) c->draw(); }
 
         bool is_active() const { return active; }
         void destroy() { active = false; }

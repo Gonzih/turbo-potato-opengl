@@ -62,7 +62,7 @@ class Game {
 
         void render()
         {
-            /* system.draw(); */
+            system.draw();
 
             main_win.erase();
 
@@ -117,7 +117,7 @@ class Game {
                 auto ms = milliseconds.count();
 
                 if (ms > 100) {
-                    /* system.update(); */
+                    system.update();
                     then = now;
                 }
 
