@@ -13,14 +13,13 @@ namespace ecs::components
     private:
         std::wstring symbol;
         std::shared_ptr<Window> window;
-        std::weak_ptr<Entity> levels;
         bool respect_light_map = true;
     public:
-        AsciiRenderComponent(std::wstring s, std::shared_ptr<Window> w, std::weak_ptr<Entity> l)
-        : symbol { s }, window { w }, levels { l }
+        AsciiRenderComponent(std::wstring s, std::shared_ptr<Window> w)
+        : symbol { s }, window { w }
         {  };
-        AsciiRenderComponent(std::wstring s, std::shared_ptr<Window> w, std::weak_ptr<Entity> l, bool resp)
-        : symbol { s }, window { w }, levels { l }, respect_light_map { resp }
+        AsciiRenderComponent(std::wstring s, std::shared_ptr<Window> w, bool resp)
+        : symbol { s }, window { w }, respect_light_map { resp }
         {  };
         virtual ~AsciiRenderComponent() override {  };
 
@@ -34,7 +33,7 @@ namespace ecs::components
 
         void draw() override {
             auto pos = m_entity->get_component<PositionComponent>()->get_pos();
-            bool visible = levels.lock()->get_component<LevelsComponent>()->visible(pos.x, pos.y);
+            bool visible = m_reg->component<Reg::Levels, LevelsComponent>()->visible(pos.x, pos.y);
 
             if (!respect_light_map || visible)
                 window->print(symbol, pos.x, pos.y);

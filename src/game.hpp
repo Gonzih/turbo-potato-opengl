@@ -44,7 +44,7 @@ public:
         auto pos =  levels->get_component<LevelsComponent>()->get_random_empty_coords();
         logger::info("Initializing player at (x, y)", pos.x, pos.y);
         player->add_component<PositionComponent>(pos);
-        player->add_component<AsciiRenderComponent>(PLAYER_CHARACTER, main_win, levels, false);
+        player->add_component<AsciiRenderComponent>(PLAYER_CHARACTER, main_win, false);
 
         levels->get_component<LevelsComponent>()->regen_light_map();
 
@@ -60,7 +60,7 @@ public:
             logger::info("Initializing enemy at (x, y)", pos.x, pos.y);
 
             enemy->add_component<PositionComponent>(pos);
-            enemy->add_component<AsciiRenderComponent>(RAT_CHARACTER, main_win, levels);
+            enemy->add_component<AsciiRenderComponent>(RAT_CHARACTER, main_win);
         }
     }
 
