@@ -9,6 +9,7 @@
 #include <algorithm>
 
 #include "../logging.hpp"
+#include "registry_keys.hpp"
 
 namespace ecs
 {
@@ -17,6 +18,7 @@ namespace ecs
     class Entity;
     class Component;
     class System;
+    class Registry;
 
     using ComponentTypeID = size_t;
 
@@ -134,5 +136,48 @@ namespace ecs
             entities.push_back(e);
             return e;
         };
+    };
+
+    inline size_t gen_reg_key()
+    {
+        static size_t id = -1;
+        return ++id;
+    }
+
+    template <size_t k>
+    inline size_t reg_key() noexcept
+    {
+        static size_t id = gen_reg_key();
+        return id;
+    }
+
+    class Registry
+    {
+    private:
+        std::vector<std::shared_ptr<Entity>> reg;
+    public:
+        Registry() = default;
+        ~Registry() = default;
+
+        template <size_t k>
+        void save(std::shared_ptr<Entity> e)
+        {
+            reg_key<k>();
+            reg.push_back(e);
+        }
+
+        template <size_t k>
+        std::shared_ptr<Entity> find()
+        {
+            size_t id = reg_key<k>();
+            return reg[id];
+        }
+
+        template <size_t k, typename T>
+        std::shared_ptr<T> component()
+        {
+            size_t id = reg_key<k>();
+            return reg[id]->get_component<T>();
+        }
     };
 };
