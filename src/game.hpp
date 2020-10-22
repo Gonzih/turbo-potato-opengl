@@ -28,7 +28,7 @@ public:
         screen_h { screen_h },
         main_win { std::make_shared<Window>(screen_w, screen_h, 0, 0) },
         reg { std::make_shared<Registry>() },
-        system {  }
+        system { reg }
     { };
 
     void init()

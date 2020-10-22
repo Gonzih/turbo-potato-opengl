@@ -42,6 +42,7 @@ namespace ecs
     {
     protected:
         Entity* m_entity;
+        std::shared_ptr<Registry> m_reg;
     public:
         Component() {  };
         virtual ~Component() {  };
@@ -52,6 +53,9 @@ namespace ecs
 
         void set_entity(Entity* e)
         { m_entity = e; }
+
+        void set_reg(std::shared_ptr<Registry> e)
+        { m_reg = e; }
     };
 
     class Entity
@@ -60,9 +64,9 @@ namespace ecs
         bool active = true;
         ComponentArray components;
         ComponentBitSet component_bit_set;
-
+        std::shared_ptr<Registry> reg;
     public:
-        Entity() {  };
+        Entity(std::shared_ptr<Registry> reg) : reg { reg } { };
         virtual ~Entity() {  };
 
         void init()
@@ -88,6 +92,7 @@ namespace ecs
         {
             std::shared_ptr<T> c = std::make_shared<T>(mArgs...);
             c->set_entity(this);
+            c->set_reg(reg);
             c->init();
 
             components[get_component_type_id<T>()] = c;
@@ -107,7 +112,11 @@ namespace ecs
     {
     private:
         std::vector<std::shared_ptr<Entity>> entities;
+        std::shared_ptr<Registry> reg;
     public:
+        System(std::shared_ptr<Registry> reg) : reg { reg } { };
+        ~System() { };
+
         void update()
         {
             for (auto& e : entities) e->update();
@@ -132,7 +141,7 @@ namespace ecs
 
         std::shared_ptr<Entity> add_entity()
         {
-            std::shared_ptr<Entity> e = std::make_shared<Entity>();
+            std::shared_ptr<Entity> e = std::make_shared<Entity>(reg);
             entities.push_back(e);
             return e;
         };
