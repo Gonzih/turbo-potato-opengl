@@ -1,4 +1,4 @@
 #pragma once
 
-#include "position_component.hpp"
-#include "ascii_render_component.hpp"
+#include "components/position.hpp"
+#include "components/ascii_render.hpp"

@@ -2,8 +2,8 @@
 
 #include <memory>
 
-#include "ecs.hpp"
-#include "../window.hpp"
+#include "../ecs.hpp"
+#include "../../window.hpp"
 
 namespace ecs::components
 {
@@ -23,8 +23,8 @@ namespace ecs::components
 
         void draw() override {
             window->print(symbol,
-                    entity->get_component<PositionComponent>()->get_x(),
-                    entity->get_component<PositionComponent>()->get_y());
+                    m_entity->get_component<PositionComponent>()->get_x(),
+                    m_entity->get_component<PositionComponent>()->get_y());
         }
 
         const std::wstring get_symbol()

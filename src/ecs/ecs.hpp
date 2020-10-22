@@ -39,7 +39,7 @@ namespace ecs
     class Component
     {
     protected:
-        Entity* entity;
+        Entity* m_entity;
     public:
         Component() {  };
         virtual ~Component() {  };
@@ -49,7 +49,7 @@ namespace ecs
         virtual void draw() { }
 
         void set_entity(Entity* e)
-        { entity = e; }
+        { m_entity = e; }
     };
 
     class Entity
