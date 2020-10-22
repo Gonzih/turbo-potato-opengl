@@ -163,13 +163,13 @@ namespace ecs
     class Registry
     {
     private:
-        std::vector<std::shared_ptr<Entity>> reg;
+        std::vector<std::weak_ptr<Entity>> reg;
     public:
         Registry() = default;
         ~Registry() = default;
 
         template <size_t k>
-        void save(std::shared_ptr<Entity> e)
+        void save(std::weak_ptr<Entity> e)
         {
             reg_key<k>();
             reg.push_back(e);
@@ -179,14 +179,17 @@ namespace ecs
         std::shared_ptr<Entity> find()
         {
             size_t id = reg_key<k>();
-            return reg[id];
+            if (auto p = reg[id].lock())
+                return p;
+            else
+                throw std::runtime_error("Could not lock shared pointer for " + std::to_string(k));
         }
 
         template <size_t k, typename T>
         std::shared_ptr<T> component()
         {
-            size_t id = reg_key<k>();
-            return reg[id]->get_component<T>();
+            std::shared_ptr<Entity> p = find<k>();
+            return p->get_component<T>();
         }
     };
 };
