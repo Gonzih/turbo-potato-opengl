@@ -5,7 +5,7 @@
 #include <memory>
 #include <mutex>
 
-namespace log {
+namespace logger {
     namespace {
         class Writer {
             private:

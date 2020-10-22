@@ -5,10 +5,10 @@
 #include <utility>
 #include <math.h>
 
-#include "random.hpp"
-#include "logging.hpp"
-#include "ecs/components/movement.hpp"
-#include "geometry.hpp"
+#include "../../../random.hpp"
+#include "../../../logging.hpp"
+#include "../movement.hpp"
+#include "../../../geometry.hpp"
 
 #define WALL_CHARACTER '#'
 #define EMPTY_SPACE_CHARACTER ' '
@@ -58,8 +58,9 @@ class LightMap {
             }
         }
     public:
+        LightMap() {};
         explicit LightMap(Point camera_pos, int w, int h, const std::vector<std::vector<Tile>> &map, float light_radius)
-        : light_map(std::vector<std::vector<LightLevel>>(w, std::vector<LightLevel>(h, LightLevel::Dim)))
+        : light_map { std::vector<std::vector<LightLevel>>(w, std::vector<LightLevel>(h, LightLevel::Dim)) }
         {
             float x, y, fi;
 
@@ -147,7 +148,7 @@ class Map {
         }
 
         void generate_maze() {
-            log::info("Maze number of rectangles is", nrect);
+            logger::info("Maze number of rectangles is", nrect);
 
             for (int i = 0; i < nrect; ++i) {
                 auto rect = gen_rect(width/4, height/4);
@@ -168,13 +169,14 @@ class Map {
             generate_maze();
         }
 
-        const int get_width() { return width; }
-        const int get_height() { return height; }
-        const char at(int x, int y) { return map[x][y].c; }
-        const bool memoized(int x, int y) { return map[x][y].memoized; }
+        const int get_width() const { return width; }
+        const int get_height() const { return height; }
+        const char at(int x, int y) const { return map[x][y].c; }
+        const bool memoized(int x, int y) const { return map[x][y].memoized; }
         void memoize(int x, int y) { map[x][y].memoized = true; }
 
-        Point get_random_empty_coords() {
+        Point get_random_empty_coords() const
+        {
             int x, y;
             for (;;) {
                 x = rand_int(0, width);
@@ -185,7 +187,8 @@ class Map {
             }
         }
 
-        bool can_move(Point pos, MovementDirection direction) {
+        bool can_move(Point pos, MovementDirection direction) const
+        {
             switch(direction) {
                 case MovementDirection::Up:
                     pos.y -= 1;

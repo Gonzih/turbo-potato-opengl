@@ -21,19 +21,19 @@ void curses_init() {
 }
 
 int main() {
-    log::init("turbo-potato.log");
+    logger::init("turbo-potato.log");
     curses_init();
     sigint_handler_init();
     rand_init();
 
     int nh, nw;
     getmaxyx(stdscr, nh, nw);
-    log::info("Starting game with width height", nw, nh);
+    logger::info("Starting game with width height", nw, nh);
     Game game { nw, nh };
 
-    log::info("Initializing game");
+    logger::info("Initializing game");
     game.init();
-    log::info("Starting loop");
+    logger::info("Starting loop");
     game.loop();
 
     return 0;
