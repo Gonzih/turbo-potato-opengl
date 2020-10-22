@@ -3,6 +3,7 @@
 #include <memory>
 
 #include "../ecs.hpp"
+#include "position.hpp"
 #include "map/map.hpp"
 
 #define LIGHT_RADIUS 15
@@ -55,7 +56,6 @@ namespace ecs::components
                         map.memoize(i, j);
                     }
 
-                    logger::info("Rendering char");
                     win->render_char(c, i, j);
                 }
             }
@@ -89,7 +89,7 @@ namespace ecs::components
 
             auto pos = get_random_empty_coords();
             logger::info("Initializing player at (x, y)", pos.x, pos.y);
-            player->get_component<PositionComponent>()->move_to(pos);
+            player.lock()->get_component<PositionComponent>()->move_to(pos);
         }
     };
 };
