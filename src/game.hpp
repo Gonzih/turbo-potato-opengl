@@ -61,7 +61,7 @@ public:
         for (int i = 0; i < n; ++i) {
             auto enemy = system.add_entity();
             auto pos =  levels->get_component<LevelsComponent>()->get_random_empty_coords();
-            logger::info("Initializing player at (x, y)", pos.x, pos.y);
+            logger::info("Initializing enemy at (x, y)", pos.x, pos.y);
 
             enemy->add_component<PositionComponent>(pos);
             enemy->add_component<AsciiRenderComponent>(RAT_CHARACTER, main_win, levels);
