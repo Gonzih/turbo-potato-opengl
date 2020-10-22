@@ -46,7 +46,7 @@ namespace ecs::components
                 {
                     c = map.at(i, j);
 
-                    if (!light_map.visible(i, j)) {
+                    if (!visible(i, j)) {
                         if (map.memoized(i, j)) {
                             c |= A_DIM;
                         } else {
@@ -78,6 +78,11 @@ namespace ecs::components
         Point get_random_empty_coords() const
         {
             return levels[current_level].get_random_empty_coords();
+        }
+
+        bool visible(int x, int y)
+        {
+            return light_map.visible(x, y);
         }
 
         void regen_current_map()

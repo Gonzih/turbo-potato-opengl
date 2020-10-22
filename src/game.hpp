@@ -9,6 +9,7 @@
 #include "ecs/components.hpp"
 
 #define PLAYER_CHARACTER L"🥔"
+#define RAT_CHARACTER L"🐀"
 
 using namespace ecs;
 using namespace ecs::components;
@@ -37,6 +38,7 @@ public:
         init_levels();
         init_player();
         levels->get_component<LevelsComponent>()->regen_light_map();
+        init_enemies();
     }
 
     void init_levels()
@@ -50,7 +52,20 @@ public:
         logger::info("Initializing player at (x, y)", pos.x, pos.y);
 
         player->add_component<PositionComponent>(pos);
-        player->add_component<AsciiRenderComponent>(PLAYER_CHARACTER, main_win);
+        player->add_component<AsciiRenderComponent>(PLAYER_CHARACTER, main_win, levels, false);
+    }
+
+    void init_enemies()
+    {
+        int n = rand_int(3, 8);
+        for (int i = 0; i < n; ++i) {
+            auto enemy = system.add_entity();
+            auto pos =  levels->get_component<LevelsComponent>()->get_random_empty_coords();
+            logger::info("Initializing player at (x, y)", pos.x, pos.y);
+
+            enemy->add_component<PositionComponent>(pos);
+            enemy->add_component<AsciiRenderComponent>(RAT_CHARACTER, main_win, levels);
+        }
     }
 
     void regen_map()
