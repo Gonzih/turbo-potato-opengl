@@ -63,7 +63,6 @@ namespace ecs::components
 
         void regen_light_map()
         {
-            logger::info("Regenerating light map");
             auto pos = player.lock()->get_component<PositionComponent>()->get_pos();
             light_map = levels[current_level].generate_light_map(pos, LIGHT_RADIUS);
         }
