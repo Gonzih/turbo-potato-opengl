@@ -39,7 +39,7 @@ public:
         reg->save<Reg::Levels>(levels);
         reg->save<Reg::Player>(player);
 
-        levels->add_component<LevelsComponent>(player, main_win, screen_w, screen_h);
+        levels->add_component<LevelsComponent>(main_win, screen_w, screen_h);
 
         auto pos =  levels->get_component<LevelsComponent>()->get_random_empty_coords();
         logger::info("Initializing player at (x, y)", pos.x, pos.y);

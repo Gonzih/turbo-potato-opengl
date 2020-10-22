@@ -15,14 +15,13 @@ namespace ecs::components
     private:
         size_t current_level = 0;
         std::vector<Map> levels;
-        std::weak_ptr<Entity> player;
         std::weak_ptr<Window> window;
         LightMap light_map;
         int width;
         int height;
     public:
-        LevelsComponent(std::weak_ptr<Entity> p, std::weak_ptr<Window> w, int width, int height)
-        : player { p }, window { w }, width { width }, height { height }
+        LevelsComponent(std::weak_ptr<Window> w, int width, int height)
+        : window { w }, width { width }, height { height }
         { };
         virtual ~LevelsComponent() override
         {  };
@@ -63,7 +62,7 @@ namespace ecs::components
 
         void regen_light_map()
         {
-            auto pos = player.lock()->get_component<PositionComponent>()->get_pos();
+            auto pos = m_reg->component<Reg::Player, PositionComponent>()->get_pos();
             light_map = levels[current_level].generate_light_map(pos, LIGHT_RADIUS);
         }
 
@@ -93,7 +92,7 @@ namespace ecs::components
 
             auto pos = get_random_empty_coords();
             logger::info("Initializing player at (x, y)", pos.x, pos.y);
-            player.lock()->get_component<PositionComponent>()->move_to(pos);
+            m_reg->component<Reg::Player, PositionComponent>()->move_to(pos);
         }
     };
 };
