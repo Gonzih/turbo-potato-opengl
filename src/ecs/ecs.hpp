@@ -87,6 +87,15 @@ namespace ecs
             return component_bit_set.test(get_component_type_id<T>());
         }
 
+        template <typename T>
+        void assert_component(std::string label) const
+        {
+            std::string name = typeid(T).name();
+            if (!has_component<T>()) {
+                throw std::runtime_error("Entity needs " + name + " component to be present for " + label + " component");
+            }
+        }
+
         template <typename T, typename... TArgs>
         std::shared_ptr<T> add_component(TArgs&&... mArgs)
         {

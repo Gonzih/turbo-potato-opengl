@@ -27,8 +27,7 @@ namespace ecs::components
         { symbol = s; }
 
         void init() override {
-            if (!m_entity->has_component<PositionComponent>())
-                throw std::runtime_error("AscriiRenderComponent requires entity to have PositionComponent also");
+            m_entity->assert_component<PositionComponent>("AsciiRenderer");
         }
 
         void draw() override {

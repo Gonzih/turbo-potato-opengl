@@ -24,9 +24,8 @@ namespace ecs::components
         : can_move_fn { f } {  };
         virtual ~MovementComponent() override {  };
 
-        void move_to(Point pos)
-        {
-            m_entity->get_component<PositionComponent>()->set_pos(pos);
+        void init() override {
+            m_entity->assert_component<PositionComponent>("AsciiRenderer");
         }
 
         void move(MovementDirection direction)
