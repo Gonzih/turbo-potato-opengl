@@ -37,39 +37,23 @@ public:
         auto levels = system.add_entity();
         auto player = system.add_entity();
 
-        std::weak_ptr<Entity> pptr = player;
-        auto get_pos_fn = [pptr] {
-            if (auto p = pptr.lock()) {
-                return p->get_component<PositionComponent>()->get_pos();
-            } else {
-                throw std::runtime_error("Could not lock player pointer for get_pos lambda");
-            }
+        auto get_pos_fn = [player] {
+            return player->get_component<PositionComponent>()->get_pos();
         };
-        auto set_pos_fn = [pptr](Point pos) {
-            if (auto p = pptr.lock()) {
-                return p->get_component<PositionComponent>()->set_pos(pos);
-            } else {
-                throw std::runtime_error("Could not lock player pointer for get_pos lambda");
-            }
+        auto set_pos_fn = [player](Point pos) {
+            return player->get_component<PositionComponent>()->set_pos(pos);
         };
 
         levels->add_component<LevelsComponent>(main_win, screen_w, screen_h, get_pos_fn, set_pos_fn);
         levels_cmp = levels->get_component<LevelsComponent>();
 
-        std::weak_ptr<LevelsComponent> lptr = levels_cmp;
-        auto can_move_fn = [lptr](Point pos, MovementDirection dir) {
-            if (auto l = lptr.lock()) {
-                return l->can_move(pos, dir);
-            } else {
-                throw std::runtime_error("Could not lock levels component pointer in can_move lambda");
-            }
+
+        auto l_cmp = levels_cmp;
+        auto can_move_fn = [l_cmp](Point pos, MovementDirection dir) {
+            return l_cmp->can_move(pos, dir);
         };
-        auto visible_fn = [lptr](int x, int y) {
-            if (auto l = lptr.lock()) {
-                return l->visible(x, y);
-            } else {
-                throw std::runtime_error("Could not lock levels component pointer in can_move lambda");
-            }
+        auto visible_fn = [l_cmp](int x, int y) {
+            return l_cmp->visible(x, y);
         };
 
         auto pos =  levels->get_component<LevelsComponent>()->get_random_empty_coords();
