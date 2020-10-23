@@ -37,6 +37,7 @@ namespace ecs::components
 
         void draw() override
         {
+            char ch;
             int c;
             Map& map = levels[current_level];
             auto win = window.lock();
@@ -45,7 +46,8 @@ namespace ecs::components
             {
                 for (int j = 0; j < map.get_height(); ++j)
                 {
-                    c = map.at(i, j);
+                    ch = map.at(i, j);
+                    c = ch;
 
                     if (!visible(i, j)) {
                         if (map.memoized(i, j)) {
@@ -55,6 +57,9 @@ namespace ecs::components
                         }
                     } else {
                         map.memoize(i, j);
+
+                        if (ch == EMPTY_SPACE_CHARACTER)
+                            continue;
                     }
 
                     win->render_char(c, i, j);
