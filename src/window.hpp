@@ -10,19 +10,16 @@ class Window {
         Window(int w, int h, int x0, int y0) {
             win = newwin(h, w, y0, x0);
             box(win, 0, 0);
-            wrefresh(win);
         };
 
         void print(std::string line, int x, int y) {
             wmove(win, y, x);
             waddstr(win, line.c_str());
-            wrefresh(win);
         }
 
         void print(std::wstring line, int x, int y) {
             wmove(win, y, x);
             waddwstr(win, line.c_str());
-            wrefresh(win);
         }
 
         void erase() {
