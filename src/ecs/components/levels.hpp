@@ -63,6 +63,7 @@ namespace ecs::components
 
         void regen_light_map()
         {
+            // TODO can this be lambda
             auto pos = m_reg->component<Reg::Player, PositionComponent>()->get_pos();
             light_map = levels[current_level].generate_light_map(pos, LIGHT_RADIUS);
         }
@@ -93,6 +94,7 @@ namespace ecs::components
 
             auto pos = get_random_empty_coords();
             logger::info("Initializing player at (x, y)", pos.x, pos.y);
+            // TODO can this be lambda
             m_reg->component<Reg::Player, MovementComponent>()->move_to(pos);
         }
     };
