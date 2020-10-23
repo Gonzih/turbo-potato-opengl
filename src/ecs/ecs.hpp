@@ -9,7 +9,6 @@
 #include <algorithm>
 
 #include "../logging.hpp"
-#include "registry_keys.hpp"
 
 namespace ecs
 {
@@ -42,7 +41,6 @@ namespace ecs
     {
     protected:
         Entity* m_entity;
-        std::shared_ptr<Registry> m_reg;
     public:
         Component() {  };
         virtual ~Component() {  };
@@ -53,9 +51,6 @@ namespace ecs
 
         void set_entity(Entity* e)
         { m_entity = e; }
-
-        void set_reg(std::shared_ptr<Registry> e)
-        { m_reg = e; }
     };
 
     class Entity
@@ -64,9 +59,8 @@ namespace ecs
         bool active = true;
         ComponentArray components;
         ComponentBitSet component_bit_set;
-        std::shared_ptr<Registry> reg;
     public:
-        Entity(std::shared_ptr<Registry> reg) : reg { reg } { };
+        Entity() { };
         virtual ~Entity() {  };
 
         void init()
@@ -101,7 +95,6 @@ namespace ecs
         {
             std::shared_ptr<T> c = std::make_shared<T>(mArgs...);
             c->set_entity(this);
-            c->set_reg(reg);
             c->init();
 
             components[get_component_type_id<T>()] = c;
@@ -121,9 +114,8 @@ namespace ecs
     {
     private:
         std::vector<std::shared_ptr<Entity>> entities;
-        std::shared_ptr<Registry> reg;
     public:
-        System(std::shared_ptr<Registry> reg) : reg { reg } { };
+        System() { };
         ~System() { };
 
         void update()
@@ -150,55 +142,9 @@ namespace ecs
 
         std::shared_ptr<Entity> add_entity()
         {
-            std::shared_ptr<Entity> e = std::make_shared<Entity>(reg);
+            std::shared_ptr<Entity> e = std::make_shared<Entity>();
             entities.push_back(e);
             return e;
         };
-    };
-
-    inline size_t gen_reg_key()
-    {
-        static size_t id = -1;
-        return ++id;
-    }
-
-    template <size_t k>
-    inline size_t reg_key() noexcept
-    {
-        static size_t id = gen_reg_key();
-        return id;
-    }
-
-    class Registry
-    {
-    private:
-        std::vector<std::weak_ptr<Entity>> reg;
-    public:
-        Registry() = default;
-        ~Registry() = default;
-
-        template <size_t k>
-        void save(std::weak_ptr<Entity> e)
-        {
-            reg_key<k>();
-            reg.push_back(e);
-        }
-
-        template <size_t k>
-        std::shared_ptr<Entity> find()
-        {
-            size_t id = reg_key<k>();
-            if (auto p = reg[id].lock())
-                return p;
-            else
-                throw std::runtime_error("Could not lock shared pointer for " + std::to_string(k));
-        }
-
-        template <size_t k, typename T>
-        std::shared_ptr<T> component()
-        {
-            std::shared_ptr<Entity> p = find<k>();
-            return p->get_component<T>();
-        }
     };
 };

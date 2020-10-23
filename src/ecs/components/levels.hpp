@@ -19,9 +19,11 @@ namespace ecs::components
         LightMap light_map;
         int width;
         int height;
+        GetPosLambda get_pos_fn;
+        SetPosLambda set_pos_fn;
     public:
-        LevelsComponent(std::weak_ptr<Window> w, int width, int height)
-        : window { w }, width { width }, height { height }
+        LevelsComponent(std::weak_ptr<Window> w, int width, int height, GetPosLambda get_pos_fn, SetPosLambda set_pos_fn)
+        : window { w }, width { width }, height { height }, get_pos_fn { get_pos_fn }, set_pos_fn { set_pos_fn }
         { };
         virtual ~LevelsComponent() override
         {  };
@@ -62,8 +64,7 @@ namespace ecs::components
 
         void regen_light_map()
         {
-            // TODO can this be lambda
-            auto pos = m_reg->component<Reg::Player, PositionComponent>()->get_pos();
+            auto pos = get_pos_fn();
             light_map = levels[current_level].generate_light_map(pos, LIGHT_RADIUS);
         }
 
@@ -93,8 +94,7 @@ namespace ecs::components
 
             auto pos = get_random_empty_coords();
             logger::info("Initializing player at (x, y)", pos.x, pos.y);
-            // TODO can this be lambda
-            m_reg->component<Reg::Player, PositionComponent>()->set_pos(pos);
+            set_pos_fn(pos);
         }
     };
 };

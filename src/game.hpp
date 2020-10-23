@@ -19,7 +19,9 @@ class Game
 private:
     int screen_w, screen_h;
     std::shared_ptr<Window> main_win;
-    std::shared_ptr<Registry> reg;
+    std::shared_ptr<LevelsComponent> levels_cmp;
+    std::shared_ptr<MovementComponent> player_mvm_cmp;
+    std::shared_ptr<PositionComponent> player_pos_cmp;
     System system;
 
 public:
@@ -27,8 +29,7 @@ public:
         screen_w { screen_w },
         screen_h { screen_h },
         main_win { std::make_shared<Window>(screen_w, screen_h, 0, 0) },
-        reg { std::make_shared<Registry>() },
-        system { reg }
+        system { }
     { };
 
     void init()
@@ -36,17 +37,38 @@ public:
         auto levels = system.add_entity();
         auto player = system.add_entity();
 
-        reg->save<Reg::Levels>(levels);
-        reg->save<Reg::Player>(player);
-
-        levels->add_component<LevelsComponent>(main_win, screen_w, screen_h);
-
-        std::weak_ptr<Entity> levels_ptr = levels;
-        auto can_move_fn = [levels_ptr](Point pos, MovementDirection dir) {
-            if (auto l = levels_ptr.lock()) {
-                return l->get_component<LevelsComponent>()->can_move(pos, dir);
+        std::weak_ptr<Entity> pptr = player;
+        auto get_pos_fn = [pptr] {
+            if (auto p = pptr.lock()) {
+                return p->get_component<PositionComponent>()->get_pos();
             } else {
-                throw std::runtime_error("Could not lock levels pointer in can_move lambda");
+                throw std::runtime_error("Could not lock player pointer for get_pos lambda");
+            }
+        };
+        auto set_pos_fn = [pptr](Point pos) {
+            if (auto p = pptr.lock()) {
+                return p->get_component<PositionComponent>()->set_pos(pos);
+            } else {
+                throw std::runtime_error("Could not lock player pointer for get_pos lambda");
+            }
+        };
+
+        levels->add_component<LevelsComponent>(main_win, screen_w, screen_h, get_pos_fn, set_pos_fn);
+        levels_cmp = levels->get_component<LevelsComponent>();
+
+        std::weak_ptr<LevelsComponent> lptr = levels_cmp;
+        auto can_move_fn = [lptr](Point pos, MovementDirection dir) {
+            if (auto l = lptr.lock()) {
+                return l->can_move(pos, dir);
+            } else {
+                throw std::runtime_error("Could not lock levels component pointer in can_move lambda");
+            }
+        };
+        auto visible_fn = [lptr](int x, int y) {
+            if (auto l = lptr.lock()) {
+                return l->visible(x, y);
+            } else {
+                throw std::runtime_error("Could not lock levels component pointer in can_move lambda");
             }
         };
 
@@ -54,14 +76,17 @@ public:
         logger::info("Initializing player at (x, y)", pos.x, pos.y);
         player->add_component<PositionComponent>(pos);
         player->add_component<MovementComponent>(can_move_fn);
-        player->add_component<AsciiRenderComponent>(PLAYER_CHARACTER, main_win, false);
+        player->add_component<AsciiRenderComponent>(PLAYER_CHARACTER, main_win, visible_fn, false);
+        player_mvm_cmp = player->get_component<MovementComponent>();
+        player_pos_cmp = player->get_component<PositionComponent>();
 
         levels->get_component<LevelsComponent>()->regen_light_map();
 
-        init_enemies(levels, can_move_fn);
+
+        init_enemies(levels, can_move_fn, visible_fn);
     }
 
-    void init_enemies(std::shared_ptr<Entity> levels, CanMoveLambda can_move_fn)
+    void init_enemies(std::shared_ptr<Entity> levels, CanMoveLambda can_move_fn, VisibleLambda visible_fn)
     {
         int n = rand_int(3, 8);
         for (int i = 0; i < n; ++i) {
@@ -71,13 +96,13 @@ public:
 
             enemy->add_component<PositionComponent>(pos);
             enemy->add_component<MovementComponent>(can_move_fn);
-            enemy->add_component<AsciiRenderComponent>(RAT_CHARACTER, main_win);
+            enemy->add_component<AsciiRenderComponent>(RAT_CHARACTER, main_win, visible_fn);
         }
     }
 
     void regen_map()
     {
-        reg->component<Reg::Levels, LevelsComponent>()->regen_current_map();
+        levels_cmp->regen_current_map();
     }
 
     void render()
@@ -119,7 +144,7 @@ public:
             if (direction == MovementDirection::None)
                 continue;
 
-            reg->component<Reg::Player, MovementComponent>()->move(direction);
+            player_mvm_cmp->move(direction);
             system.update();
             direction = MovementDirection::None;
         }
