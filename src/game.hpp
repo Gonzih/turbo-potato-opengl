@@ -44,6 +44,7 @@ public:
         auto pos =  levels->get_component<LevelsComponent>()->get_random_empty_coords();
         logger::info("Initializing player at (x, y)", pos.x, pos.y);
         player->add_component<PositionComponent>(pos);
+        player->add_component<MovementComponent>();
         player->add_component<AsciiRenderComponent>(PLAYER_CHARACTER, main_win, false);
 
         levels->get_component<LevelsComponent>()->regen_light_map();
@@ -60,6 +61,7 @@ public:
             logger::info("Initializing enemy at (x, y)", pos.x, pos.y);
 
             enemy->add_component<PositionComponent>(pos);
+            enemy->add_component<MovementComponent>();
             enemy->add_component<AsciiRenderComponent>(RAT_CHARACTER, main_win);
         }
     }
@@ -111,7 +113,7 @@ public:
 
             // TODO This maybe should be moved, but would add CYCLING DEP HELL
             if (reg->component<Reg::Levels, LevelsComponent>()->can_move(reg->component<Reg::Player, PositionComponent>()->get_pos(), direction)) {
-                reg->component<Reg::Player, PositionComponent>()->move(direction);
+                reg->component<Reg::Player, MovementComponent>()->move(direction);
                 system.update();
                 direction = MovementDirection::None;
             }

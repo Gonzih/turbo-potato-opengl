@@ -4,6 +4,7 @@
 
 #include "../ecs.hpp"
 #include "position.hpp"
+#include "movement.hpp"
 #include "map/map.hpp"
 
 #define LIGHT_RADIUS 15
@@ -92,7 +93,7 @@ namespace ecs::components
 
             auto pos = get_random_empty_coords();
             logger::info("Initializing player at (x, y)", pos.x, pos.y);
-            m_reg->component<Reg::Player, PositionComponent>()->move_to(pos);
+            m_reg->component<Reg::Player, MovementComponent>()->move_to(pos);
         }
     };
 };
