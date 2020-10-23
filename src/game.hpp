@@ -41,18 +41,27 @@ public:
 
         levels->add_component<LevelsComponent>(main_win, screen_w, screen_h);
 
+        std::weak_ptr<Entity> levels_ptr = levels;
+        auto can_move_fn = [levels_ptr](Point pos, MovementDirection dir) {
+            if (auto l = levels_ptr.lock()) {
+                return l->get_component<LevelsComponent>()->can_move(pos, dir);
+            } else {
+                throw std::runtime_error("Could not lock levels pointer in can_move lambda");
+            }
+        };
+
         auto pos =  levels->get_component<LevelsComponent>()->get_random_empty_coords();
         logger::info("Initializing player at (x, y)", pos.x, pos.y);
         player->add_component<PositionComponent>(pos);
-        player->add_component<MovementComponent>();
+        player->add_component<MovementComponent>(can_move_fn);
         player->add_component<AsciiRenderComponent>(PLAYER_CHARACTER, main_win, false);
 
         levels->get_component<LevelsComponent>()->regen_light_map();
 
-        init_enemies(levels);
+        init_enemies(levels, can_move_fn);
     }
 
-    void init_enemies(std::shared_ptr<Entity> levels)
+    void init_enemies(std::shared_ptr<Entity> levels, CanMoveLambda can_move_fn)
     {
         int n = rand_int(3, 8);
         for (int i = 0; i < n; ++i) {
@@ -61,7 +70,7 @@ public:
             logger::info("Initializing enemy at (x, y)", pos.x, pos.y);
 
             enemy->add_component<PositionComponent>(pos);
-            enemy->add_component<MovementComponent>();
+            enemy->add_component<MovementComponent>(can_move_fn);
             enemy->add_component<AsciiRenderComponent>(RAT_CHARACTER, main_win);
         }
     }
