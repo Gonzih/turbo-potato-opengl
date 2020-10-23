@@ -119,13 +119,9 @@ public:
             if (direction == MovementDirection::None)
                 continue;
 
-
-            // TODO This maybe should be moved, but would add CYCLING DEP HELL
-            if (reg->component<Reg::Levels, LevelsComponent>()->can_move(reg->component<Reg::Player, PositionComponent>()->get_pos(), direction)) {
-                reg->component<Reg::Player, MovementComponent>()->move(direction);
-                system.update();
-                direction = MovementDirection::None;
-            }
+            reg->component<Reg::Player, MovementComponent>()->move(direction);
+            system.update();
+            direction = MovementDirection::None;
         }
     }
 };

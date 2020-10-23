@@ -32,23 +32,25 @@ namespace ecs::components
         void move(MovementDirection direction)
         {
             Point pos = m_entity->get_component<PositionComponent>()->get_pos();
-            switch(direction)
-            {
-                case MovementDirection::Up:
-                    pos.y -= 1;
-                    break;
-                case MovementDirection::Down:
-                    pos.y += 1;
-                    break;
-                case MovementDirection::Left:
-                    pos.x -= 1;
-                    break;
-                case MovementDirection::Right:
-                    pos.x += 1;
-                    break;
-                case MovementDirection::None:
-                    break;
-            }
+
+            if (can_move_fn(pos, direction))
+                switch(direction)
+                {
+                    case MovementDirection::Up:
+                        pos.y -= 1;
+                        break;
+                    case MovementDirection::Down:
+                        pos.y += 1;
+                        break;
+                    case MovementDirection::Left:
+                        pos.x -= 1;
+                        break;
+                    case MovementDirection::Right:
+                        pos.x += 1;
+                        break;
+                    case MovementDirection::None:
+                        break;
+                }
             m_entity->get_component<PositionComponent>()->set_pos(pos);
         }
     };
