@@ -28,19 +28,36 @@ namespace ecs::components
         virtual ~LevelsComponent() override
         {  };
 
+        void add_map()
+        {
+            size_t new_level =  levels.size();
+            logger::info("Initializing map level", new_level);
+            Map newmap { new_level, width, height };
+            levels.push_back(newmap);
+        }
+
         void init() override
         {
-            logger::info("Initializing first map");
-            Map newmap { width, height };
-            levels.push_back(newmap);
+            add_map();
         }
 
         void draw() override
         {
             char ch;
             int c;
-            Map& map = levels[current_level];
             auto win = window.lock();
+
+            Point pos = m_entity->get_component<PositionComponent>()->get_pos();
+            auto target_level = levels[current_level].stairs_at(pos);
+            Point target_pos;
+            if (target_level ==! -1) {
+                // if target level doesn't exist (going up) add it first
+                if (!(target_level < levels.size()))
+                    add_map();
+                target_pos = levels[target_level].stairs_to(current_level);
+                current_level = target_level;
+            }
+            Map& map = levels[current_level];
 
             for (int i = 0; i < map.get_width(); ++i)
             {
@@ -94,7 +111,7 @@ namespace ecs::components
         void regen_current_map()
         {
             logger::info("Regenerating current level");
-            Map newmap { width, height };
+            Map newmap { current_level, width, height };
             levels[current_level] = newmap;
 
             auto pos = get_random_empty_coords();

@@ -4,6 +4,7 @@
 #include <vector>
 #include <utility>
 #include <math.h>
+#include <unordered_map>
 
 #include "../../../random.hpp"
 #include "../../../logging.hpp"
@@ -84,8 +85,10 @@ class LightMap {
 
 class Map {
     private:
+        size_t level;
         int width;
         int height;
+        std::unordered_map<Point, size_t> stairs;
         std::vector<std::vector<Tile>> map;
         int nrect = rand_int(8, 16);
         std::vector<Rect> rects;
@@ -147,6 +150,10 @@ class Map {
             }
         }
 
+        void add_stairs(Point pos, size_t destination_level) {
+            stairs.emplace(pos, destination_level);
+        }
+
         void generate_maze() {
             logger::info("Maze number of rectangles is", nrect);
 
@@ -158,10 +165,14 @@ class Map {
                 add_tunnel_to_existing(rect);
                 rects.push_back(rect);
             }
+            add_stairs(get_random_empty_coords(), level + 1);
+            if (level != 0)
+                add_stairs(get_random_empty_coords(), level - 1);
         }
 
     public:
-        explicit Map(int w, int h) :
+        explicit Map(size_t l, int w, int h) :
+            level( l ),
             width { w },
             height { h },
             map { std::vector<std::vector<Tile>>(w, std::vector<Tile>(h, wall_tile)) }
@@ -174,6 +185,24 @@ class Map {
         const char at(int x, int y) const { return map[x][y].c; }
         const bool memoized(int x, int y) const { return map[x][y].memoized; }
         void memoize(int x, int y) { map[x][y].memoized = true; }
+
+        int stairs_at(Point pos)
+        {
+            auto level = stairs.find(pos);
+            if(level == stairs.end())
+                return -1;
+            else
+                return (*level).second;
+        }
+
+        Point stairs_to(size_t level)
+        {
+            for (auto it = stairs.begin(); it != stairs.end(); ++it) {
+                if (it->second == level)
+                    return it->first;
+            }
+            return Point(-1, -1);
+        }
 
         Point get_random_empty_coords() const
         {

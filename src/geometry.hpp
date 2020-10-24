@@ -1,5 +1,8 @@
 #pragma once
 
+#include <functional>
+#include <utility>
+#include <cstdint>
 #include <assert.h>
 
 class Point {
@@ -12,6 +15,14 @@ class Point {
 
         Point operator-(Point p)  { return Point(x - p.x, y - p.x); }
         Point operator+(Point p)  { return Point(x + p.x, y + p.x); }
+        bool operator==(const Point& p)  { return (x == p.x) && (y == p.y); }
+        // taken from https://stackoverflow.com/questions/20590656/error-for-hash-function-of-pair-of-ints
+        size_t operator()(const Point &p) const{
+            uintmax_t hash = std::hash<int>{}(p.x);
+            hash <<= sizeof(uintmax_t) * 4;
+            hash ^= std::hash<int>{}(p.y);
+            return std::hash<uintmax_t>{}(hash);
+        }
 };
 
 class Rect {
