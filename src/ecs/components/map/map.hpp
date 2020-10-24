@@ -12,6 +12,7 @@
 #include "../../../geometry.hpp"
 
 #define WALL_CHARACTER '#'
+#define STAIR_CHARACTER '%'
 #define EMPTY_SPACE_CHARACTER ' '
 
 class Tile {
@@ -153,6 +154,7 @@ class Map {
         void add_stairs(Point pos, size_t destination_level) {
             logger::info("Generated stairs at", pos.x, pos.y);
             stairs.emplace(pos, destination_level);
+            map[pos.x][pos.y].c = STAIR_CHARACTER;
         }
 
         void generate_maze() {
