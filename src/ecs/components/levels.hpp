@@ -2,6 +2,7 @@
 
 #include <memory>
 
+#include "../../logging.hpp"
 #include "../ecs.hpp"
 #include "position.hpp"
 #include "map/map.hpp"
@@ -47,7 +48,7 @@ namespace ecs::components
             int c;
             auto win = window.lock();
 
-            Point pos = m_entity->get_component<PositionComponent>()->get_pos();
+            Point pos = get_pos_fn();
             auto target_level = levels[current_level].stairs_at(pos);
             Point target_pos;
             if (target_level ==! -1) {

@@ -151,6 +151,7 @@ class Map {
         }
 
         void add_stairs(Point pos, size_t destination_level) {
+            logger::info("Generated stairs at", pos.x, pos.y);
             stairs.emplace(pos, destination_level);
         }
 
