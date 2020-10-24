@@ -12,7 +12,6 @@ namespace ecs::components
     private:
         Point pos;
     public:
-        PositionComponent() : pos { 0, 0 } {  };
         PositionComponent(Point p) : pos { p } {  };
         PositionComponent(int x, int y) : pos { x, y } {  };
         virtual ~PositionComponent() override {  };
