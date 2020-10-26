@@ -12,6 +12,11 @@ namespace sdl
         {
             throw std::runtime_error(strcat(strdup("SDL could not initialize! SDL_Error: "), SDL_GetError()));
         }
+
+        if(!SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1"))
+        {
+            printf( "Warning: Linear texture filtering not enabled!" );
+        }
     }
 
     void init_image()
