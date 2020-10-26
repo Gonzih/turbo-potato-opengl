@@ -1,40 +1,40 @@
 #pragma once
 
-#include <ncurses.h>
+#include <SDL.h>
 
 class Window {
     private:
-        WINDOW *win;
+        //The window we'll be rendering to
+        /* int width; */
+        /* int height; */
+        SDL_Window* window = NULL;
+        //The surface contained by the window
+        SDL_Surface* screenSurface = NULL;
 
     public:
-        Window(int w, int h, int x0, int y0) {
-            win = newwin(h, w, y0, x0);
-            box(win, 0, 0);
+        Window(int w, int h)
+        /* : width { w }, height { h }, */
+        {
+            window = SDL_CreateWindow("SDL Tutorial", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h, SDL_WINDOW_SHOWN);
+
+            if (window == NULL) {
+                throw std::runtime_error(strcat(strdup("Window could not be created! SDL_Error: "), SDL_GetError()));
+            }
+
+            screenSurface = SDL_GetWindowSurface(window);
         };
 
-        void print(std::string line, int x, int y) {
-            wmove(win, y, x);
-            waddstr(win, line.c_str());
-        }
-
-        void print(std::wstring line, int x, int y) {
-            wmove(win, y, x);
-            waddwstr(win, line.c_str());
-        }
-
-        void erase() {
-            werase(win);
-        }
-
-        void refresh() {
-            wrefresh(win);
-        }
-
-        void render_char(int ch, int x, int y) {
-            mvwaddch(win, y, x, ch);
+        void render() {
+            //Fill the surface white
+            SDL_FillRect(screenSurface, NULL, SDL_MapRGB(screenSurface->format, 0, 0xFF, 0));
+            //Update the surface
+            SDL_UpdateWindowSurface(window);
+            //Wait two seconds
+            SDL_Delay(2000);
         }
 
         virtual ~Window() {
-            delwin(win);
+            //Destroy window
+            SDL_DestroyWindow(window);
         };
 };

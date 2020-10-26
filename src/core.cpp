@@ -1,40 +1,40 @@
+#include <SDL.h>
 #include <stdio.h>
+
 #include <iostream>
 #include <ncurses.h>
 #include <locale.h>
 
 #include "random.hpp"
-#include "game.hpp"
+/* #include "game.hpp" */
+#include "window.hpp"
 #include "logging.hpp"
 #include "sig.hpp"
 
 using namespace std;
 
-void curses_init() {
-    setlocale(LC_ALL,"");
-    initscr();
-    cbreak();
-    noecho();
-    nodelay(stdscr, TRUE);
-    keypad(stdscr, TRUE);
-    curs_set(0);
-}
+const int SCREEN_WIDTH = 640;
+const int SCREEN_HEIGHT = 480;
 
 int main() {
     logger::init("turbo-potato.log");
-    curses_init();
     sigint_handler_init();
     rand_init();
 
-    int nh, nw;
-    getmaxyx(stdscr, nh, nw);
-    logger::info("Starting game with width height", nw, nh);
-    Game game { nw, nh };
+    //Initialize SDL
+    if(SDL_Init(SDL_INIT_VIDEO) < 0)
+    {
+        throw std::runtime_error(strcat(strdup("SDL could not initialize! SDL_Error: "), SDL_GetError()));
+    }
 
-    logger::info("Initializing game");
-    game.init();
-    logger::info("Starting loop");
-    game.loop();
+    {
+        Window window(SCREEN_WIDTH, SCREEN_HEIGHT);
+
+        window.render();
+    }
+
+    //Quit SDL subsystems
+    SDL_Quit();
 
     return 0;
 }

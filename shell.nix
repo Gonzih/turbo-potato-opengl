@@ -8,5 +8,6 @@ in pkgs.clangStdenv.mkDerivation rec {
     clangStdenv
     clang
     ncurses
+    SDL2
   ];
 }
