@@ -48,7 +48,7 @@ namespace sdl
             explicit Renderer(SDL_Window* window, Uint32 flags)
             : m_renderer { SDL_CreateRenderer(window, -1, flags) }
             {
-                if (m_window == NULL)
+                if (window == NULL)
                 {
                     throw std::runtime_error(strcat(strdup("Cant create renderer from NULL window: "), SDL_GetError()));
                 }
@@ -157,12 +157,12 @@ namespace sdl
 
             void render()
             {
-                /* Texture texture { "preview.png", m_renderer }; */
-                /* SDL_RenderCopy(m_renderer, texture, NULL, NULL); */
-                const int SCREEN_WIDTH = 640;
-                const int SCREEN_HEIGHT = 480;
-                SDL_SetRenderDrawColor( m_renderer, 0x00, 0x00, 0xFF, 0xFF );
-                SDL_RenderDrawLine( m_renderer, 0, SCREEN_HEIGHT / 2, SCREEN_WIDTH, SCREEN_HEIGHT / 2 );
+                Texture texture { "preview.png", m_renderer };
+                SDL_RenderCopy(m_renderer, texture, NULL, NULL);
+                /* const int SCREEN_WIDTH = 640; */
+                /* const int SCREEN_HEIGHT = 480; */
+                /* SDL_SetRenderDrawColor( m_renderer, 0x00, 0x00, 0xFF, 0xFF ); */
+                /* SDL_RenderDrawLine( m_renderer, 0, SCREEN_HEIGHT / 2, SCREEN_WIDTH, SCREEN_HEIGHT / 2 ); */
             }
 
             virtual ~Window()
