@@ -9,5 +9,8 @@ in pkgs.clangStdenv.mkDerivation rec {
     clang
     ncurses
     SDL2
+    SDL2_image
+    SDL2_ttf
+    SDL2_mixer
   ];
 }
