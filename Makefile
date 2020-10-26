@@ -23,8 +23,14 @@ build-nix:
 run: build
 	./$(BIN_NAME)
 
+debug: build
+	gdb ./$(BIN_NAME)
+
 run-nix: build-nix
 	./$(BIN_NAME)
+
+debug-nix: build-nix
+	gdb ./$(BIN_NAME)
 
 shell:
 	nix-shell shell.nix
