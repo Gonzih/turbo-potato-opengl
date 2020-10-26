@@ -2,6 +2,35 @@
 
 #include <SDL.h>
 
+class Surface {
+    private:
+        SDL_Surface* surface = NULL;
+    public:
+        Surface() {};
+        Surface(SDL_Surface* surface): surface { surface } {};
+        Surface(SDL_Window* window): surface { SDL_GetWindowSurface(window) }
+        {
+            if (surface == NULL) {
+                throw std::runtime_error(strcat(strdup("Could not get surface from a window : "), SDL_GetError()));
+            }
+        };
+        Surface(const char* path): surface { SDL_LoadBMP(path) }
+        {
+            if (surface == NULL) {
+                throw std::runtime_error(strcat(strcat(strdup("Could not load surface from a file: "), path), SDL_GetError()));
+            }
+        };
+
+        virtual ~Surface()
+        {
+            SDL_FreeSurface(surface);
+        }
+
+        SDL_Surface* operator->() { return surface; }
+        SDL_Surface& operator*() { return *(surface); }
+        operator SDL_Surface*() { return surface; }
+};
+
 class Window {
     private:
         //The window we'll be rendering to
@@ -9,7 +38,7 @@ class Window {
         /* int height; */
         SDL_Window* window = NULL;
         //The surface contained by the window
-        SDL_Surface* screenSurface = NULL;
+        Surface screenSurface { };
 
     public:
         Window(int w, int h)
@@ -21,7 +50,7 @@ class Window {
                 throw std::runtime_error(strcat(strdup("Window could not be created! SDL_Error: "), SDL_GetError()));
             }
 
-            screenSurface = SDL_GetWindowSurface(window);
+            screenSurface = Surface(window);
         };
 
         void render() {
