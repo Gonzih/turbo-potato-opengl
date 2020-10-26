@@ -8,14 +8,14 @@ class Surface {
         bool auto_free = true;
     public:
         Surface() {};
-        Surface(SDL_Surface* surface): surface { surface } {};
-        Surface(SDL_Window* window): surface { SDL_GetWindowSurface(window) }, auto_free { false }
+        explicit Surface(SDL_Surface* surface): surface { surface } {};
+        explicit Surface(SDL_Window* window): surface { SDL_GetWindowSurface(window) }, auto_free { false }
         {
             if (surface == NULL) {
                 throw std::runtime_error(strcat(strdup("Could not get surface from a window : "), SDL_GetError()));
             }
         };
-        Surface(const char* path): surface { SDL_LoadBMP(path) }
+        explicit Surface(const char* path): surface { SDL_LoadBMP(path) }
         {
             if (surface == NULL) {
                 throw std::runtime_error(strcat(strcat(strdup("Could not load surface from a file: "), path), SDL_GetError()));
@@ -35,6 +35,11 @@ class Surface {
         int blit(Surface& source)
         {
             return SDL_BlitSurface(source, NULL, surface, NULL);
+        }
+
+        Surface optimize(SDL_PixelFormat* format)
+        {
+            return Surface { SDL_ConvertSurface(surface, format, 0) };
         }
 };
 
@@ -66,9 +71,9 @@ class Window {
 
         void render()
         {
-            /* Surface img { "hello_world.bmp" }; */
-            /* screenSurface.blit(img); */
-            SDL_FillRect( screenSurface, NULL, SDL_MapRGB( screenSurface->format, 0xFF, 0xFF, 0xFF ) );
+            Surface img { Surface("hello_world.bmp").optimize(screenSurface->format) };
+            screenSurface.blit(img);
+            /* SDL_FillRect( screenSurface, NULL, SDL_MapRGB( screenSurface->format, 0xFF, 0xFF, 0xFF ) ); */
             update();
         }
 
