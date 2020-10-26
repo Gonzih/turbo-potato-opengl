@@ -15,7 +15,7 @@ namespace sdl
 
         if(!SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1"))
         {
-            printf( "Warning: Linear texture filtering not enabled!" );
+            printf("Warning: Linear texture filtering not enabled!");
         }
     }
 
@@ -48,6 +48,10 @@ namespace sdl
             explicit Renderer(SDL_Window* window, Uint32 flags)
             : m_renderer { SDL_CreateRenderer(window, -1, flags) }
             {
+                if (m_window == NULL)
+                {
+                    throw std::runtime_error(strcat(strdup("Cant create renderer from NULL window: "), SDL_GetError()));
+                }
                 if (m_renderer == NULL)
                 {
                     throw std::runtime_error(strcat(strdup("Window Renderer failed to init: "), SDL_GetError()));
@@ -131,21 +135,13 @@ namespace sdl
     class Window {
         private:
             SDL_Window* m_window = NULL;
-            Renderer m_renderer { };
-            /* Surface m_surface { }; */
+            Renderer m_renderer;
 
         public:
             Window(int w, int h)
-            : m_window { SDL_CreateWindow("SDL Tutorial", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h, SDL_WINDOW_SHOWN) }
+            : m_window { SDL_CreateWindow("SDL Tutorial", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h, SDL_WINDOW_SHOWN) },
+              m_renderer { m_window, SDL_RENDERER_ACCELERATED }
             {
-                if (m_window == NULL)
-                {
-                    throw std::runtime_error(strcat(strdup("Window could not be created! SDL_Error: "), SDL_GetError()));
-                }
-
-                m_renderer = Renderer { m_window, SDL_RENDERER_ACCELERATED };
-                /* m_surface  = Surface  { m_window }; */
-
             };
 
             void clear()
