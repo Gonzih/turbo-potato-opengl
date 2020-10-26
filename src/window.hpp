@@ -5,10 +5,11 @@
 class Surface {
     private:
         SDL_Surface* surface = NULL;
+        bool auto_free = true;
     public:
         Surface() {};
         Surface(SDL_Surface* surface): surface { surface } {};
-        Surface(SDL_Window* window): surface { SDL_GetWindowSurface(window) }
+        Surface(SDL_Window* window): surface { SDL_GetWindowSurface(window) }, auto_free { false }
         {
             if (surface == NULL) {
                 throw std::runtime_error(strcat(strdup("Could not get surface from a window : "), SDL_GetError()));
@@ -23,14 +24,15 @@ class Surface {
 
         virtual ~Surface()
         {
-            SDL_FreeSurface(surface);
+            if (surface != NULL && auto_free)
+                SDL_FreeSurface(surface);
         }
 
         SDL_Surface* operator->() { return surface; }
         SDL_Surface& operator*() { return *(surface); }
         operator SDL_Surface*() { return surface; }
 
-        int blit(Surface source)
+        int blit(Surface& source)
         {
             return SDL_BlitSurface(source, NULL, surface, NULL);
         }
@@ -42,7 +44,6 @@ class Window {
         /* int width; */
         /* int height; */
         SDL_Window* window = NULL;
-        //The surface contained by the window
         Surface screenSurface { };
 
     public:
@@ -65,15 +66,15 @@ class Window {
 
         void render()
         {
-            Surface img { "snail.bmp" };
-            screenSurface.blit(img);
+            /* Surface img { "hello_world.bmp" }; */
+            /* screenSurface.blit(img); */
+            SDL_FillRect( screenSurface, NULL, SDL_MapRGB( screenSurface->format, 0xFF, 0xFF, 0xFF ) );
             update();
-
-            SDL_Delay(2000);
         }
 
-        virtual ~Window() {
-            //Destroy window
-            SDL_DestroyWindow(window);
+        virtual ~Window()
+        {
+            if (window != NULL)
+                SDL_DestroyWindow(window);
         };
 };

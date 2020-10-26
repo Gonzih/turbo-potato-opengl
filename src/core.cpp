@@ -30,10 +30,20 @@ int main() {
     {
         Window window(SCREEN_WIDTH, SCREEN_HEIGHT);
 
-        window.render();
+        SDL_Event e;
+
+        bool quit = false;
+
+        while (!quit) {
+            while (SDL_PollEvent(&e) != 0) {
+                if (e.type == SDL_QUIT)
+                    quit = true;
+            }
+
+            window.render();
+        }
     }
 
-    //Quit SDL subsystems
     SDL_Quit();
 
     return 0;
