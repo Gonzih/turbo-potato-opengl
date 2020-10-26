@@ -7,7 +7,7 @@
 
 #include "random.hpp"
 /* #include "game.hpp" */
-#include "sdl_wrappers.hpp"
+#include "sdl/sdl.hpp"
 #include "logging.hpp"
 #include "sig.hpp"
 
@@ -33,7 +33,9 @@ int main()
 
         while (!quit)
         {
+            window.clear();
             window.render();
+            window.update();
 
             while (SDL_PollEvent(&e) != 0)
             {
@@ -43,7 +45,7 @@ int main()
         }
     }
 
-    SDL_Quit();
+    sdl::quit();
 
     return 0;
 }
