@@ -141,11 +141,11 @@ namespace sdl
                 m_renderer = Renderer { m_window };
                 /* m_surface  = Surface  { m_window }; */
 
-                SDL_SetRenderDrawColor(m_renderer, 0xFF, 0xFF, 0xFF, 0xFF);
             };
 
             void clear()
             {
+                SDL_SetRenderDrawColor(m_renderer, 0xFF, 0xFF, 0xFF, 0xFF);
                 SDL_RenderClear(m_renderer);
             };
 
