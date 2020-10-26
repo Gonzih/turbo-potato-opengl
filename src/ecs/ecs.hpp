@@ -57,6 +57,7 @@ namespace ecs
     {
     private:
         bool active = true;
+        System* m_system;
         ComponentArray components;
         ComponentBitSet component_bit_set;
     public:
@@ -74,6 +75,9 @@ namespace ecs
 
         bool is_active() const { return active; }
         void destroy() { active = false; }
+
+        void set_system(System* s)
+        { m_system = s; }
 
         template <typename T>
         bool has_component() const
@@ -140,6 +144,7 @@ namespace ecs
         std::shared_ptr<Entity> add_entity()
         {
             std::shared_ptr<Entity> e = std::make_shared<Entity>();
+            e->set_system(this);
             entities.push_back(e);
             return e;
         };
