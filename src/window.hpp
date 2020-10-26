@@ -29,6 +29,11 @@ class Surface {
         SDL_Surface* operator->() { return surface; }
         SDL_Surface& operator*() { return *(surface); }
         operator SDL_Surface*() { return surface; }
+
+        int blit(Surface source)
+        {
+            return SDL_BlitSurface(source, NULL, surface, NULL);
+        }
 };
 
 class Window {
@@ -53,12 +58,17 @@ class Window {
             screenSurface = Surface(window);
         };
 
-        void render() {
-            //Fill the surface white
-            SDL_FillRect(screenSurface, NULL, SDL_MapRGB(screenSurface->format, 0, 0xFF, 0));
-            //Update the surface
+        void update()
+        {
             SDL_UpdateWindowSurface(window);
-            //Wait two seconds
+        };
+
+        void render()
+        {
+            Surface img { "snail.bmp" };
+            screenSurface.blit(img);
+            update();
+
             SDL_Delay(2000);
         }
 
