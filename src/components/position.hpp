@@ -2,8 +2,8 @@
 
 #include <memory>
 
-#include "../../geometry.hpp"
-#include "../ecs.hpp"
+#include "../ecs/ecs.hpp"
+#include "../geometry.hpp"
 
 namespace ecs::components
 {

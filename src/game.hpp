@@ -6,7 +6,7 @@
 #include "window.hpp"
 #include "logging.hpp"
 #include "geometry.hpp"
-#include "ecs/components.hpp"
+#include "components/components.hpp"
 
 #define PLAYER_CHARACTER L"🥔"
 #define RAT_CHARACTER L"🐀"

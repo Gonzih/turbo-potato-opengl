@@ -2,8 +2,8 @@
 
 #include <memory>
 
-#include "../../logging.hpp"
-#include "../ecs.hpp"
+#include "../logging.hpp"
+#include "../ecs/ecs.hpp"
 #include "position.hpp"
 #include "map/map.hpp"
 

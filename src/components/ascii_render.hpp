@@ -2,8 +2,8 @@
 
 #include <memory>
 
-#include "../ecs.hpp"
-#include "../../window.hpp"
+#include "../ecs/ecs.hpp"
+#include "../window.hpp"
 #include "levels.hpp"
 
 namespace ecs::components
