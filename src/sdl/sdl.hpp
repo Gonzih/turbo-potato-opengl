@@ -3,6 +3,7 @@
 #include <SDL.h>
 #include <SDL_image.h>
 #include <cassert>
+#include <optional>
 
 namespace sdl
 {
@@ -40,6 +41,13 @@ namespace sdl
         IMG_Quit();
         SDL_Quit();
     }
+
+    class ColorKey {
+        public:
+            int r, g, b;
+            ColorKey(int r, int g, int b)
+            : r { r }, g { g }, b { b } { };
+    };
 
     class Renderer {
         private:
@@ -84,21 +92,23 @@ namespace sdl
         public:
             Surface() {};
             explicit Surface(SDL_Surface* surface): m_surface { surface } {};
-            explicit Surface(SDL_Window* window): m_surface { SDL_GetWindowSurface(window) }, m_auto_free { false }
+            explicit Surface(SDL_Window* window, std::optional<ColorKey> ock): m_surface { SDL_GetWindowSurface(window) }, m_auto_free { false }
             {
                 if (m_surface == NULL)
                 {
                     throw std::runtime_error(strcat(strdup("Could not get m_surface from a m_window : "), SDL_GetError()));
                 }
                 set_dimensions();
+                set_color_key(ock);
             };
-            explicit Surface(std::string path): m_surface { IMG_Load(path.c_str()) }
+            explicit Surface(std::string path, std::optional<ColorKey> ock): m_surface { IMG_Load(path.c_str()) }
             {
                 if (m_surface == NULL)
                 {
                     throw std::runtime_error(strcat(strcat(strdup("Could not load m_surface from a file: "), path.c_str()), SDL_GetError()));
                 }
                 set_dimensions();
+                set_color_key(ock);
             };
 
             int get_w() { return m_width; };
@@ -123,9 +133,13 @@ namespace sdl
                 return Surface { SDL_ConvertSurface(m_surface, format, 0) };
             }
 
-            void set_color_key(int r, int g, int b)
+            void set_color_key(std::optional<ColorKey> ock)
             {
-                SDL_SetColorKey(m_surface, SDL_TRUE, SDL_MapRGB(m_surface->format, r, g, b));
+                if (ock.has_value())
+                {
+                    auto ck = ock.value();
+                    SDL_SetColorKey(m_surface, SDL_TRUE, SDL_MapRGB(m_surface->format, ck.r, ck.g, ck.b));
+                }
             }
     };
 
@@ -143,23 +157,13 @@ namespace sdl
         public:
             Texture() {};
 
-            explicit Texture(std::string path, Renderer& renderer)
-            : Texture { Surface { path }, renderer }
+            explicit Texture(std::string path, Renderer& renderer, std::optional<ColorKey> ock)
+            : Texture { Surface { path, ock }, renderer }
             { }
 
             explicit Texture(Surface surface, Renderer& renderer)
             {
                 set_dimensions(surface);
-                m_texture = SDL_CreateTextureFromSurface(renderer, surface);
-            }
-
-            explicit Texture(std::string path, Renderer& renderer, int r, int g, int b)
-            {
-                Surface surface{ path };
-                surface.set_color_key(r, g, b);
-
-                set_dimensions(surface);
-
                 m_texture = SDL_CreateTextureFromSurface(renderer, surface);
             }
 
@@ -191,26 +195,20 @@ namespace sdl
         public:
             Sprite() {};
 
-            /* Sprite(Texture& texture, int rows, int cols, int width, int height) */
-            /* : m_texture { path, renderer }, */
-            /*   m_rows { rows }, m_cols { cols }, */
-            /*   m_width { width }, m_height { height } */
-            /* { }; */
-
-            Sprite(std::string path, Renderer& renderer, int rows, int cols, int width, int height)
-            : m_texture { path, renderer },
+            Sprite(std::string path, Renderer& renderer, int rows, int cols, int width, int height, std::optional<ColorKey> ock)
+            : m_texture { path, renderer, ock },
               m_rows { rows }, m_cols { cols },
               m_width { width }, m_height { height }
             { };
 
-            void render(SDL_Renderer* renderer, int x, int y, int row, int col)
+            void render(SDL_Renderer* renderer, int x, int y, int col, int row)
             {
                 assert(row < m_rows);
                 assert(col < m_cols);
 
                 SDL_Rect clip;
                 clip.x = m_width * col;
-                clip.y = m_width * row;
+                clip.y = m_height * row;
                 clip.w = m_width;
                 clip.h = m_height;
 
@@ -263,12 +261,22 @@ namespace sdl
 
             Texture load_texture(std::string path)
             {
-                return Texture { path, m_renderer };
+                return Texture { path, m_renderer, std::nullopt };
+            }
+
+            Texture load_texture(std::string path, ColorKey ck)
+            {
+                return Texture { path, m_renderer, std::optional<ColorKey> { ck } };
             }
 
             Sprite load_sprite(std::string path, int rows, int cols, int width, int height)
             {
-                return Sprite { path, m_renderer, rows, cols, width, height };
+                return Sprite { path, m_renderer, rows, cols, width, height, std::nullopt };
+            }
+
+            Sprite load_sprite(std::string path, int rows, int cols, int width, int height, ColorKey ck)
+            {
+                return Sprite { path, m_renderer, rows, cols, width, height, std::optional<ColorKey>{ ck } };
             }
 
             void set_viewport(int x, int y, int w, int h)

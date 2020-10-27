@@ -18,8 +18,14 @@ const int SCREEN_HEIGHT = 480;
 
 void render(sdl::Window& window)
 {
-    auto sprite = window.load_sprite("sprites.png", 2, 2, 100, 100);
-    sprite.render(window.get_renderer(), 0, 0, 0, 0);
+    auto sprite = window.load_sprite("sprites.png", 2, 2, 100, 100, sdl::ColorKey { 0, 0xFF, 0xFF });
+    for (int i = 0; i < 2; ++i)
+    {
+        for (int j = 0; j < 2; ++j)
+        {
+            sprite.render(window.get_renderer(), 120 * i, 120 * j, i, j);
+        }
+    }
 }
 
 int main()
