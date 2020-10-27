@@ -23,7 +23,7 @@ void render(sdl::Window& window)
     {
         for (int j = 0; j < 2; ++j)
         {
-            sprite.render(window.get_renderer(), 120 * i, 120 * j, i, j);
+            sprite.render(window.get_renderer(), i, j, 120 * i, 120 * j);
         }
     }
 }

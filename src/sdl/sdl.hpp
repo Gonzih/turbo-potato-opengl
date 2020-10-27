@@ -201,7 +201,7 @@ namespace sdl
               m_width { width }, m_height { height }
             { };
 
-            void render(SDL_Renderer* renderer, int x, int y, int col, int row)
+            void render(SDL_Renderer* renderer, int col, int row, int x, int y)
             {
                 assert(row < m_rows);
                 assert(col < m_cols);
