@@ -2,6 +2,7 @@
 
 #include <SDL.h>
 #include <SDL_image.h>
+#include <cassert>
 
 namespace sdl
 {
@@ -168,11 +169,60 @@ namespace sdl
             int get_w() { return m_width; };
             int get_h() { return m_height; };
 
+            void render(SDL_Renderer* renderer)
+            {
+                SDL_RenderCopy(renderer, m_texture, NULL, NULL);
+            }
+
             virtual ~Texture()
             {
                 if (m_texture != NULL)
                 { SDL_DestroyTexture(m_texture); }
             }
+    };
+
+    class Sprite {
+        private:
+            Texture m_texture;
+            int m_rows = 0;
+            int m_cols = 0;
+            int m_width = 0;
+            int m_height = 0;
+        public:
+            Sprite() {};
+
+            /* Sprite(Texture& texture, int rows, int cols, int width, int height) */
+            /* : m_texture { path, renderer }, */
+            /*   m_rows { rows }, m_cols { cols }, */
+            /*   m_width { width }, m_height { height } */
+            /* { }; */
+
+            Sprite(std::string path, Renderer& renderer, int rows, int cols, int width, int height)
+            : m_texture { path, renderer },
+              m_rows { rows }, m_cols { cols },
+              m_width { width }, m_height { height }
+            { };
+
+            void render(SDL_Renderer* renderer, int x, int y, int row, int col)
+            {
+                assert(row < m_rows);
+                assert(col < m_cols);
+
+                SDL_Rect clip;
+                clip.x = m_width * col;
+                clip.y = m_width * row;
+                clip.w = m_width;
+                clip.h = m_height;
+
+                SDL_Rect renderQuad;
+                renderQuad.x = x;
+                renderQuad.y = y;
+                renderQuad.w = m_width;
+                renderQuad.h = m_height;
+
+                SDL_RenderCopy(renderer, m_texture, &clip, &renderQuad);
+            }
+
     };
 
     class Window {
@@ -190,9 +240,13 @@ namespace sdl
             {
             };
 
-            void clear()
+            void reset_viewport()
             {
                 set_viewport(0, 0, m_width, m_height);
+            }
+
+            void clear()
+            {
                 set_draw_color(0xFF, 0xFF, 0xFF, 0xFF);
                 SDL_RenderClear(m_renderer);
             };
@@ -212,14 +266,9 @@ namespace sdl
                 return Texture { path, m_renderer };
             }
 
-            Texture load_texture(std::string path, int r, int g, int b)
+            Sprite load_sprite(std::string path, int rows, int cols, int width, int height)
             {
-                return Texture { path, m_renderer, r, g, b };
-            }
-
-            void render_copy(Texture& texture)
-            {
-                SDL_RenderCopy(m_renderer, texture, NULL, NULL);
+                return Sprite { path, m_renderer, rows, cols, width, height };
             }
 
             void set_viewport(int x, int y, int w, int h)

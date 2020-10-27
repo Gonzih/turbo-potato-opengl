@@ -18,12 +18,8 @@ const int SCREEN_HEIGHT = 480;
 
 void render(sdl::Window& window)
 {
-    auto bg = window.load_texture("background.png");
-    window.render_copy(bg);
-
-    auto foo = window.load_texture("foo.png", 0, 0xFF, 0xFF);
-    window.set_viewport(SCREEN_WIDTH/2 - foo.get_w()/2, SCREEN_HEIGHT/2  - foo.get_h()/2, foo.get_w(), foo.get_h());
-    window.render_copy(foo);
+    auto sprite = window.load_sprite("sprites.png", 2, 2, 100, 100);
+    sprite.render(window.get_renderer(), 0, 0, 0, 0);
 }
 
 int main()
@@ -43,6 +39,7 @@ int main()
 
         while (!quit)
         {
+            window.reset_viewport();
             window.clear();
 
             render(window);
