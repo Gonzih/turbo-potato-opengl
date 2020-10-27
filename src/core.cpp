@@ -16,6 +16,13 @@ using namespace std;
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
 
+void render(sdl::Window& window)
+{
+    auto texture = window.load_texture("preview.png");
+    window.set_viewport(0, 0, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
+    window.render_copy(texture);
+}
+
 int main()
 {
     logger::init("turbo-potato.log");
@@ -34,7 +41,9 @@ int main()
         while (!quit)
         {
             window.clear();
-            window.render();
+
+            render(window);
+
             window.update();
 
             while (SDL_PollEvent(&e) != 0)

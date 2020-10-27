@@ -58,7 +58,6 @@ namespace sdl
                 }
             };
 
-            SDL_Renderer* operator->() { return m_renderer; }
             SDL_Renderer& operator*()  { return *(m_renderer); }
             operator SDL_Renderer*()   { return m_renderer; }
 
@@ -97,7 +96,6 @@ namespace sdl
                 { SDL_FreeSurface(m_surface); }
             }
 
-            SDL_Surface* operator->() { return m_surface; }
             SDL_Surface& operator*()  { return *(m_surface); }
             operator SDL_Surface*()   { return m_surface; }
 
@@ -121,7 +119,6 @@ namespace sdl
             : m_texture { SDL_CreateTextureFromSurface(renderer, Surface { path }) }
             { }
 
-            SDL_Texture* operator->() { return m_texture; }
             SDL_Texture& operator*()  { return *(m_texture); }
             operator SDL_Texture*()   { return m_texture; }
 
@@ -134,19 +131,23 @@ namespace sdl
 
     class Window {
         private:
+            int m_width;
+            int m_height;
             SDL_Window* m_window = NULL;
             Renderer m_renderer;
 
         public:
             Window(int w, int h)
-            : m_window { SDL_CreateWindow("SDL Tutorial", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h, SDL_WINDOW_SHOWN) },
+            : m_width { w }, m_height { h },
+              m_window { SDL_CreateWindow("SDL Tutorial", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h, SDL_WINDOW_SHOWN) },
               m_renderer { m_window, SDL_RENDERER_ACCELERATED }
             {
             };
 
             void clear()
             {
-                SDL_SetRenderDrawColor(m_renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+                set_viewport(0, 0, m_width, m_height);
+                set_draw_color(0xFF, 0xFF, 0xFF, 0xFF);
                 SDL_RenderClear(m_renderer);
             };
 
@@ -155,14 +156,34 @@ namespace sdl
                 SDL_RenderPresent(m_renderer);
             };
 
-            void render()
+            Renderer& get_renderer()
             {
-                Texture texture { "preview.png", m_renderer };
+                return m_renderer;
+            }
+
+            Texture load_texture(std::string path)
+            {
+                return Texture { path, m_renderer };
+            }
+
+            void render_copy(Texture& texture)
+            {
                 SDL_RenderCopy(m_renderer, texture, NULL, NULL);
-                /* const int SCREEN_WIDTH = 640; */
-                /* const int SCREEN_HEIGHT = 480; */
-                /* SDL_SetRenderDrawColor( m_renderer, 0x00, 0x00, 0xFF, 0xFF ); */
-                /* SDL_RenderDrawLine( m_renderer, 0, SCREEN_HEIGHT / 2, SCREEN_WIDTH, SCREEN_HEIGHT / 2 ); */
+            }
+
+            void set_viewport(int x, int y, int w, int h)
+            {
+                SDL_Rect viewport;
+                viewport.x = x;
+                viewport.y = y;
+                viewport.w = w;
+                viewport.h = h;
+                SDL_RenderSetViewport(m_renderer, &viewport);
+            }
+
+            void set_draw_color(int r, int g, int b, int a)
+            {
+                SDL_SetRenderDrawColor(m_renderer, r, g, b, a);
             }
 
             virtual ~Window()
