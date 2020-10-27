@@ -72,6 +72,14 @@ namespace sdl
         private:
             SDL_Surface* m_surface = NULL;
             bool m_auto_free = true;
+            int m_width = 0;
+            int m_height = 0;
+
+            void set_dimensions()
+            {
+                m_width = m_surface->w;
+                m_height = m_surface->h;
+            }
         public:
             Surface() {};
             explicit Surface(SDL_Surface* surface): m_surface { surface } {};
@@ -81,6 +89,7 @@ namespace sdl
                 {
                     throw std::runtime_error(strcat(strdup("Could not get m_surface from a m_window : "), SDL_GetError()));
                 }
+                set_dimensions();
             };
             explicit Surface(std::string path): m_surface { IMG_Load(path.c_str()) }
             {
@@ -88,7 +97,11 @@ namespace sdl
                 {
                     throw std::runtime_error(strcat(strcat(strdup("Could not load m_surface from a file: "), path.c_str()), SDL_GetError()));
                 }
+                set_dimensions();
             };
+
+            int get_w() { return m_width; };
+            int get_h() { return m_height; };
 
             virtual ~Surface()
             {
@@ -108,19 +121,52 @@ namespace sdl
             {
                 return Surface { SDL_ConvertSurface(m_surface, format, 0) };
             }
+
+            void set_color_key(int r, int g, int b)
+            {
+                SDL_SetColorKey(m_surface, SDL_TRUE, SDL_MapRGB(m_surface->format, r, g, b));
+            }
     };
 
     class Texture {
         private:
+            int m_height = 0;
+            int m_width = 0;
             SDL_Texture* m_texture;
+
+            void set_dimensions(Surface& surface)
+            {
+                m_width = surface.get_w();
+                m_height = surface.get_h();
+            }
         public:
             Texture() {};
+
             explicit Texture(std::string path, Renderer& renderer)
-            : m_texture { SDL_CreateTextureFromSurface(renderer, Surface { path }) }
+            : Texture { Surface { path }, renderer }
             { }
+
+            explicit Texture(Surface surface, Renderer& renderer)
+            {
+                set_dimensions(surface);
+                m_texture = SDL_CreateTextureFromSurface(renderer, surface);
+            }
+
+            explicit Texture(std::string path, Renderer& renderer, int r, int g, int b)
+            {
+                Surface surface{ path };
+                surface.set_color_key(r, g, b);
+
+                set_dimensions(surface);
+
+                m_texture = SDL_CreateTextureFromSurface(renderer, surface);
+            }
 
             SDL_Texture& operator*()  { return *(m_texture); }
             operator SDL_Texture*()   { return m_texture; }
+
+            int get_w() { return m_width; };
+            int get_h() { return m_height; };
 
             virtual ~Texture()
             {
