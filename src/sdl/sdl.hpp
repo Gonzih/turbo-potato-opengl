@@ -212,6 +212,11 @@ namespace sdl
                 return Texture { path, m_renderer };
             }
 
+            Texture load_texture(std::string path, int r, int g, int b)
+            {
+                return Texture { path, m_renderer, r, g, b };
+            }
+
             void render_copy(Texture& texture)
             {
                 SDL_RenderCopy(m_renderer, texture, NULL, NULL);
