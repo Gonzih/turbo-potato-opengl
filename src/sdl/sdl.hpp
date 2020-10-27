@@ -42,10 +42,10 @@ namespace sdl
         SDL_Quit();
     }
 
-    class ColorKey {
+    class RGB {
         public:
             int r, g, b;
-            ColorKey(int r, int g, int b)
+            RGB(int r, int g, int b)
             : r { r }, g { g }, b { b } { };
     };
 
@@ -92,7 +92,7 @@ namespace sdl
         public:
             Surface() {};
             explicit Surface(SDL_Surface* surface): m_surface { surface } {};
-            explicit Surface(SDL_Window* window, std::optional<ColorKey> ock): m_surface { SDL_GetWindowSurface(window) }, m_auto_free { false }
+            explicit Surface(SDL_Window* window, std::optional<RGB> ock): m_surface { SDL_GetWindowSurface(window) }, m_auto_free { false }
             {
                 if (m_surface == NULL)
                 {
@@ -101,7 +101,7 @@ namespace sdl
                 set_dimensions();
                 set_color_key(ock);
             };
-            explicit Surface(std::string path, std::optional<ColorKey> ock): m_surface { IMG_Load(path.c_str()) }
+            explicit Surface(std::string path, std::optional<RGB> ock): m_surface { IMG_Load(path.c_str()) }
             {
                 if (m_surface == NULL)
                 {
@@ -133,7 +133,7 @@ namespace sdl
                 return Surface { SDL_ConvertSurface(m_surface, format, 0) };
             }
 
-            void set_color_key(std::optional<ColorKey> ock)
+            void set_color_key(std::optional<RGB> ock)
             {
                 if (ock.has_value())
                 {
@@ -157,7 +157,7 @@ namespace sdl
         public:
             Texture() {};
 
-            explicit Texture(std::string path, Renderer& renderer, std::optional<ColorKey> ock)
+            explicit Texture(std::string path, Renderer& renderer, std::optional<RGB> ock)
             : Texture { Surface { path, ock }, renderer }
             { }
 
@@ -178,6 +178,11 @@ namespace sdl
                 SDL_RenderCopy(renderer, m_texture, NULL, NULL);
             }
 
+            void set_color_mod(RGB rgb)
+            {
+                SDL_SetTextureColorMod(m_texture, rgb.r, rgb.g, rgb.b);
+            }
+
             virtual ~Texture()
             {
                 if (m_texture != NULL)
@@ -195,7 +200,7 @@ namespace sdl
         public:
             Sprite() {};
 
-            Sprite(std::string path, Renderer& renderer, int rows, int cols, int width, int height, std::optional<ColorKey> ock)
+            Sprite(std::string path, Renderer& renderer, int rows, int cols, int width, int height, std::optional<RGB> ock)
             : m_texture { path, renderer, ock },
               m_rows { rows }, m_cols { cols },
               m_width { width }, m_height { height }
@@ -221,6 +226,10 @@ namespace sdl
                 SDL_RenderCopy(renderer, m_texture, &clip, &renderQuad);
             }
 
+            void set_color_mod(RGB rgb)
+            {
+                m_texture.set_color_mod(rgb);
+            }
     };
 
     class Window {
@@ -264,9 +273,9 @@ namespace sdl
                 return Texture { path, m_renderer, std::nullopt };
             }
 
-            Texture load_texture(std::string path, ColorKey ck)
+            Texture load_texture(std::string path, RGB ck)
             {
-                return Texture { path, m_renderer, std::optional<ColorKey> { ck } };
+                return Texture { path, m_renderer, std::optional<RGB> { ck } };
             }
 
             Sprite load_sprite(std::string path, int rows, int cols, int width, int height)
@@ -274,9 +283,9 @@ namespace sdl
                 return Sprite { path, m_renderer, rows, cols, width, height, std::nullopt };
             }
 
-            Sprite load_sprite(std::string path, int rows, int cols, int width, int height, ColorKey ck)
+            Sprite load_sprite(std::string path, int rows, int cols, int width, int height, RGB ck)
             {
-                return Sprite { path, m_renderer, rows, cols, width, height, std::optional<ColorKey>{ ck } };
+                return Sprite { path, m_renderer, rows, cols, width, height, std::optional<RGB>{ ck } };
             }
 
             void set_viewport(int x, int y, int w, int h)
