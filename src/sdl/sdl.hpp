@@ -187,6 +187,16 @@ namespace sdl
                 SDL_SetTextureColorMod(m_texture, rgb.r, rgb.g, rgb.b);
             }
 
+            void set_blend_mode(SDL_BlendMode blending)
+            {
+                SDL_SetTextureBlendMode(m_texture, blending);
+            }
+
+            void set_alpha(Uint8 alpha)
+            {
+                SDL_SetTextureAlphaMod(m_texture, alpha);
+            }
+
             virtual ~Texture()
             {
                 if (m_texture != NULL)
@@ -234,6 +244,16 @@ namespace sdl
             void set_color_mod(RGB rgb)
             {
                 m_texture.set_color_mod(rgb);
+            }
+
+            void set_blend_mode(SDL_BlendMode blending)
+            {
+                m_texture.set_blend_mode(blending);
+            }
+
+            void set_alpha(Uint8 alpha)
+            {
+                m_texture.set_alpha(alpha);
             }
     };
 
