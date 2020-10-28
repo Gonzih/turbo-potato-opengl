@@ -21,13 +21,19 @@ void render(sdl::Window& window)
     static int frame = 0;
     ++frame;
 
+    static double degrees = 0;
+    ++degrees;
+
+    if (degrees == 360)
+        degrees = 0;
+
     int f = frame / 5;
     if (f == 4) {
         frame = 0;
         f = 0;
     }
     auto sprite = window.load_sprite("foo.png", 1, 4, 64, 205, sdl::RGB { 0, 0xFF, 0xFF });
-    sprite.render(window.get_renderer(), f, 0, 120, 120);
+    sprite.render(window.get_renderer(), f, 0, 120, 120, degrees, NULL, SDL_FLIP_VERTICAL);
 }
 
 int main()

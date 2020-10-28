@@ -177,9 +177,9 @@ namespace sdl
             int get_w() { return m_width; };
             int get_h() { return m_height; };
 
-            void render(SDL_Renderer* renderer)
+            void render(SDL_Renderer* renderer, double angle = 0.0, SDL_Point* center = NULL, SDL_RendererFlip flip = SDL_FLIP_NONE)
             {
-                SDL_RenderCopy(renderer, m_texture, NULL, NULL);
+                SDL_RenderCopyEx(renderer, m_texture, NULL, NULL, angle, center, flip);
             }
 
             void set_color_mod(RGB rgb)
@@ -212,6 +212,28 @@ namespace sdl
             int m_cols = 0;
             int m_width = 0;
             int m_height = 0;
+
+            SDL_Rect clip_rect(int col, int row)
+            {
+                SDL_Rect rect;
+                rect.x = m_width * col;
+                rect.y = m_height * row;
+                rect.w = m_width;
+                rect.h = m_height;
+
+                return rect;
+            }
+
+            SDL_Rect render_rect(int x, int y)
+            {
+                SDL_Rect rect;
+                rect.x = x;
+                rect.y = y;
+                rect.w = m_width;
+                rect.h = m_height;
+
+                return rect;
+            }
         public:
             Sprite() {}
 
@@ -221,24 +243,15 @@ namespace sdl
               m_width { width }, m_height { height }
             { }
 
-            void render(SDL_Renderer* renderer, int col, int row, int x, int y)
+            void render(SDL_Renderer* renderer, int col, int row, int x, int y, double angle = 0.0, SDL_Point* center = NULL, SDL_RendererFlip flip = SDL_FLIP_NONE)
             {
                 assert(row < m_rows);
                 assert(col < m_cols);
 
-                SDL_Rect clip;
-                clip.x = m_width * col;
-                clip.y = m_height * row;
-                clip.w = m_width;
-                clip.h = m_height;
+                auto clip = clip_rect(col, row);
+                auto renderQuad = render_rect(x, y);
 
-                SDL_Rect renderQuad;
-                renderQuad.x = x;
-                renderQuad.y = y;
-                renderQuad.w = m_width;
-                renderQuad.h = m_height;
-
-                SDL_RenderCopy(renderer, m_texture, &clip, &renderQuad);
+                SDL_RenderCopyEx(renderer, m_texture, &clip, &renderQuad, angle, center, flip);
             }
 
             void set_color_mod(RGB rgb)
