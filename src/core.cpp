@@ -18,18 +18,16 @@ const int SCREEN_HEIGHT = 480;
 
 void render(sdl::Window& window)
 {
-    auto sprite = window.load_sprite("sprites.png", 2, 2, 100, 100, sdl::RGB { 0, 0xFF, 0xFF });
-    sprite.set_blend_mode(SDL_BLENDMODE_BLEND);
-    sprite.set_alpha(100);
-    /* sprite.set_color_mod(sdl::RGB { 128, 0xFF, 0xFF }); */
+    static int frame = 0;
+    ++frame;
 
-    for (int i = 0; i < 2; ++i)
-    {
-        for (int j = 0; j < 2; ++j)
-        {
-            sprite.render(window.get_renderer(), i, j, 120 * i, 120 * j);
-        }
+    int f = frame / 5;
+    if (f == 4) {
+        frame = 0;
+        f = 0;
     }
+    auto sprite = window.load_sprite("foo.png", 1, 4, 64, 205, sdl::RGB { 0, 0xFF, 0xFF });
+    sprite.render(window.get_renderer(), f, 0, 120, 120);
 }
 
 int main()

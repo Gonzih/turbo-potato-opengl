@@ -67,7 +67,7 @@ namespace sdl
                 {
                     throw std::runtime_error(strcat(strdup("Window Renderer failed to init: "), SDL_GetError()));
                 }
-            };
+            }
 
             SDL_Renderer& operator*()  { return *(m_renderer); }
             operator SDL_Renderer*()   { return m_renderer; }
@@ -93,8 +93,8 @@ namespace sdl
                 m_height = m_surface->h;
             }
         public:
-            Surface() {};
-            explicit Surface(SDL_Surface* surface): m_surface { surface } {};
+            Surface() {}
+            explicit Surface(SDL_Surface* surface): m_surface { surface } {}
             explicit Surface(SDL_Window* window, std::optional<RGB> ock): m_surface { SDL_GetWindowSurface(window) }, m_auto_free { false }
             {
                 if (m_surface == NULL)
@@ -103,7 +103,7 @@ namespace sdl
                 }
                 set_dimensions();
                 set_color_key(ock);
-            };
+            }
             explicit Surface(std::string path, std::optional<RGB> ock): m_surface { IMG_Load(path.c_str()) }
             {
                 if (m_surface == NULL)
@@ -112,7 +112,7 @@ namespace sdl
                 }
                 set_dimensions();
                 set_color_key(ock);
-            };
+            }
 
             int get_w() { return m_width; };
             int get_h() { return m_height; };
@@ -159,7 +159,7 @@ namespace sdl
                 m_height = surface.get_h();
             }
         public:
-            Texture() {};
+            Texture() {}
 
             explicit Texture(std::string path, Renderer& renderer, std::optional<RGB> ock)
             : Texture { Surface { path, ock }, renderer }
@@ -213,13 +213,13 @@ namespace sdl
             int m_width = 0;
             int m_height = 0;
         public:
-            Sprite() {};
+            Sprite() {}
 
             Sprite(std::string path, Renderer& renderer, int rows, int cols, int width, int height, std::optional<RGB> ock)
             : m_texture { path, renderer, ock },
               m_rows { rows }, m_cols { cols },
               m_width { width }, m_height { height }
-            { };
+            { }
 
             void render(SDL_Renderer* renderer, int col, int row, int x, int y)
             {
@@ -269,9 +269,8 @@ namespace sdl
             Window(int w, int h)
             : m_width { w }, m_height { h },
               m_window { SDL_CreateWindow("SDL Tutorial", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h, SDL_WINDOW_SHOWN) },
-              m_renderer { m_window, SDL_RENDERER_ACCELERATED }
-            {
-            };
+              m_renderer { m_window, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC }
+            { }
 
             void reset_viewport()
             {
@@ -282,12 +281,12 @@ namespace sdl
             {
                 set_draw_color(0xFF, 0xFF, 0xFF, 0xFF);
                 SDL_RenderClear(m_renderer);
-            };
+            }
 
             void update()
             {
                 SDL_RenderPresent(m_renderer);
-            };
+            }
 
             Renderer& get_renderer()
             {
@@ -333,6 +332,6 @@ namespace sdl
             {
                 if (m_window != NULL)
                 { SDL_DestroyWindow(m_window); }
-            };
+            }
     };
 }
