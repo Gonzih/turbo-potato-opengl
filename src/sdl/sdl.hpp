@@ -42,14 +42,16 @@ namespace sdl
         SDL_Quit();
     }
 
-    class RGB {
+    class RGB
+    {
         public:
-            int r, g, b;
-            RGB(int r, int g, int b)
+            Uint8 r, g, b;
+            RGB(Uint8 r, Uint8 g, Uint8 b)
             : r { r }, g { g }, b { b } { };
     };
 
-    class Renderer {
+    class Renderer
+    {
         private:
             SDL_Renderer* m_renderer;
         public:
@@ -77,7 +79,8 @@ namespace sdl
             }
     };
 
-    class Surface {
+    class Surface
+    {
         private:
             SDL_Surface* m_surface = NULL;
             bool m_auto_free = true;
@@ -143,7 +146,8 @@ namespace sdl
             }
     };
 
-    class Texture {
+    class Texture
+    {
         private:
             int m_height = 0;
             int m_width = 0;
@@ -190,7 +194,8 @@ namespace sdl
             }
     };
 
-    class Sprite {
+    class Sprite
+    {
         private:
             Texture m_texture;
             int m_rows = 0;
@@ -232,7 +237,8 @@ namespace sdl
             }
     };
 
-    class Window {
+    class Window
+    {
         private:
             int m_width;
             int m_height;
