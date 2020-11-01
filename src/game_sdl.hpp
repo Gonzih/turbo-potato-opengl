@@ -1,6 +1,7 @@
 #pragma once
 
 #include "logging.hpp"
+#include "geometry.hpp"
 #include "sdl/sdl.hpp"
 #include "ecs/ecs.hpp"
 #include "components/components.hpp"
@@ -13,20 +14,29 @@ class Game
 private:
     int screen_width;
     int screen_height;
-    sdl::Window window;
+    std::shared_ptr<sdl::Window> window;
     System system;
 
 public:
     Game(int screen_width, int screen_height) :
         screen_width { screen_width },
         screen_height { screen_height },
-        window { screen_width, screen_height }
+        window { std::make_shared<sdl::Window>(screen_width, screen_height) }
     { };
 
     void init()
     {
+
         logger::info("Starting with screen dims", screen_width, screen_height);
         auto player = system.add_entity();
+        player->add_component<PositionComponent>(Point {120, 120});
+
+        // FIXME: not sure why this doesn't work
+        // static int sprite_width = 64;
+        // static int sprite_height = 205;
+        // auto sprite = std::move(window->load_sprite("foo.png", 1, 4, sprite_width, sprite_height, sdl::RGB { 0, 0xFF, 0xFF }));
+        // player->add_component<SpriteRenderComponent>(std::move(sprite), window);
+        player->add_component<SpriteRenderComponent>(window);
     }
 
     void quit()
@@ -41,6 +51,7 @@ public:
             case SDLK_LEFT:
                 logger::info("KEY LEFT");
                 break;
+            case SDLK_RIGHT:
                 logger::info("KEY RIGHT");
                 break;
             case SDLK_UP:
@@ -54,36 +65,16 @@ public:
         }
     }
 
-    void render(sdl::Window& window)
-    {
-        static int frame = 0;
-        static int sprite_width = 64;
-        static int sprite_height = 205;
-        static int pos_x = 120;
-        static int pos_y = 120;
-
-        ++pos_x;
-        ++frame;
-        SDL_RendererFlip flip = SDL_FLIP_HORIZONTAL;
-        int f = frame / 5;
-        if (f == 4) {
-            frame = 0;
-            f = 0;
-        }
-        auto sprite = window.load_sprite("foo.png", 1, 4, sprite_width, sprite_height, sdl::RGB { 0, 0xFF, 0xFF });
-        sprite.render(window.get_renderer(), f, 0, pos_x, pos_y, 0, NULL, flip);
-    }
-
     void loop()
     {
         SDL_Event event;
         while(true)
         {
-            window.reset_viewport();
-            window.clear();
+            window->reset_viewport();
+            window->clear();
 
-            render(window);
-            window.update();
+            system.draw();
+            window->update();
 
             while (SDL_PollEvent(&event) != 0)
             {

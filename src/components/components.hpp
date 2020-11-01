@@ -9,8 +9,8 @@ enum class MovementDirection {
 };
 
 namespace ecs::components {
-    // class PositionComponent;
-    // class AsciiRenderComponent;
+    class PositionComponent;
+    class SpriteRenderComponent;
     // class LevelsComponent;
     // class MovementComponent;
 
@@ -20,7 +20,7 @@ namespace ecs::components {
     using VisibleLambda = std::function<bool(int, int)>;
 };
 
-// #include "position.hpp"
-// #include "ascii_render.hpp"
+#include "position.hpp"
+#include "sprite_render.hpp"
 // #include "levels.hpp"
 // #include "movement.hpp"
