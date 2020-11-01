@@ -9,10 +9,10 @@ enum class MovementDirection {
 };
 
 namespace ecs::components {
-    class PositionComponent;
-    class AsciiRenderComponent;
-    class LevelsComponent;
-    class MovementComponent;
+    // class PositionComponent;
+    // class AsciiRenderComponent;
+    // class LevelsComponent;
+    // class MovementComponent;
 
     using SetPosLambda = std::function<void(Point)>;
     using GetPosLambda = std::function<Point()>;
@@ -20,7 +20,7 @@ namespace ecs::components {
     using VisibleLambda = std::function<bool(int, int)>;
 };
 
-#include "components/position.hpp"
-#include "components/ascii_render.hpp"
-#include "components/levels.hpp"
-#include "components/movement.hpp"
+// #include "position.hpp"
+// #include "ascii_render.hpp"
+// #include "levels.hpp"
+// #include "movement.hpp"

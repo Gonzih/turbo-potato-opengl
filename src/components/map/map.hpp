@@ -6,10 +6,10 @@
 #include <math.h>
 #include <unordered_map>
 
-#include "../../../random.hpp"
-#include "../../../logging.hpp"
+#include "../../random.hpp"
+#include "../../logging.hpp"
 #include "../movement.hpp"
-#include "../../../geometry.hpp"
+#include "../../geometry.hpp"
 
 #define WALL_CHARACTER '#'
 #define STAIR_CHARACTER '%'

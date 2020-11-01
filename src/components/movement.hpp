@@ -3,7 +3,6 @@
 #include <memory>
 
 #include "../ecs/ecs.hpp"
-#include "../window.hpp"
 
 namespace ecs::components
 {
