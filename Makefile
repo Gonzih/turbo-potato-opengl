@@ -10,7 +10,7 @@ BIN_NAME = core
 
 default: run
 
-clean:
+clean: .clang_complete
 	rm -f ./$(BIN_NAME)
 
 build: clean
@@ -34,3 +34,6 @@ debug-nix: build-nix
 
 shell:
 	nix-shell shell.nix
+
+.clang_complete:
+	echo "$(CXXFLAGS) $(LDFLAGS)" > .clang_complete
