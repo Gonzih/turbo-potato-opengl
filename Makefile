@@ -10,10 +10,10 @@ BIN_NAME = core
 
 default: run
 
-clean: .clang_complete
-	rm -f ./$(BIN_NAME)
+clean:
+	rm -f ./$(BIN_NAME) .clang_complete
 
-build: clean
+build: clean .clang_complete
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $(BIN_NAME) src/*.cpp
 	chmod +x ./$(BIN_NAME)
 
@@ -36,4 +36,4 @@ shell:
 	nix-shell shell.nix
 
 .clang_complete:
-	echo "$(CXXFLAGS) $(LDFLAGS)" > .clang_complete
+	echo "$(CXXFLAGS) $(LDFLAGS)" | tr " " "\n" > .clang_complete
