@@ -32,11 +32,11 @@ public:
         player->add_component<PositionComponent>(Point {120, 120});
 
         // FIXME: not sure why this doesn't work
-        // static int sprite_width = 64;
-        // static int sprite_height = 205;
-        // auto sprite = std::move(window->load_sprite("foo.png", 1, 4, sprite_width, sprite_height, sdl::RGB { 0, 0xFF, 0xFF }));
-        // player->add_component<SpriteRenderComponent>(std::move(sprite), window);
-        player->add_component<SpriteRenderComponent>(window);
+        static int sprite_width = 64;
+        static int sprite_height = 205;
+        std::shared_ptr<sdl::Sprite> sprite = window->load_sprite("sprites/foo.png", 1, 4, sprite_width, sprite_height, sdl::RGB { 0, 0xFF, 0xFF });
+        player->add_component<SpriteComponent>(window, sprite);
+        player->add_component<SpriteRenderComponent>();
     }
 
     void quit()

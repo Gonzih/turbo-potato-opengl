@@ -4,6 +4,7 @@
 #include <SDL_image.h>
 #include <cassert>
 #include <optional>
+#include <memory>
 
 namespace sdl
 {
@@ -316,14 +317,14 @@ namespace sdl
                 return Texture { path, m_renderer, std::optional<RGB> { ck } };
             }
 
-            Sprite load_sprite(std::string path, int rows, int cols, int width, int height)
+            std::shared_ptr<Sprite> load_sprite(std::string path, int rows, int cols, int width, int height)
             {
-                return Sprite { path, m_renderer, rows, cols, width, height, std::nullopt };
+                return std::make_shared<Sprite>(path, m_renderer, rows, cols, width, height, std::nullopt);
             }
 
-            Sprite load_sprite(std::string path, int rows, int cols, int width, int height, RGB ck)
+            std::shared_ptr<Sprite> load_sprite(std::string path, int rows, int cols, int width, int height, RGB ck)
             {
-                return Sprite { path, m_renderer, rows, cols, width, height, std::optional<RGB>{ ck } };
+                return std::make_shared<Sprite>(path, m_renderer, rows, cols, width, height, std::optional<RGB>{ ck });
             }
 
             void set_viewport(int x, int y, int w, int h)

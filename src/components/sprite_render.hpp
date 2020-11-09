@@ -5,21 +5,19 @@
 #include "../sdl/sdl.hpp"
 #include "../ecs/ecs.hpp"
 #include "position.hpp"
+#include "sprite.hpp"
 
 namespace ecs::components
 {
     class SpriteRenderComponent : public Component
     {
     private:
-        std::shared_ptr<sdl::Window> window;
     public:
-        SpriteRenderComponent(std::shared_ptr<sdl::Window> w)
-        : window { w }
-        {  };
+        SpriteRenderComponent() {  };
         virtual ~SpriteRenderComponent() override {  };
 
         void init() override {
-            m_entity->assert_component<PositionComponent>("SpriteRenderer");
+            m_entity->assert_component<SpriteComponent>("SpriteRenderer");
         }
 
         void draw() override {
@@ -27,9 +25,10 @@ namespace ecs::components
 
             static int frame = 0;
             static SDL_RendererFlip flip = SDL_FLIP_HORIZONTAL;
-            static int sprite_width = 64;
-            static int sprite_height = 205;
-            auto sprite = window->load_sprite("foo.png", 1, 4, sprite_width, sprite_height, sdl::RGB { 0, 0xFF, 0xFF });
+            /* static int sprite_width = 64; */
+            /* static int sprite_height = 205; */
+            auto sprite = m_entity->get_component<SpriteComponent>()->m_sprite;
+            auto window = m_entity->get_component<SpriteComponent>()->m_window;
 
             ++frame;
             int f = frame / 5;
@@ -37,7 +36,7 @@ namespace ecs::components
                 frame = 0;
                 f = 0;
             }
-            sprite.render(window->get_renderer(), f, 0, pos.x, pos.y, 0, NULL, flip);
+            sprite->render(window->get_renderer(), f, 0, pos.x, pos.y, 0, NULL, flip);
         }
     };
 };
