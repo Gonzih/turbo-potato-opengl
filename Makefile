@@ -23,8 +23,7 @@ clean:
 	rm -f ./$(BIN_NAME)
 
 build: clean
-	# $(CXX) $(CXXFLAGS) $(LDFLAGS) -o $(BIN_NAME) src/*.cpp src/**/*.cpp
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $(BIN_NAME) src/*.cpp
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $(BIN_NAME) src/*.cpp src/**/*.cpp
 	chmod +x ./$(BIN_NAME)
 
 build-nix:

@@ -4,6 +4,7 @@
 
 #include "../logging.hpp"
 #include "../ecs/ecs.hpp"
+#include "components.hpp"
 #include "position.hpp"
 #include "map/map.hpp"
 
@@ -16,14 +17,14 @@ namespace ecs::components
     private:
         size_t current_level = 0;
         std::vector<Map> levels;
-        std::weak_ptr<Window> window;
         LightMap light_map;
         int width;
         int height;
+        int sprite_size;
         GetPosLambda get_pos_fn;
         SetPosLambda set_pos_fn;
     public:
-        LevelsComponent(std::weak_ptr<Window> w, int width, int height, GetPosLambda get_pos_fn, SetPosLambda set_pos_fn);
+        LevelsComponent(int width, int height, int sprite_size, GetPosLambda get_pos_fn, SetPosLambda set_pos_fn);
         virtual ~LevelsComponent() override;
 
         void init() override;

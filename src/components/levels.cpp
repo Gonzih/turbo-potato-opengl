@@ -2,10 +2,10 @@
 
 namespace ecs::components
 {
-        LevelsComponent::LevelsComponent(std::weak_ptr<Window> w, int width, int height, GetPosLambda get_pos_fn, SetPosLambda set_pos_fn)
-        : window { w }, width { width }, height { height }, get_pos_fn { get_pos_fn }, set_pos_fn { set_pos_fn }
+        LevelsComponent::LevelsComponent(int width, int height, int sprite_size, GetPosLambda get_pos_fn, SetPosLambda set_pos_fn)
+        : width { width }, height { height }, sprite_size { sprite_size }, get_pos_fn { get_pos_fn }, set_pos_fn { set_pos_fn }
         { };
-        virtual LevelsComponent::~LevelsComponent() override
+        LevelsComponent::~LevelsComponent()
         {  };
 
         void LevelsComponent::add_map()
@@ -16,16 +16,17 @@ namespace ecs::components
             levels.push_back(newmap);
         }
 
-        void LevelsComponent::init() override
+        void LevelsComponent::init()
         {
             add_map();
         }
 
-        void LevelsComponent::draw() override
+        void LevelsComponent::draw()
         {
             char ch;
             int c;
-            auto win = window.lock();
+            auto window = m_entity->get_component<SpriteComponent>()->m_window;
+            auto sprite = m_entity->get_component<SpriteComponent>()->m_sprite;
 
             Point pos = get_pos_fn();
             auto target_level = levels[current_level].stairs_at(pos);
@@ -51,9 +52,8 @@ namespace ecs::components
 
                     if (!visible(i, j)) {
                         if (map.memoized(i, j)) {
-                            c |= A_DIM;
                         } else {
-                            c = '.' | A_DIM;
+                            c = '.';
                         }
                     } else {
                         map.memoize(i, j);
@@ -62,7 +62,9 @@ namespace ecs::components
                             continue;
                     }
 
-                    win->render_char(c, i, j);
+                    if (c == '#') {
+                        sprite->render(window->get_renderer(), 0, 0, i*sprite_size, j*sprite_size, 0, NULL);
+                    }
                 }
             }
         }
@@ -73,7 +75,7 @@ namespace ecs::components
             light_map = levels[current_level].generate_light_map(pos, LIGHT_RADIUS);
         }
 
-        void LevelsComponent::update() override
+        void LevelsComponent::update()
         { regen_light_map(); }
 
         bool LevelsComponent::can_move(Point pos, MovementDirection direction) const

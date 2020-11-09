@@ -11,8 +11,8 @@ enum class MovementDirection {
 namespace ecs::components {
     class PositionComponent;
     class SpriteRenderComponent;
-    // class LevelsComponent;
-    // class MovementComponent;
+    class LevelsComponent;
+    class MovementComponent;
 
     using SetPosLambda = std::function<void(Point)>;
     using GetPosLambda = std::function<Point()>;
@@ -22,5 +22,5 @@ namespace ecs::components {
 
 #include "position.hpp"
 #include "sprite_render.hpp"
-// #include "levels.hpp"
-// #include "movement.hpp"
+#include "levels.hpp"
+#include "movement.hpp"
