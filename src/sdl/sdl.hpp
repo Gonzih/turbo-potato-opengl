@@ -9,7 +9,7 @@
 namespace sdl
 {
 
-    void init_sdl()
+    inline void init_sdl()
     {
         if(SDL_Init(SDL_INIT_VIDEO) < 0)
         {
@@ -22,7 +22,7 @@ namespace sdl
         }
     }
 
-    void init_image()
+    inline void init_image()
     {
         int imgFlags = IMG_INIT_PNG;
         if (!(IMG_Init(imgFlags) & imgFlags))
@@ -31,13 +31,13 @@ namespace sdl
         }
     }
 
-    void init()
+    inline void init()
     {
         init_sdl();
         init_image();
     }
 
-    void quit()
+    inline void quit()
     {
         IMG_Quit();
         SDL_Quit();

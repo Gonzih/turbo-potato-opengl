@@ -45,12 +45,12 @@ namespace logger {
     }
 
 
-    void init(std::string fname) {
+    inline void init(std::string fname) {
         logger = std::make_shared<Writer>(fname);
     }
 
     template<typename... Rest>
-    void info(Rest... rest){
+    inline void info(Rest... rest){
         logger->print("<INFO> ");
         logger->print(rest...);
         logger->print('\n');
@@ -58,7 +58,7 @@ namespace logger {
     }
 
     template<typename... Rest>
-    void critical(Rest... rest){
+    inline void critical(Rest... rest){
         logger->print("<OMGPANIC> ");
         logger->print(rest...);
         logger->print('\n');
