@@ -78,23 +78,35 @@ public:
 
     void handle_keypress(SDL_Event &event)
     {
+        static MovementDirection direction;
         switch(event.key.keysym.sym)
         {
             case SDLK_LEFT:
+                direction = MovementDirection::Left;
                 logger::info("KEY LEFT");
                 break;
             case SDLK_RIGHT:
+                direction = MovementDirection::Right;
                 logger::info("KEY RIGHT");
                 break;
             case SDLK_UP:
+                direction = MovementDirection::Up;
                 logger::info("KEY UP");
                 break;
             case SDLK_DOWN:
+                direction = MovementDirection::Down;
                 logger::info("KEY DOWN");
                 break;
             default:
                 break;
         }
+
+        if (direction == MovementDirection::None)
+            return;
+
+        player_mvm_cmp->move(direction);
+        system.update();
+        direction = MovementDirection::None;
     }
 
     void loop()
@@ -102,6 +114,7 @@ public:
         SDL_Event event;
         while(true)
         {
+            system.collect_garbage();
             window->reset_viewport();
             window->clear();
 
