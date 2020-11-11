@@ -269,6 +269,12 @@ namespace sdl
             {
                 m_texture.set_alpha(alpha);
             }
+
+            int get_width() const
+            { return m_width; }
+
+            int get_height() const
+            { return m_height; }
     };
 
     class Window

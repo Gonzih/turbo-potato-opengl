@@ -69,6 +69,27 @@ public:
         player_pos_cmp = player->get_component<PositionComponent>();
 
         levels->get_component<LevelsComponent>()->regen_light_map();
+
+        init_enemies(levels, can_move_fn, visible_fn);
+    }
+
+    void init_enemies(std::shared_ptr<Entity> levels, CanMoveLambda can_move_fn, VisibleLambda visible_fn)
+    {
+        static int sprite_width = 64;
+        static int sprite_height = 205;
+
+        std::shared_ptr<sdl::Sprite> player_sprite = window->load_sprite("sprites/foo.png", 1, 4, sprite_width, sprite_height, sdl::RGB { 0, 0xFF, 0xFF });
+        int n = rand_int(3, 8);
+        for (int i = 0; i < n; ++i) {
+            auto enemy = system.add_entity();
+            auto pos =  levels->get_component<LevelsComponent>()->get_random_empty_coords();
+            logger::info("Initializing enemy at (x, y)", pos.x, pos.y);
+
+            enemy->add_component<PositionComponent>(pos);
+            enemy->add_component<MovementComponent>(can_move_fn);
+            enemy->add_component<SpriteComponent>(window, player_sprite);
+            enemy->add_component<SpriteRenderComponent>();
+        }
     }
 
     void quit()

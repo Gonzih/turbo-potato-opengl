@@ -23,20 +23,13 @@ namespace ecs::components
         void draw() override {
             auto pos = m_entity->get_component<PositionComponent>()->get_pos();
 
-            static int frame = 0;
             static SDL_RendererFlip flip = SDL_FLIP_HORIZONTAL;
-            /* static int sprite_width = 64; */
-            /* static int sprite_height = 205; */
             auto sprite = m_entity->get_component<SpriteComponent>()->m_sprite;
             auto window = m_entity->get_component<SpriteComponent>()->m_window;
+            /* auto w = sprite->get_width(); */
+            /* auto h = sprite->get_height(); */
 
-            ++frame;
-            int f = frame / 5;
-            if (f == 4) {
-                frame = 0;
-                f = 0;
-            }
-            sprite->render(window->get_renderer(), f, 0, pos.x, pos.y, 0, NULL, flip);
+            sprite->render(window->get_renderer(), 0, 0, pos.x, pos.y, 0, NULL, flip);
         }
     };
 };
