@@ -16,6 +16,9 @@ private:
     int screen_height;
     std::shared_ptr<sdl::Window> window;
     System system;
+    std::shared_ptr<Group> levels_group;
+    std::shared_ptr<Group> characters_group;
+    std::shared_ptr<Group> darkness_group;
     std::shared_ptr<LevelsComponent> levels_cmp;
     std::shared_ptr<MovementComponent> player_mvm_cmp;
     std::shared_ptr<PositionComponent> player_pos_cmp;
@@ -29,8 +32,11 @@ public:
 
     void init()
     {
-        auto levels = system.add_entity();
-        auto player = system.add_entity();
+        levels_group = system.add_group();
+        auto levels = levels_group->add_entity();
+
+        characters_group = system.add_group();
+        auto player = characters_group->add_entity();
 
         auto get_pos_fn = [player] {
             return player->get_component<PositionComponent>()->get_pos();
@@ -77,7 +83,8 @@ public:
 
         init_enemies(levels, can_move_fn);
 
-        auto darkness = system.add_entity();
+        darkness_group = system.add_group();
+        auto darkness = darkness_group->add_entity();
 
         static int darkness_size = 32;
         std::shared_ptr<sdl::Sprite> darkness_sprite = window->load_sprite("sprites/darkness.png", 1, 1, darkness_size, darkness_size);
@@ -94,7 +101,7 @@ public:
 
         int n = rand_int(3, 8);
         for (int i = 0; i < n; ++i) {
-            auto enemy = system.add_entity();
+            auto enemy = characters_group->add_entity();
             auto pos =  levels->get_component<LevelsComponent>()->get_random_empty_coords();
             logger::info("Initializing enemy at (x, y)", pos.x, pos.y);
 

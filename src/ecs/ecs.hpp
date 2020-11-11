@@ -57,7 +57,6 @@ namespace ecs
     {
     private:
         bool active = true;
-        System* m_system;
         ComponentArray components;
         ComponentBitSet component_bit_set;
     public:
@@ -75,9 +74,6 @@ namespace ecs
 
         bool is_active() const { return active; }
         void destroy() { active = false; }
-
-        void set_system(System* s)
-        { m_system = s; }
 
         template <typename T>
         bool has_component() const
@@ -114,39 +110,69 @@ namespace ecs
         }
     };
 
+    class Group
+    {
+    private:
+        std::vector<std::shared_ptr<Entity>> m_entities;
+    public:
+        Group() { };
+        ~Group() { };
+
+        void update()
+        {
+            for (auto& e : m_entities) e->update();
+        }
+
+        void draw()
+        {
+            for (auto& e : m_entities) e->draw();
+        }
+
+        void collect_garbage()
+        {
+            m_entities.erase(
+                    std::remove_if(
+                        m_entities.begin(), m_entities.end(),
+                        [](const std::shared_ptr<Entity> e) { return !e->is_active(); }),
+                    m_entities.end());
+        }
+
+        std::shared_ptr<Entity> add_entity()
+        {
+            std::shared_ptr<Entity> e = std::make_shared<Entity>();
+            m_entities.push_back(e);
+            return e;
+        };
+    };
+
     class System
     {
     private:
-        std::vector<std::shared_ptr<Entity>> entities;
+        std::vector<std::shared_ptr<Group>> m_groups;
     public:
         System() { };
         ~System() { };
 
         void update()
         {
-            for (auto& e : entities) e->update();
+            for (auto& g : m_groups) g->update();
         }
 
         void draw()
         {
-            for (auto& e : entities) e->draw();
+            for (auto& g : m_groups) g->draw();
         }
 
         void collect_garbage()
         {
-            entities.erase(
-                    std::remove_if(
-                        entities.begin(), entities.end(),
-                        [](const std::shared_ptr<Entity> e) { return !e->is_active(); }),
-                    entities.end());
+            for (auto& g : m_groups) g->collect_garbage();
         }
 
-        std::shared_ptr<Entity> add_entity()
+        std::shared_ptr<Group> add_group()
         {
-            std::shared_ptr<Entity> e = std::make_shared<Entity>();
-            e->set_system(this);
-            entities.push_back(e);
-            return e;
+            std::shared_ptr<Group> g = std::make_shared<Group>();
+            m_groups.push_back(g);
+            return g;
         };
     };
 };
