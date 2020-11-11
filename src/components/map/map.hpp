@@ -5,6 +5,7 @@
 #include <utility>
 #include <math.h>
 #include <unordered_map>
+#include <assert.h>
 
 #include "../../random.hpp"
 #include "../../logging.hpp"
@@ -80,6 +81,8 @@ class LightMap {
         }
 
         LightLevel light_level(int x, int y) {
+            assert(x < light_map.size());
+            assert(y < light_map[x].size());
             return light_map[x][y];
         };
 };
