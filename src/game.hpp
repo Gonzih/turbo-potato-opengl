@@ -31,7 +31,6 @@ public:
     {
         auto levels = system.add_entity();
         auto player = system.add_entity();
-        auto darkness = system.add_entity();
 
         auto get_pos_fn = [player] {
             return player->get_component<PositionComponent>()->get_pos();
@@ -77,6 +76,8 @@ public:
         levels->get_component<LevelsComponent>()->regen_light_map();
 
         init_enemies(levels, can_move_fn);
+
+        auto darkness = system.add_entity();
 
         static int darkness_size = 32;
         std::shared_ptr<sdl::Sprite> darkness_sprite = window->load_sprite("sprites/darkness.png", 1, 1, darkness_size, darkness_size);
