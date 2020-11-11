@@ -76,7 +76,7 @@ public:
 
         levels->get_component<LevelsComponent>()->regen_light_map();
 
-        init_enemies(levels, can_move_fn, visible_fn);
+        init_enemies(levels, can_move_fn);
 
         static int darkness_size = 32;
         std::shared_ptr<sdl::Sprite> darkness_sprite = window->load_sprite("sprites/darkness.png", 1, 1, darkness_size, darkness_size);
@@ -86,7 +86,7 @@ public:
         darkness->add_component<DarknessComponent>(map_width, map_height, visible_fn, memoized_fn);
     }
 
-    void init_enemies(std::shared_ptr<Entity> levels, CanMoveLambda can_move_fn, VisibleLambda visible_fn)
+    void init_enemies(std::shared_ptr<Entity> levels, CanMoveLambda can_move_fn)
     {
         static int player_size = 32;
         std::shared_ptr<sdl::Sprite> player_sprite = window->load_sprite("sprites/mage.png", 1, 1, player_size, player_size, sdl::RGB { 0xFF, 0, 0xFF });
