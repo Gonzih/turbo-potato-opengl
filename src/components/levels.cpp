@@ -30,19 +30,19 @@ namespace ecs::components
             auto sprite_w = sprite->get_width();
             auto sprite_h = sprite->get_height();
 
-            Point pos = get_pos_fn();
-            auto target_level = levels[current_level].stairs_at(pos);
-            Point target_pos;
-            if (target_level != -1) {
-                // if target level doesn't exist (going up) add it first
-                if (!(target_level < levels.size())) {
-                    add_map();
-                }
-                target_pos = levels[target_level].stairs_to(current_level);
-                logger::info("Moving to level", target_level, target_pos.x, target_pos.y);
-                set_pos_fn(target_pos);
-                current_level = target_level;
-            }
+            /* Point pos = get_pos_fn(); */
+            /* auto target_level = levels[current_level].stairs_at(pos); */
+            /* Point target_pos; */
+            /* if (target_level != -1) { */
+            /*     // if target level doesn't exist (going up) add it first */
+            /*     if (!(target_level < levels.size())) { */
+            /*         add_map(); */
+            /*     } */
+            /*     target_pos = levels[target_level].stairs_to(current_level); */
+            /*     logger::info("Moving to level", target_level, target_pos.x, target_pos.y); */
+            /*     set_pos_fn(target_pos); */
+            /*     current_level = target_level; */
+            /* } */
             Map& map = levels[current_level];
 
             for (int i = 0; i < map.get_width(); ++i)
