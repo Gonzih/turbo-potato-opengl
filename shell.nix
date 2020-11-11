@@ -8,7 +8,6 @@ in pkgs.llvmPackages.libcxxStdenv.mkDerivation rec {
     llvmPackages.libcxxStdenv
     llvmPackages.libclang
     clang
-    ncurses
     SDL2
     SDL2_image
     SDL2_ttf

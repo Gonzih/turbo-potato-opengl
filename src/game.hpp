@@ -1,15 +1,10 @@
 #pragma once
 
-#include <ncurses.h>
-/* #include <chrono> */
-
-#include "window.hpp"
 #include "logging.hpp"
 #include "geometry.hpp"
+#include "sdl/sdl.hpp"
+#include "ecs/ecs.hpp"
 #include "components/components.hpp"
-
-#define PLAYER_CHARACTER L"🥔"
-#define RAT_CHARACTER L"🐀"
 
 using namespace ecs;
 using namespace ecs::components;
@@ -17,19 +12,19 @@ using namespace ecs::components;
 class Game
 {
 private:
-    int screen_w, screen_h;
-    std::shared_ptr<Window> main_win;
+    int screen_width;
+    int screen_height;
+    std::shared_ptr<sdl::Window> window;
+    System system;
     std::shared_ptr<LevelsComponent> levels_cmp;
     std::shared_ptr<MovementComponent> player_mvm_cmp;
     std::shared_ptr<PositionComponent> player_pos_cmp;
-    System system;
 
 public:
-    explicit Game(int screen_w, int screen_h) :
-        screen_w { screen_w },
-        screen_h { screen_h },
-        main_win { std::make_shared<Window>(screen_w, screen_h, 0, 0) },
-        system { }
+    Game(int screen_width, int screen_height) :
+        screen_width { screen_width },
+        screen_height { screen_height },
+        window { std::make_shared<sdl::Window>(screen_width, screen_height) }
     { };
 
     void init()
@@ -44,9 +39,12 @@ public:
             return player->get_component<PositionComponent>()->set_pos(pos);
         };
 
-        levels->add_component<LevelsComponent>(main_win, screen_w, screen_h, get_pos_fn, set_pos_fn);
+        static int wall_size = 32;
+        std::shared_ptr<sdl::Sprite> wall_sprite = window->load_sprite("sprites/wall.png", 1, 1, wall_size, wall_size);
+        logger::info("Loading levels sprite");
+        levels->add_component<SpriteComponent>(window, wall_sprite);
+        levels->add_component<LevelsComponent>(screen_width/wall_size, screen_height/wall_size, get_pos_fn, set_pos_fn);
         levels_cmp = levels->get_component<LevelsComponent>();
-
 
         auto l_cmp = levels_cmp;
         auto can_move_fn = [l_cmp](Point pos, MovementDirection dir) {
@@ -58,20 +56,27 @@ public:
 
         auto pos =  levels->get_component<LevelsComponent>()->get_random_empty_coords();
         logger::info("Initializing player at (x, y)", pos.x, pos.y);
+
+        static int player_size = 32;
+        std::shared_ptr<sdl::Sprite> player_sprite = window->load_sprite("sprites/mage.png", 1, 1, player_size, player_size, sdl::RGB { 0xFF, 0, 0xFF });
+
         player->add_component<PositionComponent>(pos);
         player->add_component<MovementComponent>(can_move_fn);
-        player->add_component<AsciiRenderComponent>(PLAYER_CHARACTER, main_win, visible_fn, false);
+        player->add_component<SpriteComponent>(window, player_sprite);
+        player->add_component<SpriteRenderComponent>();
         player_mvm_cmp = player->get_component<MovementComponent>();
         player_pos_cmp = player->get_component<PositionComponent>();
 
         levels->get_component<LevelsComponent>()->regen_light_map();
-
 
         init_enemies(levels, can_move_fn, visible_fn);
     }
 
     void init_enemies(std::shared_ptr<Entity> levels, CanMoveLambda can_move_fn, VisibleLambda visible_fn)
     {
+        static int player_size = 32;
+        std::shared_ptr<sdl::Sprite> player_sprite = window->load_sprite("sprites/mage.png", 1, 1, player_size, player_size, sdl::RGB { 0xFF, 0, 0xFF });
+
         int n = rand_int(3, 8);
         for (int i = 0; i < n; ++i) {
             auto enemy = system.add_entity();
@@ -80,57 +85,78 @@ public:
 
             enemy->add_component<PositionComponent>(pos);
             enemy->add_component<MovementComponent>(can_move_fn);
-            enemy->add_component<AsciiRenderComponent>(RAT_CHARACTER, main_win, visible_fn);
+            enemy->add_component<SpriteComponent>(window, player_sprite);
+            enemy->add_component<SpriteRenderComponent>();
         }
     }
 
-    void regen_map()
+    void quit()
     {
-        levels_cmp->regen_current_map();
+        exit(0);
     }
 
-    void render()
+    void handle_keypress(SDL_Event &event)
     {
-        main_win->erase();
-        system.draw();
-        main_win->refresh();
+        static MovementDirection direction;
+        switch(event.key.keysym.sym)
+        {
+            case SDLK_LEFT:
+                direction = MovementDirection::Left;
+                logger::info("KEY LEFT");
+                break;
+            case SDLK_RIGHT:
+                direction = MovementDirection::Right;
+                logger::info("KEY RIGHT");
+                break;
+            case SDLK_UP:
+                direction = MovementDirection::Up;
+                logger::info("KEY UP");
+                break;
+            case SDLK_DOWN:
+                direction = MovementDirection::Down;
+                logger::info("KEY DOWN");
+                break;
+            default:
+                break;
+        }
+
+        if (direction == MovementDirection::None)
+            return;
+
+        player_mvm_cmp->move(direction);
+        system.update();
+        direction = MovementDirection::None;
     }
 
     void loop()
     {
-        int c;
-        MovementDirection direction;
-
-        for(;;) {
+        SDL_Event event;
+        while(true)
+        {
             system.collect_garbage();
+            window->reset_viewport();
+            window->clear();
 
-            render();
+            system.draw();
+            window->update();
 
-            c = getch();
-            switch(c) {
-                case KEY_UP:
-                    direction = MovementDirection::Up;
-                    break;
-                case KEY_DOWN:
-                    direction = MovementDirection::Down;
-                    break;
-                case KEY_RIGHT:
-                    direction = MovementDirection::Right;
-                    break;
-                case KEY_LEFT:
-                    direction = MovementDirection::Left;
-                    break;
-                case ' ':
-                    regen_map();
-                    continue;
-            };
-
-            if (direction == MovementDirection::None)
-                continue;
-
-            player_mvm_cmp->move(direction);
-            system.update();
-            direction = MovementDirection::None;
+            while (SDL_PollEvent(&event) != 0)
+            {
+                switch(event.type)
+                {
+                    case SDL_KEYDOWN:
+                        handle_keypress(event);
+                        break;
+                    case SDL_KEYUP:
+                        break;
+                    case SDL_QUIT:
+                        quit();
+                        break;
+                    default:
+                        logger::info("KEY CAUGHT", event.type);
+                        break;
+                }
+            }
         }
     }
 };

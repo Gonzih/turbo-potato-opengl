@@ -1,15 +1,13 @@
 #include <SDL.h>
 #include <stdio.h>
 #include <iostream>
-#include <ncurses.h>
 #include <locale.h>
 
 #include "random.hpp"
 /* #include "game.hpp" */
-#include "game_sdl.hpp"
+#include "game.hpp"
 #include "sdl/sdl.hpp"
 #include "logging.hpp"
-// #include "sig.hpp"
 
 using namespace std;
 

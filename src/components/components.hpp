@@ -21,6 +21,7 @@ namespace ecs::components {
 };
 
 #include "position.hpp"
+#include "sprite.hpp"
 #include "sprite_render.hpp"
 #include "levels.hpp"
 #include "movement.hpp"
