@@ -43,7 +43,7 @@ public:
         std::shared_ptr<sdl::Sprite> wall_sprite = window->load_sprite("sprites/wall.png", 1, 1, wall_size, wall_size);
         logger::info("Loading levels sprite");
         levels->add_component<SpriteComponent>(window, wall_sprite);
-        levels->add_component<LevelsComponent>(screen_width/wall_size, screen_height/wall_size, wall_size, get_pos_fn, set_pos_fn);
+        levels->add_component<LevelsComponent>(screen_width/wall_size, screen_height/wall_size, get_pos_fn, set_pos_fn);
         levels_cmp = levels->get_component<LevelsComponent>();
 
         auto l_cmp = levels_cmp;
@@ -57,9 +57,8 @@ public:
         auto pos =  levels->get_component<LevelsComponent>()->get_random_empty_coords();
         logger::info("Initializing player at (x, y)", pos.x, pos.y);
 
-        static int sprite_width = 64;
-        static int sprite_height = 205;
-        std::shared_ptr<sdl::Sprite> player_sprite = window->load_sprite("sprites/foo.png", 1, 4, sprite_width, sprite_height, sdl::RGB { 0, 0xFF, 0xFF });
+        static int player_size = 32;
+        std::shared_ptr<sdl::Sprite> player_sprite = window->load_sprite("sprites/mage.png", 1, 1, player_size, player_size, sdl::RGB { 0xFF, 0, 0xFF });
 
         player->add_component<PositionComponent>(pos);
         player->add_component<MovementComponent>(can_move_fn);
@@ -75,10 +74,9 @@ public:
 
     void init_enemies(std::shared_ptr<Entity> levels, CanMoveLambda can_move_fn, VisibleLambda visible_fn)
     {
-        static int sprite_width = 64;
-        static int sprite_height = 205;
+        static int player_size = 32;
+        std::shared_ptr<sdl::Sprite> player_sprite = window->load_sprite("sprites/mage.png", 1, 1, player_size, player_size, sdl::RGB { 0xFF, 0, 0xFF });
 
-        std::shared_ptr<sdl::Sprite> player_sprite = window->load_sprite("sprites/foo.png", 1, 4, sprite_width, sprite_height, sdl::RGB { 0, 0xFF, 0xFF });
         int n = rand_int(3, 8);
         for (int i = 0; i < n; ++i) {
             auto enemy = system.add_entity();
@@ -147,8 +145,9 @@ public:
                 switch(event.type)
                 {
                     case SDL_KEYDOWN:
-                    case SDL_KEYUP:
                         handle_keypress(event);
+                        break;
+                    case SDL_KEYUP:
                         break;
                     case SDL_QUIT:
                         quit();

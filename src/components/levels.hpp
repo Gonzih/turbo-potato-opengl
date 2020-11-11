@@ -20,11 +20,10 @@ namespace ecs::components
         LightMap light_map;
         int width;
         int height;
-        int sprite_size;
         GetPosLambda get_pos_fn;
         SetPosLambda set_pos_fn;
     public:
-        LevelsComponent(int width, int height, int sprite_size, GetPosLambda get_pos_fn, SetPosLambda set_pos_fn);
+        LevelsComponent(int width, int height, GetPosLambda get_pos_fn, SetPosLambda set_pos_fn);
         virtual ~LevelsComponent() override;
 
         void init() override;

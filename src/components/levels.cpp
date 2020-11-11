@@ -2,8 +2,8 @@
 
 namespace ecs::components
 {
-        LevelsComponent::LevelsComponent(int width, int height, int sprite_size, GetPosLambda get_pos_fn, SetPosLambda set_pos_fn)
-        : levels {  }, width { width }, height { height }, sprite_size { sprite_size }, get_pos_fn { get_pos_fn }, set_pos_fn { set_pos_fn }
+        LevelsComponent::LevelsComponent(int width, int height, GetPosLambda get_pos_fn, SetPosLambda set_pos_fn)
+        : levels {  }, width { width }, height { height }, get_pos_fn { get_pos_fn }, set_pos_fn { set_pos_fn }
         { };
         LevelsComponent::~LevelsComponent()
         {  };
@@ -28,6 +28,8 @@ namespace ecs::components
             int c;
             auto window = m_entity->get_component<SpriteComponent>()->m_window;
             auto sprite = m_entity->get_component<SpriteComponent>()->m_sprite;
+            auto sprite_w = sprite->get_width();
+            auto sprite_h = sprite->get_height();
 
             Point pos = get_pos_fn();
             auto target_level = levels[current_level].stairs_at(pos);
@@ -63,9 +65,8 @@ namespace ecs::components
                             continue;
                     }
 
-                    if (c == '#') {
-                        logger::info("Rendering char", "at", i, j);
-                        sprite->render(window->get_renderer(), 0, 0, i*sprite_size, j*sprite_size, 0, NULL);
+                    if (c == WALL_CHARACTER) {
+                        sprite->render(window->get_renderer(), 0, 0, i*sprite_w, j*sprite_h, 0, NULL);
                     }
                 }
             }

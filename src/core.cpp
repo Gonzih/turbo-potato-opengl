@@ -22,7 +22,7 @@ int main()
     rand_init();
 
     sdl::init();
-    /* atexit(SDL_Quit); */
+    atexit(SDL_Quit);
 
     Game game { SCREEN_WIDTH, SCREEN_HEIGHT};
     game.init();
