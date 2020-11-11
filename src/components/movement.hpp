@@ -16,7 +16,7 @@ namespace ecs::components
         virtual ~MovementComponent() override {  };
 
         void init() override {
-            m_entity->assert_component<PositionComponent>("AsciiRenderer");
+            m_entity->assert_component<PositionComponent>("Movement");
         }
 
         void move(MovementDirection direction)

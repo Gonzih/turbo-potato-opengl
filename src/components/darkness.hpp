@@ -22,7 +22,10 @@ namespace ecs::components
         {  }
         virtual ~DarknessComponent() override {  }
 
-        void init() override { }
+        void init() override
+        {
+            m_entity->assert_component<SpriteComponent>("DarknessComponent");
+        }
         void draw() override
         {
 

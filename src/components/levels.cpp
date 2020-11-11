@@ -19,6 +19,7 @@ namespace ecs::components
 
         void LevelsComponent::init()
         {
+            m_entity->assert_component<SpriteComponent>("LevelsComponent");
             add_map();
         }
 
