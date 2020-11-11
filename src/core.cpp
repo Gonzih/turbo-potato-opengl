@@ -13,8 +13,8 @@
 
 using namespace std;
 
-const int SCREEN_WIDTH = 640;
-const int SCREEN_HEIGHT = 480;
+const int SCREEN_WIDTH = 1280;
+const int SCREEN_HEIGHT = 1280;
 
 int main()
 {
@@ -22,7 +22,7 @@ int main()
     rand_init();
 
     sdl::init();
-    atexit(SDL_Quit);
+    /* atexit(SDL_Quit); */
 
     Game game { SCREEN_WIDTH, SCREEN_HEIGHT};
     game.init();

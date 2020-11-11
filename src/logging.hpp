@@ -15,13 +15,14 @@ namespace logger {
 
             public:
                 Writer(std::string fname) : fname(fname) {
-                    fstream.open(fname, std::ios::out | std::ios::app);
+                    /* fstream.open(fname, std::ios::out | std::ios::app); */
                 };
 
                 template<typename First>
                 void print(First first){
-                    std::lock_guard<std::mutex> guard(write_mutex);
-                    fstream << first;
+                    /* std::lock_guard<std::mutex> guard(write_mutex); */
+                    std::cout << first;
+                    /* fstream << first; */
                 }
 
                 template<typename First, typename... Rest>
@@ -32,12 +33,12 @@ namespace logger {
                 }
 
                 void flush() {
-                    std::lock_guard<std::mutex> guard(write_mutex);
-                    fstream.flush();
+                    /* std::lock_guard<std::mutex> guard(write_mutex); */
+                    /* fstream.flush(); */
                 }
 
                 ~Writer() {
-                    fstream.close();
+                    /* fstream.close(); */
                 }
         };
 
@@ -47,6 +48,10 @@ namespace logger {
 
     inline void init(std::string fname) {
         logger = std::make_shared<Writer>(fname);
+    }
+
+    inline void flush() {
+        logger->flush();
     }
 
     template<typename... Rest>

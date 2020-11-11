@@ -175,11 +175,12 @@ class Map {
 
     public:
         explicit Map(size_t l, int w, int h) :
-            level( l ),
+            level { l },
             width { w },
             height { h },
             map { std::vector<std::vector<Tile>>(w, std::vector<Tile>(h, wall_tile)) }
         {
+            logger::info("Generating maze");
             generate_maze();
         }
 

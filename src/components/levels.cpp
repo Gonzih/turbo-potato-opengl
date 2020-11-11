@@ -3,17 +3,18 @@
 namespace ecs::components
 {
         LevelsComponent::LevelsComponent(int width, int height, int sprite_size, GetPosLambda get_pos_fn, SetPosLambda set_pos_fn)
-        : width { width }, height { height }, sprite_size { sprite_size }, get_pos_fn { get_pos_fn }, set_pos_fn { set_pos_fn }
+        : levels {  }, width { width }, height { height }, sprite_size { sprite_size }, get_pos_fn { get_pos_fn }, set_pos_fn { set_pos_fn }
         { };
         LevelsComponent::~LevelsComponent()
         {  };
 
         void LevelsComponent::add_map()
         {
-            size_t new_level =  levels.size();
-            logger::info("Initializing map level", new_level);
-            Map newmap { new_level, width, height };
+            auto id =  levels.size();
+            /* logger::info("Initializing map level"); */
+            Map newmap { id, width, height };
             levels.push_back(newmap);
+            current_level = id;
         }
 
         void LevelsComponent::init()
@@ -63,6 +64,7 @@ namespace ecs::components
                     }
 
                     if (c == '#') {
+                        logger::info("Rendering char", "at", i, j);
                         sprite->render(window->get_renderer(), 0, 0, i*sprite_size, j*sprite_size, 0, NULL);
                     }
                 }
