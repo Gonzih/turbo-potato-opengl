@@ -18,6 +18,7 @@ namespace ecs::components {
     using GetPosLambda = std::function<Point()>;
     using CanMoveLambda = std::function<bool(Point, MovementDirection)>;
     using VisibleLambda = std::function<bool(int, int)>;
+    using MemoizedLambda = std::function<bool(int, int)>;
 };
 
 #include "position.hpp"
@@ -25,3 +26,4 @@ namespace ecs::components {
 #include "sprite_render.hpp"
 #include "levels.hpp"
 #include "movement.hpp"
+#include "darkness.hpp"

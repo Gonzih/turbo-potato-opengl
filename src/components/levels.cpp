@@ -11,7 +11,7 @@ namespace ecs::components
         void LevelsComponent::add_map()
         {
             auto id =  levels.size();
-            /* logger::info("Initializing map level"); */
+            logger::info("Initializing map level");
             Map newmap { id, width, height };
             levels.push_back(newmap);
             current_level = id;
@@ -25,7 +25,6 @@ namespace ecs::components
         void LevelsComponent::draw()
         {
             char ch;
-            int c;
             auto window = m_entity->get_component<SpriteComponent>()->m_window;
             auto sprite = m_entity->get_component<SpriteComponent>()->m_sprite;
             auto sprite_w = sprite->get_width();
@@ -51,21 +50,15 @@ namespace ecs::components
                 for (int j = 0; j < map.get_height(); ++j)
                 {
                     ch = map.at(i, j);
-                    c = ch;
 
-                    if (!visible(i, j)) {
-                        if (map.memoized(i, j)) {
-                        } else {
-                            c = '.';
-                        }
-                    } else {
+                    if (visible(i, j)) {
                         map.memoize(i, j);
-
-                        if (ch == EMPTY_SPACE_CHARACTER)
-                            continue;
                     }
 
-                    if (c == WALL_CHARACTER) {
+                    if (ch == EMPTY_SPACE_CHARACTER)
+                        continue;
+
+                    if (ch == WALL_CHARACTER) {
                         sprite->render(window->get_renderer(), 0, 0, i*sprite_w, j*sprite_h, 0, NULL);
                     }
                 }
@@ -94,6 +87,11 @@ namespace ecs::components
         bool LevelsComponent::visible(int x, int y)
         {
             return light_map.visible(x, y);
+        }
+
+        bool LevelsComponent::memoized(int x, int y)
+        {
+            return levels[current_level].memoized(x, y);
         }
 
         void LevelsComponent::regen_current_map()

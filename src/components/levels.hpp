@@ -36,6 +36,7 @@ namespace ecs::components
         bool can_move(Point pos, MovementDirection direction) const;
         Point get_random_empty_coords() const;
         bool visible(int x, int y);
+        bool memoized(int x, int y);
         void regen_current_map();
     };
 };

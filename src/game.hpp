@@ -31,6 +31,7 @@ public:
     {
         auto levels = system.add_entity();
         auto player = system.add_entity();
+        auto darkness = system.add_entity();
 
         auto get_pos_fn = [player] {
             return player->get_component<PositionComponent>()->get_pos();
@@ -40,10 +41,13 @@ public:
         };
 
         static int wall_size = 32;
+        static int map_width = screen_width/wall_size;
+        static int map_height = screen_height/wall_size;
+
         std::shared_ptr<sdl::Sprite> wall_sprite = window->load_sprite("sprites/wall.png", 1, 1, wall_size, wall_size);
         logger::info("Loading levels sprite");
         levels->add_component<SpriteComponent>(window, wall_sprite);
-        levels->add_component<LevelsComponent>(screen_width/wall_size, screen_height/wall_size, get_pos_fn, set_pos_fn);
+        levels->add_component<LevelsComponent>(map_width, map_height, get_pos_fn, set_pos_fn);
         levels_cmp = levels->get_component<LevelsComponent>();
 
         auto l_cmp = levels_cmp;
@@ -52,6 +56,9 @@ public:
         };
         auto visible_fn = [l_cmp](int x, int y) {
             return l_cmp->visible(x, y);
+        };
+        auto memoized_fn = [l_cmp](int x, int y) {
+            return l_cmp->memoized(x, y);
         };
 
         auto pos =  levels->get_component<LevelsComponent>()->get_random_empty_coords();
@@ -70,6 +77,13 @@ public:
         levels->get_component<LevelsComponent>()->regen_light_map();
 
         init_enemies(levels, can_move_fn, visible_fn);
+
+        static int darkness_size = 32;
+        std::shared_ptr<sdl::Sprite> darkness_sprite = window->load_sprite("sprites/darkness.png", 1, 1, darkness_size, darkness_size);
+        darkness_sprite->set_blend_mode(SDL_BLENDMODE_BLEND);
+
+        darkness->add_component<SpriteComponent>(window, darkness_sprite);
+        darkness->add_component<DarknessComponent>(map_width, map_height, visible_fn, memoized_fn);
     }
 
     void init_enemies(std::shared_ptr<Entity> levels, CanMoveLambda can_move_fn, VisibleLambda visible_fn)
