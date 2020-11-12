@@ -46,6 +46,7 @@ namespace ecs::components
             /* } */
             Map& map = levels[current_level];
 
+            int sprite_col = 0;
             for (int i = 0; i < map.get_width(); ++i)
             {
                 for (int j = 0; j < map.get_height(); ++j)
@@ -59,17 +60,19 @@ namespace ecs::components
                     switch (tile)
                     {
                         case TileType::Wall:
-                            sprite->render(window->get_renderer(), 0, 0, i*sprite_w, j*sprite_h, 0, NULL);
+                            sprite_col = 0;
                             break;
                         case TileType::Empty:
-                            sprite->render(window->get_renderer(), 0, 1, i*sprite_w, j*sprite_h, 0, NULL);
+                            sprite_col = 1;
                             break;
                         case TileType::StairsDown:
-                            sprite->render(window->get_renderer(), 0, 2, i*sprite_w, j*sprite_h, 0, NULL);
+                            sprite_col = 2;
                             break;
                         case TileType::StairsUp:
                             break;
                     }
+
+                    sprite->render(window->get_renderer(), 0, sprite_col, i*sprite_w, j*sprite_h, 0, NULL);
                 }
             }
         }
