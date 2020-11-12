@@ -5,6 +5,8 @@
 #include <cassert>
 #include <optional>
 #include <memory>
+#include <unordered_map>
+#include <string>
 
 namespace sdl
 {
@@ -313,24 +315,16 @@ namespace sdl
                 return m_renderer;
             }
 
+            [[deprecated]]
             Texture load_texture(std::string path)
             {
                 return Texture { path, m_renderer, std::nullopt };
             }
 
+            [[deprecated]]
             Texture load_texture(std::string path, RGB ck)
             {
                 return Texture { path, m_renderer, std::optional<RGB> { ck } };
-            }
-
-            std::shared_ptr<Sprite> load_sprite(std::string path, int rows, int cols, int width, int height)
-            {
-                return std::make_shared<Sprite>(path, m_renderer, rows, cols, width, height, std::nullopt);
-            }
-
-            std::shared_ptr<Sprite> load_sprite(std::string path, int rows, int cols, int width, int height, RGB ck)
-            {
-                return std::make_shared<Sprite>(path, m_renderer, rows, cols, width, height, std::optional<RGB>{ ck });
             }
 
             void set_viewport(int x, int y, int w, int h)
@@ -352,6 +346,36 @@ namespace sdl
             {
                 if (m_window != NULL)
                 { SDL_DestroyWindow(m_window); }
+            }
+    };
+
+    class SpriteManager
+    {
+        private:
+            std::shared_ptr<Window> m_window;
+            std::unordered_map<std::string, std::shared_ptr<Sprite>> m_sprites;
+        public:
+            SpriteManager(std::shared_ptr<Window> window) : m_window { window }, m_sprites { } { };
+            ~SpriteManager() { };
+
+            void preload_sprite(std::string path, int rows, int cols, int width, int height)
+            {
+                auto sprite = std::make_shared<Sprite>(path, m_window->get_renderer(), rows, cols, width, height, std::nullopt);
+                m_sprites[path] = sprite;
+            }
+
+            void preload_sprite(std::string path, int rows, int cols, int width, int height, RGB ck)
+            {
+                auto sprite = std::make_shared<Sprite>(path, m_window->get_renderer(), rows, cols, width, height, std::optional<RGB>{ ck });
+                m_sprites[path] = sprite;
+            }
+
+            std::shared_ptr<Sprite> get_sprite(std::string path)
+            {
+                if (m_sprites.find(path) == m_sprites.end())
+                    throw std::runtime_error("Could not find sprite for " + path);
+
+                return m_sprites[path];
             }
     };
 }

@@ -23,16 +23,23 @@ private:
     std::shared_ptr<LevelsComponent> levels_cmp;
     std::shared_ptr<MovementComponent> player_mvm_cmp;
     std::shared_ptr<PositionComponent> player_pos_cmp;
+    std::unique_ptr<sdl::SpriteManager> sprite_manager;
 
 public:
     Game(int screen_width, int screen_height) :
         screen_width { screen_width },
         screen_height { screen_height },
-        window { std::make_shared<sdl::Window>(screen_width, screen_height) }
+        window { std::make_shared<sdl::Window>(screen_width, screen_height) },
+        sprite_manager { std::make_unique<sdl::SpriteManager>(window) }
     { };
 
     void init()
     {
+        static int sprite_size = 32;
+        sprite_manager->preload_sprite("sprites/wall.png", 1, 1, sprite_size, sprite_size);
+        sprite_manager->preload_sprite("sprites/mage.png", 1, 1, sprite_size, sprite_size, sdl::RGB { 0xFF, 0, 0xFF });
+        sprite_manager->preload_sprite("sprites/darkness.png", 1, 1, sprite_size, sprite_size);
+
         levels_group = system.add_group();
         auto levels = levels_group->add_entity();
 
@@ -46,11 +53,10 @@ public:
             return player->get_component<PositionComponent>()->set_pos(pos);
         };
 
-        static int wall_size = 32;
-        static int map_width = screen_width/wall_size;
-        static int map_height = screen_height/wall_size;
+        static int map_width = screen_width/sprite_size;
+        static int map_height = screen_height/sprite_size;
 
-        std::shared_ptr<sdl::Sprite> wall_sprite = window->load_sprite("sprites/wall.png", 1, 1, wall_size, wall_size);
+        std::shared_ptr<sdl::Sprite> wall_sprite = sprite_manager->get_sprite("sprites/wall.png");
         logger::info("Loading levels sprite");
         levels->add_component<SpriteComponent>(window, wall_sprite);
         levels->add_component<LevelsComponent>(map_width, map_height, get_pos_fn, set_pos_fn);
@@ -70,8 +76,7 @@ public:
         auto pos =  levels->get_component<LevelsComponent>()->get_random_empty_coords();
         logger::info("Initializing player at (x, y)", pos.x, pos.y);
 
-        static int player_size = 32;
-        std::shared_ptr<sdl::Sprite> player_sprite = window->load_sprite("sprites/mage.png", 1, 1, player_size, player_size, sdl::RGB { 0xFF, 0, 0xFF });
+        std::shared_ptr<sdl::Sprite> player_sprite = sprite_manager->get_sprite("sprites/mage.png");
 
         player->add_component<PositionComponent>(pos);
         player->add_component<MovementComponent>(can_move_fn);
@@ -88,8 +93,7 @@ public:
         darkness_group = system.add_group();
         auto darkness = darkness_group->add_entity();
 
-        static int darkness_size = 32;
-        std::shared_ptr<sdl::Sprite> darkness_sprite = window->load_sprite("sprites/darkness.png", 1, 1, darkness_size, darkness_size);
+        std::shared_ptr<sdl::Sprite> darkness_sprite = sprite_manager->get_sprite("sprites/darkness.png");
         darkness_sprite->set_blend_mode(SDL_BLENDMODE_BLEND);
 
         darkness->add_component<SpriteComponent>(window, darkness_sprite);
@@ -98,8 +102,7 @@ public:
 
     void init_enemies(std::shared_ptr<Entity> levels, CanMoveLambda can_move_fn, VisibleLambda visible_fn)
     {
-        static int player_size = 32;
-        std::shared_ptr<sdl::Sprite> player_sprite = window->load_sprite("sprites/mage.png", 1, 1, player_size, player_size, sdl::RGB { 0xFF, 0, 0xFF });
+        std::shared_ptr<sdl::Sprite> player_sprite = sprite_manager->get_sprite("sprites/mage.png");
 
         int n = rand_int(3, 8);
         for (int i = 0; i < n; ++i) {
