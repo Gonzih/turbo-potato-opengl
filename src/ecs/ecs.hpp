@@ -17,7 +17,7 @@ namespace ecs
     class Entity;
     class Component;
     class System;
-    class Registry;
+    class Group;
 
     using ComponentTypeID = size_t;
 
@@ -56,29 +56,29 @@ namespace ecs
     class Entity
     {
     private:
-        bool active = true;
-        ComponentArray components;
-        ComponentBitSet component_bit_set;
+        bool m_active = true;
+        ComponentArray m_components;
+        ComponentBitSet m_component_bit_set;
     public:
         Entity() { };
         virtual ~Entity() {  };
 
         void init()
-        { for (auto& c : components) if (c) c->init();  }
+        { for (auto& c : m_components) if (c) c->init();  }
 
         void update()
-        { for (auto& c : components) if (c) c->update();  }
+        { for (auto& c : m_components) if (c) c->update();  }
 
         void draw()
-        { for (auto& c : components) if (c) c->draw(); }
+        { for (auto& c : m_components) if (c) c->draw(); }
 
-        bool is_active() const { return active; }
-        void destroy() { active = false; }
+        bool is_active() const { return m_active; }
+        void destroy() { m_active = false; }
 
         template <typename T>
         bool has_component() const
         {
-            return component_bit_set.test(get_component_type_id<T>());
+            return m_component_bit_set.test(get_component_type_id<T>());
         }
 
         template <typename T>
@@ -97,15 +97,15 @@ namespace ecs
             c->set_entity(this);
             c->init();
 
-            components[get_component_type_id<T>()] = c;
-            component_bit_set.set(get_component_type_id<T>());
+            m_components[get_component_type_id<T>()] = c;
+            m_component_bit_set.set(get_component_type_id<T>());
 
             return c;
         }
 
         template <typename T>
         std::shared_ptr<T> get_component() {
-            auto ptr = components[get_component_type_id<T>()];
+            auto ptr = m_components[get_component_type_id<T>()];
             return std::static_pointer_cast<T>(ptr);
         }
     };
