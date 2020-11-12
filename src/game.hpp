@@ -36,9 +36,9 @@ public:
     void init()
     {
         static int sprite_size = 32;
-        sprite_manager->preload_sprite("sprites/wall.png", 1, 1, sprite_size, sprite_size);
-        sprite_manager->preload_sprite("sprites/mage.png", 1, 1, sprite_size, sprite_size, sdl::RGB { 0xFF, 0, 0xFF });
+        sprite_manager->preload_sprite("sprites/surroundings.png", 1, 3, sprite_size, sprite_size);
         sprite_manager->preload_sprite("sprites/darkness.png", 1, 1, sprite_size, sprite_size);
+        sprite_manager->preload_sprite("sprites/mage.png", 1, 1, sprite_size, sprite_size, sdl::RGB { 0xFF, 0, 0xFF });
 
         levels_group = system.add_group();
         auto levels = levels_group->add_entity();
@@ -56,7 +56,7 @@ public:
         static int map_width = screen_width/sprite_size;
         static int map_height = screen_height/sprite_size;
 
-        std::shared_ptr<sdl::Sprite> wall_sprite = sprite_manager->get_sprite("sprites/wall.png");
+        auto wall_sprite = sprite_manager->get_sprite("sprites/surroundings.png");
         logger::info("Loading levels sprite");
         levels->add_component<SpriteComponent>(window, wall_sprite);
         levels->add_component<LevelsComponent>(map_width, map_height, get_pos_fn, set_pos_fn);
@@ -76,7 +76,7 @@ public:
         auto pos =  levels->get_component<LevelsComponent>()->get_random_empty_coords();
         logger::info("Initializing player at (x, y)", pos.x, pos.y);
 
-        std::shared_ptr<sdl::Sprite> player_sprite = sprite_manager->get_sprite("sprites/mage.png");
+        auto player_sprite = sprite_manager->get_sprite("sprites/mage.png");
 
         player->add_component<PositionComponent>(pos);
         player->add_component<MovementComponent>(can_move_fn);
@@ -93,7 +93,7 @@ public:
         darkness_group = system.add_group();
         auto darkness = darkness_group->add_entity();
 
-        std::shared_ptr<sdl::Sprite> darkness_sprite = sprite_manager->get_sprite("sprites/darkness.png");
+        auto darkness_sprite = sprite_manager->get_sprite("sprites/darkness.png");
         darkness_sprite->set_blend_mode(SDL_BLENDMODE_BLEND);
 
         darkness->add_component<SpriteComponent>(window, darkness_sprite);
@@ -102,7 +102,7 @@ public:
 
     void init_enemies(std::shared_ptr<Entity> levels, CanMoveLambda can_move_fn, VisibleLambda visible_fn)
     {
-        std::shared_ptr<sdl::Sprite> player_sprite = sprite_manager->get_sprite("sprites/mage.png");
+        auto player_sprite = sprite_manager->get_sprite("sprites/mage.png");
 
         int n = rand_int(3, 8);
         for (int i = 0; i < n; ++i) {

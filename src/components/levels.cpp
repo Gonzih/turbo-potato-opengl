@@ -56,11 +56,19 @@ namespace ecs::components
                         map.memoize(i, j);
                     }
 
-                    if (tile == TileType::Empty)
-                        continue;
-
-                    if (tile == TileType::Wall) {
-                        sprite->render(window->get_renderer(), 0, 0, i*sprite_w, j*sprite_h, 0, NULL);
+                    switch (tile)
+                    {
+                        case TileType::Wall:
+                            sprite->render(window->get_renderer(), 0, 0, i*sprite_w, j*sprite_h, 0, NULL);
+                            break;
+                        case TileType::Empty:
+                            sprite->render(window->get_renderer(), 0, 1, i*sprite_w, j*sprite_h, 0, NULL);
+                            break;
+                        case TileType::StairsDown:
+                            sprite->render(window->get_renderer(), 0, 2, i*sprite_w, j*sprite_h, 0, NULL);
+                            break;
+                        case TileType::StairsUp:
+                            break;
                     }
                 }
             }
