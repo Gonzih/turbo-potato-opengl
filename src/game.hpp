@@ -75,13 +75,13 @@ public:
         player->add_component<PositionComponent>(pos);
         player->add_component<MovementComponent>(can_move_fn);
         player->add_component<SpriteComponent>(window, player_sprite);
-        player->add_component<SpriteRenderComponent>();
+        player->add_component<SpriteRenderComponent>(visible_fn);
         player_mvm_cmp = player->get_component<MovementComponent>();
         player_pos_cmp = player->get_component<PositionComponent>();
 
         levels->get_component<LevelsComponent>()->regen_light_map();
 
-        init_enemies(levels, can_move_fn);
+        init_enemies(levels, can_move_fn, visible_fn);
 
         darkness_group = system.add_group();
         auto darkness = darkness_group->add_entity();
@@ -94,7 +94,7 @@ public:
         darkness->add_component<DarknessComponent>(map_width, map_height, visible_fn, memoized_fn);
     }
 
-    void init_enemies(std::shared_ptr<Entity> levels, CanMoveLambda can_move_fn)
+    void init_enemies(std::shared_ptr<Entity> levels, CanMoveLambda can_move_fn, VisibleLambda visible_fn)
     {
         static int player_size = 32;
         std::shared_ptr<sdl::Sprite> player_sprite = window->load_sprite("sprites/mage.png", 1, 1, player_size, player_size, sdl::RGB { 0xFF, 0, 0xFF });
@@ -108,7 +108,7 @@ public:
             enemy->add_component<PositionComponent>(pos);
             enemy->add_component<MovementComponent>(can_move_fn);
             enemy->add_component<SpriteComponent>(window, player_sprite);
-            enemy->add_component<SpriteRenderComponent>();
+            enemy->add_component<SpriteRenderComponent>(visible_fn);
         }
     }
 

@@ -12,8 +12,10 @@ namespace ecs::components
     class SpriteRenderComponent : public Component
     {
     private:
+        VisibleLambda m_is_visible;
     public:
-        SpriteRenderComponent() {  };
+        SpriteRenderComponent(VisibleLambda vfn)
+        : m_is_visible { vfn } {  };
         virtual ~SpriteRenderComponent() override {  };
 
         void init() override {
@@ -29,7 +31,8 @@ namespace ecs::components
             auto w = sprite->get_width();
             auto h = sprite->get_height();
 
-            sprite->render(window->get_renderer(), 0, 0, pos.x*w, pos.y*h, 0, NULL, flip);
+            if (m_is_visible(pos.x, pos.y))
+                sprite->render(window->get_renderer(), 0, 0, pos.x*w, pos.y*h, 0, NULL, flip);
         }
     };
 };
