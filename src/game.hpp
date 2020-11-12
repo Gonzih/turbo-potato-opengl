@@ -17,6 +17,7 @@ private:
     std::shared_ptr<sdl::Window> window;
     System system;
     std::shared_ptr<Group> levels_group;
+    std::shared_ptr<Group> player_group;
     std::shared_ptr<Group> characters_group;
     std::shared_ptr<Group> darkness_group;
     std::shared_ptr<LevelsComponent> levels_cmp;
@@ -35,8 +36,8 @@ public:
         levels_group = system.add_group();
         auto levels = levels_group->add_entity();
 
-        characters_group = system.add_group();
-        auto player = characters_group->add_entity();
+        player_group = system.add_group();
+        auto player = player_group->add_entity();
 
         auto get_pos_fn = [player] {
             return player->get_component<PositionComponent>()->get_pos();
@@ -81,6 +82,7 @@ public:
 
         levels->get_component<LevelsComponent>()->regen_light_map();
 
+        characters_group = system.add_group();
         init_enemies(levels, can_move_fn, visible_fn);
 
         darkness_group = system.add_group();
