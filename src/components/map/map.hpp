@@ -12,18 +12,24 @@
 #include "../movement.hpp"
 #include "../../geometry.hpp"
 
-#define WALL_CHARACTER '#'
-#define STAIR_CHARACTER '%'
-#define EMPTY_SPACE_CHARACTER ' '
+enum TileType
+{
+    Wall,
+    StairsDown,
+    StairsUp,
+    Empty,
+};
 
-class Tile {
+class Tile
+{
     public:
-        explicit Tile(char c_): c(c_) { };
-        char c = WALL_CHARACTER;
-        bool memoized = false;
+        explicit Tile(TileType t): m_type { t } { };
+        TileType m_type = TileType::Empty;
+        bool m_memoized = false;
     private:
 };
-const Tile wall_tile {WALL_CHARACTER};
+
+const Tile wall_tile { TileType::Wall };
 
 enum LightLevel {
     Invisible,
@@ -52,7 +58,7 @@ class LightMap {
 
                 light_map[tx][ty] = LightLevel::Visible;
 
-                if (map[tx][ty].c == WALL_CHARACTER) {
+                if (map[tx][ty].m_type == TileType::Wall) {
                     return;
                 }
 
@@ -116,7 +122,7 @@ class Map {
             // renders the rectangle on the map
             for (int x = rect.x0; x < rect.x1; ++x) {
                 for (int y = rect.y0; y < rect.y1; ++y) {
-                    map[x][y].c = EMPTY_SPACE_CHARACTER;
+                    map[x][y].m_type = TileType::Empty;
                 }
             }
         }
@@ -157,7 +163,7 @@ class Map {
         void add_stairs(Point pos, size_t destination_level) {
             logger::info("Generated stairs at", pos.x, pos.y);
             stairs.emplace(pos, destination_level);
-            map[pos.x][pos.y].c = STAIR_CHARACTER;
+            map[pos.x][pos.y].m_type = TileType::StairsDown;
         }
 
         void generate_maze() {
@@ -189,9 +195,9 @@ class Map {
 
         const int get_width() const { return width; }
         const int get_height() const { return height; }
-        const char at(int x, int y) const { return map[x][y].c; }
-        const bool memoized(int x, int y) const { return map[x][y].memoized; }
-        void memoize(int x, int y) { map[x][y].memoized = true; }
+        const TileType at(int x, int y) const { return map[x][y].m_type; }
+        const bool memoized(int x, int y) const { return map[x][y].m_memoized; }
+        void memoize(int x, int y) { map[x][y].m_memoized = true; }
 
         int stairs_at(Point pos)
         {
@@ -217,7 +223,7 @@ class Map {
             for (;;) {
                 x = rand_int(0, width);
                 y = rand_int(0, height);
-                if (at(x, y) == EMPTY_SPACE_CHARACTER) {
+                if (at(x, y) == TileType::Empty) {
                     return Point(x, y);
                 }
             }
@@ -244,7 +250,7 @@ class Map {
 
             auto [x, y] = pos;
 
-            return x >= 0 && y >= 0 && x <= width && y <= height && map[x][y].c != WALL_CHARACTER;
+            return x >= 0 && y >= 0 && x <= width && y <= height && map[x][y].m_type != TileType::Wall;
         };
 
         LightMap generate_light_map(Point camera_pos, int light_radius) {

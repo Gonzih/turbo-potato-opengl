@@ -25,7 +25,7 @@ namespace ecs::components
 
         void LevelsComponent::draw()
         {
-            char ch;
+            TileType tile;
             auto window = m_entity->get_component<SpriteComponent>()->m_window;
             auto sprite = m_entity->get_component<SpriteComponent>()->m_sprite;
             auto sprite_w = sprite->get_width();
@@ -50,16 +50,16 @@ namespace ecs::components
             {
                 for (int j = 0; j < map.get_height(); ++j)
                 {
-                    ch = map.at(i, j);
+                    tile = map.at(i, j);
 
                     if (visible(i, j)) {
                         map.memoize(i, j);
                     }
 
-                    if (ch == EMPTY_SPACE_CHARACTER)
+                    if (tile == TileType::Empty)
                         continue;
 
-                    if (ch == WALL_CHARACTER) {
+                    if (tile == TileType::Wall) {
                         sprite->render(window->get_renderer(), 0, 0, i*sprite_w, j*sprite_h, 0, NULL);
                     }
                 }
