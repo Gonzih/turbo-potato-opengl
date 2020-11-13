@@ -1,12 +1,16 @@
 let
    pkgs = import <nixpkgs> {};
-in pkgs.clangStdenv.mkDerivation rec {
+in pkgs.llvmPackages.libcxxStdenv.mkDerivation rec {
   name = "makefile-guy-dev";
   LIBCLANG_PATH="${pkgs.llvmPackages.libclang}/lib";
   nativeBuildInputs = [ pkgs.pkg-config ];
   buildInputs = with pkgs; [
-    clangStdenv
+    llvmPackages.libcxxStdenv
+    llvmPackages.libclang
     clang
-    ncurses
+    SDL2
+    SDL2_image
+    SDL2_ttf
+    SDL2_mixer
   ];
 }

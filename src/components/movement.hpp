@@ -2,8 +2,7 @@
 
 #include <memory>
 
-#include "../ecs.hpp"
-#include "../../window.hpp"
+#include "../ecs/ecs.hpp"
 
 namespace ecs::components
 {
@@ -17,12 +16,12 @@ namespace ecs::components
         virtual ~MovementComponent() override {  };
 
         void init() override {
-            m_entity->assert_component<PositionComponent>("AsciiRenderer");
+            m_entity->assert_component<PositionComponent>("Movement");
         }
 
         void move(MovementDirection direction)
         {
-            Point pos = m_entity->get_component<PositionComponent>()->get_pos();
+            Vector2D pos = m_entity->get_component<PositionComponent>()->get_pos();
 
             if (can_move_fn(pos, direction))
                 switch(direction)

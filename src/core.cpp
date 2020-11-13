@@ -1,39 +1,29 @@
+#include <SDL.h>
 #include <stdio.h>
 #include <iostream>
-#include <ncurses.h>
 #include <locale.h>
 
 #include "random.hpp"
+/* #include "game.hpp" */
 #include "game.hpp"
+#include "sdl/sdl.hpp"
 #include "logging.hpp"
-#include "sig.hpp"
 
 using namespace std;
 
-void curses_init() {
-    setlocale(LC_ALL,"");
-    initscr();
-    cbreak();
-    noecho();
-    nodelay(stdscr, TRUE);
-    keypad(stdscr, TRUE);
-    curs_set(0);
-}
+const int SCREEN_WIDTH = 1280;
+const int SCREEN_HEIGHT = 1280;
 
-int main() {
+int main()
+{
     logger::init("turbo-potato.log");
-    curses_init();
-    sigint_handler_init();
     rand_init();
 
-    int nh, nw;
-    getmaxyx(stdscr, nh, nw);
-    logger::info("Starting game with width height", nw, nh);
-    Game game { nw, nh };
+    sdl::init();
+    atexit(SDL_Quit);
 
-    logger::info("Initializing game");
+    Game game { SCREEN_WIDTH, SCREEN_HEIGHT};
     game.init();
-    logger::info("Starting loop");
     game.loop();
 
     return 0;

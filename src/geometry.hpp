@@ -5,17 +5,17 @@
 #include <cstdint>
 #include <assert.h>
 
-class Point {
+class Vector2D {
     public:
         int x, y;
 
-        Point() {};
-        explicit Point(int x, int y) : x(x), y(y) {}
-        virtual ~Point() {  };
+        Vector2D() {};
+        explicit Vector2D(int x, int y) : x(x), y(y) {}
+        virtual ~Vector2D() {  };
 
-        Point operator-(Point p)  { return Point(x - p.x, y - p.x); }
-        Point operator+(Point p)  { return Point(x + p.x, y + p.x); }
-        bool operator==(const Point& p) const { return (x == p.x) && (y == p.y); }
+        Vector2D operator-(Vector2D p)  { return Vector2D(x - p.x, y - p.x); }
+        Vector2D operator+(Vector2D p)  { return Vector2D(x + p.x, y + p.x); }
+        bool operator==(const Vector2D& p) const { return (x == p.x) && (y == p.y); }
 };
 
 class Rect {
@@ -27,14 +27,14 @@ class Rect {
         }
 };
 
-int center_x(Rect r) { return ((r.x1 - r.x0) / 2) + r.x0; }
-int center_y(Rect r) { return ((r.y1 - r.y0) / 2) + r.y0; }
-Point center(Rect r) { return Point(center_x(r), center_y(r)); }
+inline int center_x(Rect r) { return ((r.x1 - r.x0) / 2) + r.x0; }
+inline int center_y(Rect r) { return ((r.y1 - r.y0) / 2) + r.y0; }
+inline Vector2D center(Rect r) { return Vector2D(center_x(r), center_y(r)); }
 
 namespace std {
-  template<> struct hash<Point> {
+  template<> struct hash<Vector2D> {
     // hash fn taken from https://stackoverflow.com/questions/20590656/error-for-hash-function-of-pair-of-ints
-    size_t operator()(Point const& p) const {
+    size_t operator()(Vector2D const& p) const {
         uintmax_t hash = std::hash<int>{}(p.x);
         hash <<= sizeof(uintmax_t) * 4;
         hash ^= std::hash<int>{}(p.y);

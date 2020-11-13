@@ -1,2 +1,3 @@
 core
 *.log
+.clang_complete
