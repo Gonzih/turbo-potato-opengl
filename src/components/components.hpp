@@ -14,9 +14,9 @@ namespace ecs::components {
     class LevelsComponent;
     class MovementComponent;
 
-    using SetPosLambda = std::function<void(Point)>;
-    using GetPosLambda = std::function<Point()>;
-    using CanMoveLambda = std::function<bool(Point, MovementDirection)>;
+    using SetPosLambda = std::function<void(Vector2D)>;
+    using GetPosLambda = std::function<Vector2D()>;
+    using CanMoveLambda = std::function<bool(Vector2D, MovementDirection)>;
     using VisibleLambda = std::function<bool(int, int)>;
     using MemoizedLambda = std::function<bool(int, int)>;
 };

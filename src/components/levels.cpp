@@ -69,17 +69,17 @@ namespace ecs::components
         void LevelsComponent::update()
         { regen_light_map(); }
 
-        bool LevelsComponent::can_move(Point pos, MovementDirection direction) const
+        bool LevelsComponent::can_move(Vector2D pos, MovementDirection direction) const
         {
             return level->can_move(pos, direction);
         }
 
-        bool LevelsComponent::can_go_downstairs(Point pos) const
+        bool LevelsComponent::can_go_downstairs(Vector2D pos) const
         {
             return level->at(pos.x, pos.y) == TileType::StairsDown;
         }
 
-        Point LevelsComponent::get_random_empty_coords() const
+        Vector2D LevelsComponent::get_random_empty_coords() const
         {
             return level->get_random_empty_coords();
         }

@@ -49,7 +49,7 @@ public:
         auto get_pos_fn = [player] {
             return player->get_component<PositionComponent>()->get_pos();
         };
-        auto set_pos_fn = [player](Point pos) {
+        auto set_pos_fn = [player](Vector2D pos) {
             return player->get_component<PositionComponent>()->set_pos(pos);
         };
 
@@ -63,7 +63,7 @@ public:
         levels_cmp = levels->get_component<LevelsComponent>();
 
         auto l_cmp = levels_cmp;
-        auto can_move_fn = [l_cmp](Point pos, MovementDirection dir) {
+        auto can_move_fn = [l_cmp](Vector2D pos, MovementDirection dir) {
             return l_cmp->can_move(pos, dir);
         };
         auto visible_fn = [l_cmp](int x, int y) {
@@ -105,7 +105,7 @@ public:
         auto player_sprite = sprite_manager->get_sprite("sprites/mage.png");
 
         auto l_cmp = levels_cmp;
-        auto can_move_fn = [l_cmp](Point pos, MovementDirection dir) {
+        auto can_move_fn = [l_cmp](Vector2D pos, MovementDirection dir) {
             return l_cmp->can_move(pos, dir);
         };
         auto visible_fn = [l_cmp](int x, int y) {

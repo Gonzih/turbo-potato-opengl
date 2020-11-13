@@ -10,14 +10,14 @@ namespace ecs::components
     class PositionComponent : public Component
     {
     private:
-        Point pos;
+        Vector2D pos;
     public:
-        PositionComponent(Point p) : pos { p } {  };
+        PositionComponent(Vector2D p) : pos { p } {  };
         PositionComponent(int x, int y) : pos { x, y } {  };
         virtual ~PositionComponent() override {  };
 
-        void set_pos(Point np) { pos = np; };
-        const Point get_pos() { return pos; };
+        void set_pos(Vector2D np) { pos = np; };
+        const Vector2D get_pos() { return pos; };
         const int get_x() { return pos.x; };
         const int get_y() { return pos.y; };
     };

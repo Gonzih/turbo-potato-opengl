@@ -21,7 +21,7 @@ namespace ecs::components
 
         void move(MovementDirection direction)
         {
-            Point pos = m_entity->get_component<PositionComponent>()->get_pos();
+            Vector2D pos = m_entity->get_component<PositionComponent>()->get_pos();
 
             if (can_move_fn(pos, direction))
                 switch(direction)

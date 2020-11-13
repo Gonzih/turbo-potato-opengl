@@ -42,7 +42,7 @@ class LightMap {
         std::vector<std::vector<LightLevel>> light_map;
 
         // Implementation based on this pseudo code http://www.roguebasin.com/index.php?title=Eligloscode
-        void calc_fov(float x, float y, int w, int h, Point camera_pos, const std::vector<std::vector<Tile>> &map, int light_radius) {
+        void calc_fov(float x, float y, int w, int h, Vector2D camera_pos, const std::vector<std::vector<Tile>> &map, int light_radius) {
             int i, tx, ty;
             float ox, oy;
             ox = static_cast<float>(camera_pos.x) + 0.5f;
@@ -68,7 +68,7 @@ class LightMap {
         }
     public:
         LightMap() {};
-        explicit LightMap(Point camera_pos, int w, int h, const std::vector<std::vector<Tile>> &map, float light_radius)
+        explicit LightMap(Vector2D camera_pos, int w, int h, const std::vector<std::vector<Tile>> &map, float light_radius)
         : light_map { std::vector<std::vector<LightLevel>>(w, std::vector<LightLevel>(h, LightLevel::Dim)) }
         {
             float x, y, fi;
@@ -158,7 +158,7 @@ class Map {
             }
         }
 
-        void add_stairs(Point pos) {
+        void add_stairs(Vector2D pos) {
             logger::info("Generated stairs at", pos.x, pos.y);
             map[pos.x][pos.y].m_type = TileType::StairsDown;
         }
@@ -193,19 +193,19 @@ class Map {
         const bool memoized(int x, int y) const { return map[x][y].m_memoized; }
         void memoize(int x, int y) { map[x][y].m_memoized = true; }
 
-        Point get_random_empty_coords() const
+        Vector2D get_random_empty_coords() const
         {
             int x, y;
             for (;;) {
                 x = rand_int(0, width);
                 y = rand_int(0, height);
                 if (at(x, y) == TileType::Empty) {
-                    return Point(x, y);
+                    return Vector2D(x, y);
                 }
             }
         }
 
-        bool can_move(Point pos, MovementDirection direction) const
+        bool can_move(Vector2D pos, MovementDirection direction) const
         {
             switch(direction) {
                 case MovementDirection::Up:
@@ -229,7 +229,7 @@ class Map {
             return x >= 0 && y >= 0 && x <= width && y <= height && map[x][y].m_type != TileType::Wall;
         };
 
-        LightMap generate_light_map(Point camera_pos, int light_radius) {
+        LightMap generate_light_map(Vector2D camera_pos, int light_radius) {
             return LightMap(camera_pos, width, height, map, light_radius);
         };
 };

@@ -33,9 +33,9 @@ namespace ecs::components
         void add_map();
         void regen_light_map();
 
-        bool can_move(Point pos, MovementDirection direction) const;
-        bool can_go_downstairs(Point pos) const;
-        Point get_random_empty_coords() const;
+        bool can_move(Vector2D pos, MovementDirection direction) const;
+        bool can_go_downstairs(Vector2D pos) const;
+        Vector2D get_random_empty_coords() const;
         bool visible(int x, int y);
         bool memoized(int x, int y);
         void go_down_level();
