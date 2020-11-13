@@ -3,18 +3,16 @@
 namespace ecs::components
 {
         LevelsComponent::LevelsComponent(int width, int height, GetPosLambda get_pos_fn, SetPosLambda set_pos_fn)
-        : levels {  }, width { width }, height { height }, get_pos_fn { get_pos_fn }, set_pos_fn { set_pos_fn }
+        : difficulty { 0 }, width { width }, height { height }, get_pos_fn { get_pos_fn }, set_pos_fn { set_pos_fn }
         { };
         LevelsComponent::~LevelsComponent()
         {  };
 
         void LevelsComponent::add_map()
         {
-            auto id =  levels.size();
+            difficulty++;
             logger::info("Initializing map level");
-            Map newmap { id, width, height };
-            levels.push_back(newmap);
-            current_level = id;
+            level = std::make_unique<Map>(width, height);
         }
 
         void LevelsComponent::init()
@@ -31,30 +29,15 @@ namespace ecs::components
             auto sprite_w = sprite->get_width();
             auto sprite_h = sprite->get_height();
 
-            /* Point pos = get_pos_fn(); */
-            /* auto target_level = levels[current_level].stairs_at(pos); */
-            /* Point target_pos; */
-            /* if (target_level != -1) { */
-            /*     // if target level doesn't exist (going up) add it first */
-            /*     if (!(target_level < levels.size())) { */
-            /*         add_map(); */
-            /*     } */
-            /*     target_pos = levels[target_level].stairs_to(current_level); */
-            /*     logger::info("Moving to level", target_level, target_pos.x, target_pos.y); */
-            /*     set_pos_fn(target_pos); */
-            /*     current_level = target_level; */
-            /* } */
-            Map& map = levels[current_level];
-
             int sprite_col = 0;
-            for (int i = 0; i < map.get_width(); ++i)
+            for (int i = 0; i < level->get_width(); ++i)
             {
-                for (int j = 0; j < map.get_height(); ++j)
+                for (int j = 0; j < level->get_height(); ++j)
                 {
-                    tile = map.at(i, j);
+                    tile = level->at(i, j);
 
                     if (visible(i, j)) {
-                        map.memoize(i, j);
+                        level->memoize(i, j);
                     }
 
                     switch (tile)
@@ -80,7 +63,7 @@ namespace ecs::components
         void LevelsComponent::regen_light_map()
         {
             auto pos = get_pos_fn();
-            light_map = levels[current_level].generate_light_map(pos, LIGHT_RADIUS);
+            light_map = level->generate_light_map(pos, LIGHT_RADIUS);
         }
 
         void LevelsComponent::update()
@@ -88,12 +71,17 @@ namespace ecs::components
 
         bool LevelsComponent::can_move(Point pos, MovementDirection direction) const
         {
-            return levels[current_level].can_move(pos, direction);
+            return level->can_move(pos, direction);
+        }
+
+        bool LevelsComponent::can_go_downstairs(Point pos) const
+        {
+            return level->at(pos.x, pos.y) == TileType::StairsDown;
         }
 
         Point LevelsComponent::get_random_empty_coords() const
         {
-            return levels[current_level].get_random_empty_coords();
+            return level->get_random_empty_coords();
         }
 
         bool LevelsComponent::visible(int x, int y)
@@ -103,17 +91,18 @@ namespace ecs::components
 
         bool LevelsComponent::memoized(int x, int y)
         {
-            return levels[current_level].memoized(x, y);
+            return level->memoized(x, y);
         }
 
-        void LevelsComponent::regen_current_map()
+        void LevelsComponent::go_down_level()
         {
-            logger::info("Regenerating current level");
-            Map newmap { current_level, width, height };
-            levels[current_level] = newmap;
+            add_map();
 
             auto pos = get_random_empty_coords();
             logger::info("Initializing player at (x, y)", pos.x, pos.y);
             set_pos_fn(pos);
         }
+
+        int LevelsComponent::get_difficulty()
+        { return difficulty; }
 };

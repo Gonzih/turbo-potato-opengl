@@ -18,7 +18,7 @@ private:
     System system;
     std::shared_ptr<Group> levels_group;
     std::shared_ptr<Group> player_group;
-    std::shared_ptr<Group> characters_group;
+    std::shared_ptr<Group> enemies_group;
     std::shared_ptr<Group> darkness_group;
     std::shared_ptr<LevelsComponent> levels_cmp;
     std::shared_ptr<MovementComponent> player_mvm_cmp;
@@ -87,8 +87,8 @@ public:
 
         levels->get_component<LevelsComponent>()->regen_light_map();
 
-        characters_group = system.add_group();
-        init_enemies(levels, can_move_fn, visible_fn);
+        enemies_group = system.add_group();
+        init_enemies();
 
         darkness_group = system.add_group();
         auto darkness = darkness_group->add_entity();
@@ -100,14 +100,22 @@ public:
         darkness->add_component<DarknessComponent>(map_width, map_height, visible_fn, memoized_fn);
     }
 
-    void init_enemies(std::shared_ptr<Entity> levels, CanMoveLambda can_move_fn, VisibleLambda visible_fn)
+    void init_enemies()
     {
         auto player_sprite = sprite_manager->get_sprite("sprites/mage.png");
 
-        int n = rand_int(3, 8);
+        auto l_cmp = levels_cmp;
+        auto can_move_fn = [l_cmp](Point pos, MovementDirection dir) {
+            return l_cmp->can_move(pos, dir);
+        };
+        auto visible_fn = [l_cmp](int x, int y) {
+            return l_cmp->visible(x, y);
+        };
+
+        int n = rand_int(4, 11) + levels_cmp->get_difficulty();
         for (int i = 0; i < n; ++i) {
-            auto enemy = characters_group->add_entity();
-            auto pos =  levels->get_component<LevelsComponent>()->get_random_empty_coords();
+            auto enemy = enemies_group->add_entity();
+            auto pos =  levels_cmp->get_random_empty_coords();
             logger::info("Initializing enemy at (x, y)", pos.x, pos.y);
 
             enemy->add_component<PositionComponent>(pos);
@@ -120,6 +128,19 @@ public:
     void quit()
     {
         exit(0);
+    }
+
+    void attempt_to_go_next_level()
+    {
+        auto pos = player_pos_cmp->get_pos();
+        if (levels_cmp->can_go_downstairs(pos))
+        {
+            levels_cmp->go_down_level();
+            enemies_group->destroy_all();
+            system.collect_garbage();
+            init_enemies();
+            system.update();
+        }
     }
 
     void handle_keypress(SDL_Event &event)
@@ -143,7 +164,12 @@ public:
                 direction = MovementDirection::Down;
                 logger::info("KEY DOWN");
                 break;
+            case SDLK_PERIOD:
+                attempt_to_go_next_level();
+                logger::info("KEY DOWNSTIARS");
+                break;
             default:
+                logger::info("UNHANDLED KEY", event.key.keysym.sym);
                 break;
         }
 
@@ -180,7 +206,6 @@ public:
                         quit();
                         break;
                     default:
-                        logger::info("KEY CAUGHT", event.type);
                         break;
                 }
             }

@@ -95,10 +95,8 @@ class LightMap {
 
 class Map {
     private:
-        size_t level;
         int width;
         int height;
-        std::unordered_map<Point, size_t> stairs;
         std::vector<std::vector<Tile>> map;
         int nrect = rand_int(8, 16);
         std::vector<Rect> rects;
@@ -160,9 +158,8 @@ class Map {
             }
         }
 
-        void add_stairs(Point pos, size_t destination_level) {
+        void add_stairs(Point pos) {
             logger::info("Generated stairs at", pos.x, pos.y);
-            stairs.emplace(pos, destination_level);
             map[pos.x][pos.y].m_type = TileType::StairsDown;
         }
 
@@ -177,14 +174,11 @@ class Map {
                 add_tunnel_to_existing(rect);
                 rects.push_back(rect);
             }
-            add_stairs(get_random_empty_coords(), level + 1);
-            if (level != 0)
-                add_stairs(get_random_empty_coords(), level - 1);
+            add_stairs(get_random_empty_coords());
         }
 
     public:
-        explicit Map(size_t l, int w, int h) :
-            level { l },
+        explicit Map(int w, int h) :
             width { w },
             height { h },
             map { std::vector<std::vector<Tile>>(w, std::vector<Tile>(h, wall_tile)) }
@@ -198,24 +192,6 @@ class Map {
         const TileType at(int x, int y) const { return map[x][y].m_type; }
         const bool memoized(int x, int y) const { return map[x][y].m_memoized; }
         void memoize(int x, int y) { map[x][y].m_memoized = true; }
-
-        int stairs_at(Point pos)
-        {
-            auto level = stairs.find(pos);
-            if(level == stairs.end())
-                return -1;
-            else
-                return (*level).second;
-        }
-
-        Point stairs_to(size_t level)
-        {
-            for (auto it = stairs.begin(); it != stairs.end(); ++it) {
-                if (it->second == level)
-                    return it->first;
-            }
-            return Point(-1, -1);
-        }
 
         Point get_random_empty_coords() const
         {

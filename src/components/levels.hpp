@@ -15,8 +15,8 @@ namespace ecs::components
     class LevelsComponent : public Component
     {
     private:
-        size_t current_level = 0;
-        std::vector<Map> levels;
+        int difficulty = 0;
+        std::unique_ptr<Map> level;
         LightMap light_map;
         int width;
         int height;
@@ -34,9 +34,12 @@ namespace ecs::components
         void regen_light_map();
 
         bool can_move(Point pos, MovementDirection direction) const;
+        bool can_go_downstairs(Point pos) const;
         Point get_random_empty_coords() const;
         bool visible(int x, int y);
         bool memoized(int x, int y);
-        void regen_current_map();
+        void go_down_level();
+
+        int get_difficulty();
     };
 };

@@ -128,6 +128,11 @@ namespace ecs
             for (auto& e : m_entities) e->draw();
         }
 
+        void destroy_all()
+        {
+            for (auto& e : m_entities) e->destroy();
+        }
+
         void collect_garbage()
         {
             m_entities.erase(
