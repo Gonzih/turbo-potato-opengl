@@ -10,7 +10,8 @@ class Vector2D {
         int x, y;
 
         Vector2D() {};
-        explicit Vector2D(int x, int y) : x(x), y(y) {}
+        explicit Vector2D(int x, int y) : x { x }, y { y } {}
+        explicit Vector2D(std::pair<int, int> v) : x { v.first } , y { v.second } {}
         virtual ~Vector2D() {  };
 
         Vector2D operator-(Vector2D p)  { return Vector2D(x - p.x, y - p.x); }

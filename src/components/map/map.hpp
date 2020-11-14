@@ -98,7 +98,7 @@ class Map {
         int width;
         int height;
         std::vector<std::vector<Tile>> map;
-        int nrect = rand_int(8, 16);
+        int nrect = rand_int(12, 26);
         std::vector<Rect> rects;
 
         Rect gen_rect(int size_w_limit, int size_h_limit) {
@@ -187,8 +187,8 @@ class Map {
             generate_maze();
         }
 
-        const int get_width() const { return width; }
-        const int get_height() const { return height; }
+        const int get_w() const { return width; }
+        const int get_h() const { return height; }
         const TileType at(int x, int y) const { return map[x][y].m_type; }
         const bool memoized(int x, int y) const { return map[x][y].m_memoized; }
         void memoize(int x, int y) { map[x][y].m_memoized = true; }

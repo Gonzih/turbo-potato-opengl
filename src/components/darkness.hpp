@@ -31,8 +31,8 @@ namespace ecs::components
 
             auto window = m_entity->get_component<SpriteComponent>()->m_window;
             auto sprite = m_entity->get_component<SpriteComponent>()->m_sprite;
-            auto sprite_w = sprite->get_width();
-            auto sprite_h = sprite->get_height();
+            auto sprite_w = sprite->get_w();
+            auto sprite_h = sprite->get_h();
 
             for (int x = 0; x < m_width; ++x)
             {

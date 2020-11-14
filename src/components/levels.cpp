@@ -26,18 +26,18 @@ namespace ecs::components
             TileType tile;
             auto window = m_entity->get_component<SpriteComponent>()->m_window;
             auto sprite = m_entity->get_component<SpriteComponent>()->m_sprite;
-            auto sprite_w = sprite->get_width();
-            auto sprite_h = sprite->get_height();
+            auto sprite_w = sprite->get_w();
+            auto sprite_h = sprite->get_h();
 
             int sprite_col = 0;
-            for (int i = 0; i < level->get_width(); ++i)
+            for (int x = 0; x < level->get_w(); ++x)
             {
-                for (int j = 0; j < level->get_height(); ++j)
+                for (int y = 0; y < level->get_h(); ++y)
                 {
-                    tile = level->at(i, j);
+                    tile = level->at(x, y);
 
-                    if (visible(i, j)) {
-                        level->memoize(i, j);
+                    if (visible(x, y)) {
+                        level->memoize(x, y);
                     }
 
                     switch (tile)
@@ -55,7 +55,7 @@ namespace ecs::components
                             break;
                     }
 
-                    sprite->render(window->get_renderer(), 0, sprite_col, i*sprite_w, j*sprite_h, 0, NULL);
+                    sprite->render(window->get_renderer(), 0, sprite_col, x*sprite_w, y*sprite_h, 0, NULL);
                 }
             }
         }

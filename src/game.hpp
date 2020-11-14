@@ -35,6 +35,8 @@ public:
 
     void init()
     {
+        window->set_resizable(false);
+
         static int sprite_size = 32;
         sprite_manager->preload_sprite("sprites/surroundings.png", 1, 3, sprite_size, sprite_size);
         sprite_manager->preload_sprite("sprites/darkness.png", 1, 1, sprite_size, sprite_size);

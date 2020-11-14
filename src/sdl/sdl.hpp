@@ -272,10 +272,10 @@ namespace sdl
                 m_texture.set_alpha(alpha);
             }
 
-            int get_width() const
+            int get_w() const
             { return m_width; }
 
-            int get_height() const
+            int get_h() const
             { return m_height; }
     };
 
@@ -337,9 +337,23 @@ namespace sdl
                 SDL_RenderSetViewport(m_renderer, &viewport);
             }
 
+            std::pair<int, int> get_screen_size()
+            {
+                SDL_DisplayMode DM;
+                SDL_GetCurrentDisplayMode(0, &DM);
+
+                return std::pair<int, int> { DM.w, DM.h };
+            }
+
             void set_draw_color(int r, int g, int b, int a)
             {
                 SDL_SetRenderDrawColor(m_renderer, r, g, b, a);
+            }
+
+            void set_resizable(bool v)
+            {
+                SDL_bool b = v ? SDL_TRUE : SDL_FALSE;
+                SDL_SetWindowResizable(m_window, b);
             }
 
             virtual ~Window()
