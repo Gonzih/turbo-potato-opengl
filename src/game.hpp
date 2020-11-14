@@ -12,6 +12,7 @@ using namespace ecs::components;
 class Game
 {
 private:
+    bool is_running = true;
     int screen_width;
     int screen_height;
     std::shared_ptr<sdl::Window> window;
@@ -170,6 +171,10 @@ public:
                 attempt_to_go_next_level();
                 logger::info("KEY DOWNSTIARS");
                 break;
+            case SDLK_ESCAPE:
+                is_running = false;
+                logger::info("exiting");
+                break;
             default:
                 logger::info("UNHANDLED KEY", event.key.keysym.sym);
                 break;
@@ -186,7 +191,7 @@ public:
     void loop()
     {
         SDL_Event event;
-        while(true)
+        while(is_running)
         {
             system.collect_garbage();
             window->reset_viewport();
