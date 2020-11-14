@@ -27,4 +27,3 @@ namespace ecs::components {
 #include "levels.hpp"
 #include "movement.hpp"
 #include "darkness.hpp"
-#include "viewport.hpp"
