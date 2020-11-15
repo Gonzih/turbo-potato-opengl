@@ -133,6 +133,11 @@ namespace ecs
             for (auto& e : m_entities) e->destroy();
         }
 
+        std::ctor<std::shared_ptr<Entity>>& entities()
+        {
+            return m_entities;
+        }
+
         void collect_garbage()
         {
             m_entities.erase(
