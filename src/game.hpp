@@ -17,6 +17,7 @@ class Game
 private:
     int m_difficulty = 0;
     bool m_is_running = true;
+    int m_sprite_size = 32;
     int m_screen_width;
     int m_screen_height;
     std::shared_ptr<sdl::Window> m_window;
@@ -27,6 +28,7 @@ private:
     std::shared_ptr<Group> m_darkness_group;
     std::shared_ptr<MovementComponent> m_player_mvm_cmp;
     std::shared_ptr<TransformComponent> m_player_pos_cmp;
+    std::shared_ptr<TransformComponent> m_player_sprite_pos_cmp;
     std::unique_ptr<sdl::SpriteManager> m_sprite_manager;
     std::unique_ptr<Map> m_level;
     std::unique_ptr<LightMap> m_light_map;
@@ -39,26 +41,44 @@ public:
         m_sprite_manager { std::make_unique<sdl::SpriteManager>(m_window) }
     { };
 
+    void add_map()
+    {
+        static int map_width = m_screen_width/m_sprite_size;
+        static int map_height = m_screen_height/m_sprite_size;
+
+        auto wall_sprite = m_sprite_manager->get_sprite("sprites/surroundings.png");
+        logger::info("Loading levels sprite");
+        m_level = std::make_unique<Map>(map_width, map_height);
+    }
+
+    void add_darkness()
+    {
+        /* static int map_width = m_screen_width/m_sprite_size; */
+        /* static int map_height = m_screen_height/m_sprite_size; */
+
+        /* auto darkness = m_darkness_group->add_entity(); */
+
+        /* auto darkness_sprite = m_sprite_manager->get_sprite("sprites/darkness.png"); */
+        /* darkness_sprite->set_blend_mode(SDL_BLENDMODE_BLEND); */
+
+        /* darkness->add_component<SpriteComponent>(m_window, darkness_sprite); */
+        /* darkness->add_component<DarknessComponent>(map_width, map_height, get_visible_fn(), get_memoized_fn()); */
+    }
+
     void init()
     {
         m_window->set_resizable(false);
 
-        static int sprite_size = 32;
-        m_sprite_manager->preload_sprite("sprites/surroundings.png", 1, 3, sprite_size, sprite_size);
-        m_sprite_manager->preload_sprite("sprites/darkness.png", 1, 1, sprite_size, sprite_size);
-        m_sprite_manager->preload_sprite("sprites/mage.png", 1, 1, sprite_size, sprite_size, sdl::RGB { 0xFF, 0, 0xFF });
+        m_sprite_manager->preload_sprite("sprites/surroundings.png", 1, 3, m_sprite_size, m_sprite_size);
+        m_sprite_manager->preload_sprite("sprites/darkness.png", 1, 1, m_sprite_size, m_sprite_size);
+        m_sprite_manager->preload_sprite("sprites/mage.png", 1, 1, m_sprite_size, m_sprite_size, sdl::RGB { 0xFF, 0, 0xFF });
 
         m_tiles_group = m_system.add_group();
         m_player_group = m_system.add_group();
         auto player = m_player_group->add_entity();
         auto player_movement = m_player_group->add_entity();
 
-        static int map_width = m_screen_width/sprite_size;
-        static int map_height = m_screen_height/sprite_size;
-
-        auto wall_sprite = m_sprite_manager->get_sprite("sprites/surroundings.png");
-        logger::info("Loading levels sprite");
-        m_level = std::make_unique<Map>(map_width, map_height);
+        add_map();
         generate_tiles();
 
         auto pos =  m_level->get_random_empty_coords();
@@ -81,13 +101,7 @@ public:
         init_enemies();
 
         m_darkness_group = m_system.add_group();
-        /* auto darkness = m_darkness_group->add_entity(); */
-
-        /* auto darkness_sprite = m_sprite_manager->get_sprite("sprites/darkness.png"); */
-        /* darkness_sprite->set_blend_mode(SDL_BLENDMODE_BLEND); */
-
-        /* darkness->add_component<SpriteComponent>(m_window, darkness_sprite); */
-        /* darkness->add_component<DarknessComponent>(map_width, map_height, get_visible_fn(), get_memoized_fn()); */
+        add_darkness();
     }
 
     VisibleLambda get_visible_fn()
@@ -133,9 +147,14 @@ public:
         if (can_go_downstairs(pos))
         {
             go_down_level();
+
+            m_tiles_group->destroy_all();
             m_enemies_group->destroy_all();
             m_system.collect_garbage();
+
+            generate_tiles();
             init_enemies();
+
             m_system.update();
         }
     }
@@ -251,11 +270,12 @@ public:
 
     bool visible(int x, int y)
     {
-        bool vis = m_light_map->visible(x, y);
+        /* bool vis = m_light_map->visible(x, y); */
 
-        if (vis) { m_level->memoize(x, y); }
+        /* if (vis) { m_level->memoize(x, y); } */
 
-        return vis;
+        /* return vis; */
+        return true;
     }
 
     bool memoized(int x, int y)
@@ -271,11 +291,11 @@ public:
 
     void go_down_level()
     {
-        /* add_map(); */
-
-        /* auto pos = get_random_empty_coords(); */
-        /* logger::info("Initializing player at (x, y)", pos.x, pos.y); */
-        /* set_pos_fn(pos); */
+        add_map();
+        auto pos = m_level->get_random_empty_coords();
+        logger::info("Initializing player at (x, y)", pos.x, pos.y);
+        m_player_pos_cmp->set_pos(pos);
+        m_player_sprite_pos_cmp->set_pos(pos);
     }
 
     void generate_tiles()
