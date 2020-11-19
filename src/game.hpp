@@ -291,7 +291,7 @@ public:
                 entity->add_component<TransformComponent>(Vector2D { x, y });
                 entity->add_component<MovementComponent>(get_can_move_fn());
                 entity->add_component<SpriteComponent>(m_window, sprite);
-                entity->add_component<SpriteRenderComponent>(sprite_col, 0, get_visible_fn());
+                entity->add_component<SpriteRenderComponent>(sprite_col, 0, [](int x, int y){ return true; });
             }
         }
     }
