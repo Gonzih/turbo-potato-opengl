@@ -3,14 +3,14 @@
 #include <algorithm>
 #include <vector>
 #include <utility>
+#include <memory>
 #include <math.h>
 #include <unordered_map>
 #include <assert.h>
 
-#include "../../random.hpp"
-#include "../../logging.hpp"
-#include "../movement.hpp"
-#include "../../geometry.hpp"
+#include "../random.hpp"
+#include "../logging.hpp"
+#include "../geometry.hpp"
 
 enum TileType
 {
@@ -229,7 +229,7 @@ class Map {
             return x >= 0 && y >= 0 && x <= width && y <= height && map[x][y].m_type != TileType::Wall;
         };
 
-        LightMap generate_light_map(Vector2D camera_pos, int light_radius) {
-            return LightMap(camera_pos, width, height, map, light_radius);
+        std::unique_ptr<LightMap> generate_light_map(Vector2D camera_pos, int light_radius) {
+            return std::make_unique<LightMap>(camera_pos, width, height, map, light_radius);
         };
 };

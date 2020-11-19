@@ -4,7 +4,6 @@
 
 #include "../sdl/sdl.hpp"
 #include "../ecs/ecs.hpp"
-#include "position.hpp"
 
 namespace ecs::components
 {

@@ -5,125 +5,118 @@
 #include "sdl/sdl.hpp"
 #include "ecs/ecs.hpp"
 #include "components/components.hpp"
+#include "map/map.hpp"
 
 using namespace ecs;
 using namespace ecs::components;
 
+#define LIGHT_RADIUS 15
+
 class Game
 {
 private:
-    bool is_running = true;
-    int screen_width;
-    int screen_height;
-    std::shared_ptr<sdl::Window> window;
-    System system;
-    std::shared_ptr<Group> levels_group;
-    std::shared_ptr<Group> player_group;
-    std::shared_ptr<Group> enemies_group;
-    std::shared_ptr<Group> darkness_group;
-    std::shared_ptr<LevelsComponent> levels_cmp;
-    std::shared_ptr<MovementComponent> player_mvm_cmp;
-    std::shared_ptr<PositionComponent> player_pos_cmp;
-    std::unique_ptr<sdl::SpriteManager> sprite_manager;
+    int m_difficulty = 0;
+    bool m_is_running = true;
+    int m_screen_width;
+    int m_screen_height;
+    std::shared_ptr<sdl::Window> m_window;
+    System m_system;
+    std::shared_ptr<Group> m_tiles_group;
+    std::shared_ptr<Group> m_player_group;
+    std::shared_ptr<Group> m_enemies_group;
+    std::shared_ptr<Group> m_darkness_group;
+    std::shared_ptr<MovementComponent> m_player_mvm_cmp;
+    std::shared_ptr<TransformComponent> m_player_pos_cmp;
+    std::unique_ptr<sdl::SpriteManager> m_sprite_manager;
+    std::unique_ptr<Map> m_level;
+    std::unique_ptr<LightMap> m_light_map;
 
 public:
     Game(int screen_width, int screen_height) :
-        screen_width { screen_width },
-        screen_height { screen_height },
-        window { std::make_shared<sdl::Window>(screen_width, screen_height) },
-        sprite_manager { std::make_unique<sdl::SpriteManager>(window) }
+        m_screen_width { screen_width },
+        m_screen_height { screen_height },
+        m_window { std::make_shared<sdl::Window>(screen_width, screen_height) },
+        m_sprite_manager { std::make_unique<sdl::SpriteManager>(m_window) }
     { };
 
     void init()
     {
-        window->set_resizable(false);
+        m_window->set_resizable(false);
 
         static int sprite_size = 32;
-        sprite_manager->preload_sprite("sprites/surroundings.png", 1, 3, sprite_size, sprite_size);
-        sprite_manager->preload_sprite("sprites/darkness.png", 1, 1, sprite_size, sprite_size);
-        sprite_manager->preload_sprite("sprites/mage.png", 1, 1, sprite_size, sprite_size, sdl::RGB { 0xFF, 0, 0xFF });
+        m_sprite_manager->preload_sprite("sprites/surroundings.png", 1, 3, sprite_size, sprite_size);
+        m_sprite_manager->preload_sprite("sprites/darkness.png", 1, 1, sprite_size, sprite_size);
+        m_sprite_manager->preload_sprite("sprites/mage.png", 1, 1, sprite_size, sprite_size, sdl::RGB { 0xFF, 0, 0xFF });
 
-        levels_group = system.add_group();
-        auto levels = levels_group->add_entity();
+        m_tiles_group = m_system.add_group();
+        m_player_group = m_system.add_group();
+        auto player = m_player_group->add_entity();
 
-        player_group = system.add_group();
-        auto player = player_group->add_entity();
+        static int map_width = m_screen_width/sprite_size;
+        static int map_height = m_screen_height/sprite_size;
 
-        auto get_pos_fn = [player] {
-            return player->get_component<PositionComponent>()->get_pos();
-        };
-        auto set_pos_fn = [player](Vector2D pos) {
-            return player->get_component<PositionComponent>()->set_pos(pos);
-        };
-
-        static int map_width = screen_width/sprite_size;
-        static int map_height = screen_height/sprite_size;
-
-        auto wall_sprite = sprite_manager->get_sprite("sprites/surroundings.png");
+        auto wall_sprite = m_sprite_manager->get_sprite("sprites/surroundings.png");
         logger::info("Loading levels sprite");
-        levels->add_component<SpriteComponent>(window, wall_sprite);
-        levels->add_component<LevelsComponent>(map_width, map_height, get_pos_fn, set_pos_fn);
-        levels_cmp = levels->get_component<LevelsComponent>();
+        m_level = std::make_unique<Map>(map_width, map_height);
+        generate_tiles();
 
-        auto l_cmp = levels_cmp;
-        auto can_move_fn = [l_cmp](Vector2D pos, MovementDirection dir) {
-            return l_cmp->can_move(pos, dir);
+        auto can_move_fn = [](Vector2D pos, MovementDirection dir) {
+            return true;
         };
-        auto visible_fn = [l_cmp](int x, int y) {
-            return l_cmp->visible(x, y);
+        auto visible_fn = [](int x, int y) {
+            return true;
         };
-        auto memoized_fn = [l_cmp](int x, int y) {
-            return l_cmp->memoized(x, y);
+        auto memoized_fn = [](int x, int y) {
+            return true;
         };
 
-        auto pos =  levels->get_component<LevelsComponent>()->get_random_empty_coords();
+        auto pos =  m_level->get_random_empty_coords();
         logger::info("Initializing player at (x, y)", pos.x, pos.y);
 
-        auto player_sprite = sprite_manager->get_sprite("sprites/mage.png");
+        auto player_sprite = m_sprite_manager->get_sprite("sprites/mage.png");
 
-        player->add_component<PositionComponent>(pos);
+        player->add_component<TransformComponent>(pos);
         player->add_component<MovementComponent>(can_move_fn);
-        player->add_component<SpriteComponent>(window, player_sprite);
+        player->add_component<SpriteComponent>(m_window, player_sprite);
         player->add_component<SpriteRenderComponent>(visible_fn);
-        player_mvm_cmp = player->get_component<MovementComponent>();
-        player_pos_cmp = player->get_component<PositionComponent>();
+        m_player_mvm_cmp = player->get_component<MovementComponent>();
+        m_player_pos_cmp = player->get_component<TransformComponent>();
 
-        levels->get_component<LevelsComponent>()->regen_light_map();
+        m_light_map = m_level->generate_light_map();
 
-        enemies_group = system.add_group();
+        m_enemies_group = m_system.add_group();
         init_enemies();
 
-        darkness_group = system.add_group();
-        auto darkness = darkness_group->add_entity();
+        m_darkness_group = m_system.add_group();
+        auto darkness = m_darkness_group->add_entity();
 
-        auto darkness_sprite = sprite_manager->get_sprite("sprites/darkness.png");
+        auto darkness_sprite = m_sprite_manager->get_sprite("sprites/darkness.png");
         darkness_sprite->set_blend_mode(SDL_BLENDMODE_BLEND);
 
-        darkness->add_component<SpriteComponent>(window, darkness_sprite);
+        darkness->add_component<SpriteComponent>(m_window, darkness_sprite);
         darkness->add_component<DarknessComponent>(map_width, map_height, visible_fn, memoized_fn);
     }
 
     void init_enemies()
     {
-        auto player_sprite = sprite_manager->get_sprite("sprites/mage.png");
+        auto player_sprite = m_sprite_manager->get_sprite("sprites/mage.png");
 
-        auto l_cmp = levels_cmp;
         auto can_move_fn = [l_cmp](Vector2D pos, MovementDirection dir) {
-            return l_cmp->can_move(pos, dir);
+            return true;
         };
-        auto visible_fn = [l_cmp](int x, int y) {
-            return l_cmp->visible(x, y);
+        auto visible_fn = [](int x, int y) {
+            return true;
         };
 
-        int n = rand_int(4, 11) + levels_cmp->get_difficulty();
+        int n = rand_int(4, 11) + m_difficulty;
         for (int i = 0; i < n; ++i) {
-            auto enemy = enemies_group->add_entity();
-            auto pos =  levels_cmp->get_random_empty_coords();
+            auto enemy = m_enemies_group->add_entity();
+            auto pos =  m_level->get_random_empty_coords();
             logger::info("Initializing enemy at (x, y)", pos.x, pos.y);
 
-            enemy->add_component<PositionComponent>(pos);
+            enemy->add_component<TransformComponent>(pos);
             enemy->add_component<MovementComponent>(can_move_fn);
-            enemy->add_component<SpriteComponent>(window, player_sprite);
+            enemy->add_component<SpriteComponent>(m_window, player_sprite);
             enemy->add_component<SpriteRenderComponent>(visible_fn);
         }
     }
@@ -136,13 +129,13 @@ public:
     void attempt_to_go_next_level()
     {
         auto pos = player_pos_cmp->get_pos();
-        if (levels_cmp->can_go_downstairs(pos))
+        if (can_go_downstairs(pos))
         {
-            levels_cmp->go_down_level();
-            enemies_group->destroy_all();
-            system.collect_garbage();
+            go_down_level();
+            m_enemies_group->destroy_all();
+            m_system.collect_garbage();
             init_enemies();
-            system.update();
+            m_system.update();
         }
     }
 
@@ -215,6 +208,76 @@ public:
                     default:
                         break;
                 }
+            }
+        }
+    }
+
+    // LEVELS RELATED TOOLING
+
+    bool can_move(Vector2D pos, MovementDirection direction) const
+    {
+        return level->can_move(pos, direction);
+    }
+
+    bool can_go_downstairs(Vector2D pos) const
+    {
+        return level->at(pos.x, pos.y) == TileType::StairsDown;
+    }
+
+    bool visible(int x, int y)
+    {
+        return light_map.visible(x, y);
+    }
+
+    bool memoized(int x, int y)
+    {
+        return level->memoized(x, y);
+    }
+
+    void regen_light_map()
+    {
+        auto pos = get_pos_fn();
+        m_light_map = m_level->generate_light_map(pos, LIGHT_RADIUS);
+    }
+
+    void go_down_level()
+    {
+        /* add_map(); */
+
+        /* auto pos = get_random_empty_coords(); */
+        /* logger::info("Initializing player at (x, y)", pos.x, pos.y); */
+        /* set_pos_fn(pos); */
+    }
+
+    void generate_tiles()
+    {
+        int sprite_col;
+        for (int x = 0; x < m_level->get_w(); ++x)
+        {
+            for (int y = 0; y < m_level->get_h(); ++y)
+            {
+                auto tile = m_level->at(x, y);
+                auto entity = m_tiles_group->add_entity();
+
+                if (visible(x, y)) {
+                    m_level->memoize(x, y);
+                }
+
+                switch (tile)
+                {
+                    case TileType::Wall:
+                        sprite_col = 0;
+                        break;
+                    case TileType::Empty:
+                        sprite_col = 1;
+                        break;
+                    case TileType::StairsDown:
+                        sprite_col = 2;
+                        break;
+                    case TileType::StairsUp:
+                        break;
+                }
+
             }
         }
     }

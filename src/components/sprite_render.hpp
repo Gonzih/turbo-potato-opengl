@@ -4,7 +4,7 @@
 
 #include "../sdl/sdl.hpp"
 #include "../ecs/ecs.hpp"
-#include "position.hpp"
+#include "transform.hpp"
 #include "sprite.hpp"
 
 namespace ecs::components
@@ -12,10 +12,18 @@ namespace ecs::components
     class SpriteRenderComponent : public Component
     {
     private:
+        int m_col = 0;
+        int m_row = 0;
         VisibleLambda m_is_visible;
     public:
         SpriteRenderComponent(VisibleLambda vfn)
         : m_is_visible { vfn } {  };
+        SpriteRenderComponent(int col, int row, VisibleLambda vfn)
+        : SpriteRenderComponent { vfn }
+        {
+            m_col = col;
+            m_row = row;
+        };
         virtual ~SpriteRenderComponent() override {  };
 
         void init() override {
@@ -23,7 +31,7 @@ namespace ecs::components
         }
 
         void draw() override {
-            auto pos = m_entity->get_component<PositionComponent>()->get_pos();
+            auto pos = m_entity->get_component<TransformComponent>()->get_pos();
 
             static SDL_RendererFlip flip = SDL_FLIP_HORIZONTAL;
             auto sprite = m_entity->get_component<SpriteComponent>()->m_sprite;
@@ -32,7 +40,7 @@ namespace ecs::components
             auto h = sprite->get_h();
 
             if (m_is_visible(pos.x, pos.y))
-                sprite->render(window->get_renderer(), 0, 0, pos.x*w, pos.y*h, 0, NULL, flip);
+                sprite->render(window->get_renderer(), m_col, m_row, pos.x*w, pos.y*h, 0, NULL, flip);
         }
     };
 };

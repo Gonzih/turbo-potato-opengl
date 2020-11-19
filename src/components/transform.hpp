@@ -7,14 +7,14 @@
 
 namespace ecs::components
 {
-    class PositionComponent : public Component
+    class TransformComponent : public Component
     {
     private:
         Vector2D pos;
     public:
-        PositionComponent(Vector2D p) : pos { p } {  };
-        PositionComponent(int x, int y) : pos { x, y } {  };
-        virtual ~PositionComponent() override {  };
+        TransformComponent(Vector2D p) : pos { p } {  };
+        TransformComponent(int x, int y) : pos { x, y } {  };
+        virtual ~TransformComponent() override {  };
 
         void set_pos(Vector2D np) { pos = np; };
         const Vector2D get_pos() { return pos; };

@@ -16,12 +16,12 @@ namespace ecs::components
         virtual ~MovementComponent() override {  };
 
         void init() override {
-            m_entity->assert_component<PositionComponent>("Movement");
+            m_entity->assert_component<TransformComponent>("Movement");
         }
 
         void move(MovementDirection direction)
         {
-            Vector2D pos = m_entity->get_component<PositionComponent>()->get_pos();
+            Vector2D pos = m_entity->get_component<TransformComponent>()->get_pos();
 
             if (can_move_fn(pos, direction))
                 switch(direction)
@@ -41,7 +41,7 @@ namespace ecs::components
                     case MovementDirection::None:
                         break;
                 }
-            m_entity->get_component<PositionComponent>()->set_pos(pos);
+            m_entity->get_component<TransformComponent>()->set_pos(pos);
         }
     };
 };

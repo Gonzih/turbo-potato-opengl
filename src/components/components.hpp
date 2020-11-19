@@ -9,9 +9,8 @@ enum class MovementDirection {
 };
 
 namespace ecs::components {
-    class PositionComponent;
+    class TransformComponent;
     class SpriteRenderComponent;
-    class LevelsComponent;
     class MovementComponent;
 
     using SetPosLambda = std::function<void(Vector2D)>;
@@ -21,9 +20,8 @@ namespace ecs::components {
     using MemoizedLambda = std::function<bool(int, int)>;
 };
 
-#include "position.hpp"
+#include "transform.hpp"
 #include "sprite.hpp"
 #include "sprite_render.hpp"
-#include "levels.hpp"
 #include "movement.hpp"
 #include "darkness.hpp"
