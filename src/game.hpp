@@ -51,6 +51,7 @@ public:
         m_tiles_group = m_system.add_group();
         m_player_group = m_system.add_group();
         auto player = m_player_group->add_entity();
+        auto player_movement = m_player_group->add_entity();
 
         static int map_width = m_screen_width/sprite_size;
         static int map_height = m_screen_height/sprite_size;
@@ -65,12 +66,14 @@ public:
 
         auto player_sprite = m_sprite_manager->get_sprite("sprites/mage.png");
 
-        player->add_component<TransformComponent>(pos);
-        player->add_component<MovementComponent>(get_can_move_fn());
         player->add_component<SpriteComponent>(m_window, player_sprite);
-        player->add_component<SpriteRenderComponent>(get_visible_fn());
-        m_player_mvm_cmp = player->get_component<MovementComponent>();
-        m_player_pos_cmp = player->get_component<TransformComponent>();
+        player->add_component<SpriteRenderComponent>([](int x, int y){ return true; });
+        player->add_component<TransformComponent>(pos);
+
+        player_movement->add_component<TransformComponent>(pos);
+        player_movement->add_component<MovementComponent>(get_can_move_fn());
+        m_player_mvm_cmp = player_movement->get_component<MovementComponent>();
+        m_player_pos_cmp = player_movement->get_component<TransformComponent>();
 
         regen_light_map();
 
@@ -78,13 +81,13 @@ public:
         init_enemies();
 
         m_darkness_group = m_system.add_group();
-        auto darkness = m_darkness_group->add_entity();
+        /* auto darkness = m_darkness_group->add_entity(); */
 
-        auto darkness_sprite = m_sprite_manager->get_sprite("sprites/darkness.png");
-        darkness_sprite->set_blend_mode(SDL_BLENDMODE_BLEND);
+        /* auto darkness_sprite = m_sprite_manager->get_sprite("sprites/darkness.png"); */
+        /* darkness_sprite->set_blend_mode(SDL_BLENDMODE_BLEND); */
 
-        darkness->add_component<SpriteComponent>(m_window, darkness_sprite);
-        darkness->add_component<DarknessComponent>(map_width, map_height, get_visible_fn(), get_memoized_fn());
+        /* darkness->add_component<SpriteComponent>(m_window, darkness_sprite); */
+        /* darkness->add_component<DarknessComponent>(map_width, map_height, get_visible_fn(), get_memoized_fn()); */
     }
 
     VisibleLambda get_visible_fn()
@@ -182,11 +185,28 @@ public:
         if (direction == MovementDirection::None)
             return;
 
-        m_player_mvm_cmp->move(direction);
+        move(direction);
         regen_light_map();
         m_system.update();
 
         direction = MovementDirection::None;
+    }
+
+    void move(MovementDirection direction)
+    {
+        m_player_mvm_cmp->move(direction);
+
+        auto opposite = opposite_direction(direction);
+
+        for (auto& e : m_tiles_group->entities())
+        {
+            e->get_component<MovementComponent>()->move(opposite);
+        }
+
+        for (auto& e : m_enemies_group->entities())
+        {
+            e->get_component<MovementComponent>()->move(opposite);
+        }
     }
 
     void loop()
