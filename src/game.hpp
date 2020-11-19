@@ -75,16 +75,16 @@ public:
         regen_light_map();
 
         m_enemies_group = m_system.add_group();
-        /* init_enemies(); */
+        init_enemies();
 
         m_darkness_group = m_system.add_group();
-        /* auto darkness = m_darkness_group->add_entity(); */
+        auto darkness = m_darkness_group->add_entity();
 
-        /* auto darkness_sprite = m_sprite_manager->get_sprite("sprites/darkness.png"); */
-        /* darkness_sprite->set_blend_mode(SDL_BLENDMODE_BLEND); */
+        auto darkness_sprite = m_sprite_manager->get_sprite("sprites/darkness.png");
+        darkness_sprite->set_blend_mode(SDL_BLENDMODE_BLEND);
 
-        /* darkness->add_component<SpriteComponent>(m_window, darkness_sprite); */
-        /* darkness->add_component<DarknessComponent>(map_width, map_height, get_visible_fn(), memoized_fn); */
+        darkness->add_component<SpriteComponent>(m_window, darkness_sprite);
+        darkness->add_component<DarknessComponent>(map_width, map_height, get_visible_fn(), get_memoized_fn());
     }
 
     VisibleLambda get_visible_fn()
@@ -183,7 +183,9 @@ public:
             return;
 
         m_player_mvm_cmp->move(direction);
+        regen_light_map();
         m_system.update();
+
         direction = MovementDirection::None;
     }
 
@@ -232,7 +234,11 @@ public:
 
     bool visible(int x, int y)
     {
-        return m_light_map->visible(x, y);
+        bool vis = m_light_map->visible(x, y);
+
+        if (vis) { m_level->memoize(x, y); }
+
+        return vis;
     }
 
     bool memoized(int x, int y)
