@@ -71,7 +71,7 @@ public:
         player->add_component<TransformComponent>(pos);
 
         player_movement->add_component<TransformComponent>(pos);
-        player_movement->add_component<MovementComponent>(get_can_move_fn());
+        player_movement->add_component<MovementComponent>();
         m_player_mvm_cmp = player_movement->get_component<MovementComponent>();
         m_player_pos_cmp = player_movement->get_component<TransformComponent>();
 
@@ -98,14 +98,6 @@ public:
         };
     }
 
-    CanMoveLambda get_can_move_fn()
-    {
-        return [this](Vector2D pos, MovementDirection dir)
-        {
-            return this->can_move(pos, dir);
-        };
-    }
-
     MemoizedLambda get_memoized_fn() {
         return [this](int x, int y)
         {
@@ -124,7 +116,7 @@ public:
             logger::info("Initializing enemy at (x, y)", pos.x, pos.y);
 
             enemy->add_component<TransformComponent>(pos);
-            enemy->add_component<MovementComponent>(get_can_move_fn());
+            enemy->add_component<MovementComponent>();
             enemy->add_component<SpriteComponent>(m_window, player_sprite);
             enemy->add_component<SpriteRenderComponent>(get_visible_fn());
         }
@@ -194,18 +186,23 @@ public:
 
     void move(MovementDirection direction)
     {
-        m_player_mvm_cmp->move(direction);
+        auto pos = m_player_pos_cmp->get_pos();
 
-        auto opposite = opposite_direction(direction);
-
-        for (auto& e : m_tiles_group->entities())
+        if (can_move(pos, direction))
         {
-            e->get_component<MovementComponent>()->move(opposite);
-        }
+            m_player_mvm_cmp->move(direction);
 
-        for (auto& e : m_enemies_group->entities())
-        {
-            e->get_component<MovementComponent>()->move(opposite);
+            auto opposite = opposite_direction(direction);
+
+            for (auto& e : m_tiles_group->entities())
+            {
+                e->get_component<MovementComponent>()->move(opposite);
+            }
+
+            for (auto& e : m_enemies_group->entities())
+            {
+                e->get_component<MovementComponent>()->move(opposite);
+            }
         }
     }
 
@@ -309,7 +306,7 @@ public:
                 }
 
                 entity->add_component<TransformComponent>(Vector2D { x, y });
-                entity->add_component<MovementComponent>(get_can_move_fn());
+                entity->add_component<MovementComponent>();
                 entity->add_component<SpriteComponent>(m_window, sprite);
                 entity->add_component<SpriteRenderComponent>(sprite_col, 0, [](int x, int y){ return true; });
             }
