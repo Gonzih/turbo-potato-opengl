@@ -12,18 +12,15 @@ namespace ecs::components
     class SpriteRenderComponent : public Component
     {
     private:
-        int m_col = 0;
-        int m_row = 0;
+        int m_col;
+        int m_row;
         VisibleLambda m_is_visible;
     public:
         SpriteRenderComponent(VisibleLambda vfn)
-        : m_is_visible { vfn } {  };
+        : m_col { 0 }, m_row { 0 }, m_is_visible { vfn } {  };
         SpriteRenderComponent(int col, int row, VisibleLambda vfn)
-        : SpriteRenderComponent { vfn }
-        {
-            m_col = col;
-            m_row = row;
-        };
+        : m_col { col }, m_row { row }, m_is_visible { vfn } {  };
+
         virtual ~SpriteRenderComponent() override {  };
 
         void init() override {

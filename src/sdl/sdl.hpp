@@ -246,10 +246,10 @@ namespace sdl
               m_width { width }, m_height { height }
             { }
 
-            void render(SDL_Renderer* renderer, int row, int col, int x, int y, double angle = 0.0, SDL_Point* center = NULL, SDL_RendererFlip flip = SDL_FLIP_NONE)
+            void render(SDL_Renderer* renderer, int col, int row, int x, int y, double angle = 0.0, SDL_Point* center = NULL, SDL_RendererFlip flip = SDL_FLIP_NONE)
             {
-                assert(row < m_rows);
                 assert(col < m_cols);
+                assert(row < m_rows);
 
                 auto clip = clip_rect(col, row);
                 auto renderQuad = render_rect(x, y);

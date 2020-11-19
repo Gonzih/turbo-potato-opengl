@@ -60,53 +60,59 @@ public:
         m_level = std::make_unique<Map>(map_width, map_height);
         generate_tiles();
 
-        auto can_move_fn = [](Vector2D pos, MovementDirection dir) {
-            return true;
-        };
-        auto visible_fn = [](int x, int y) {
-            return true;
-        };
-        auto memoized_fn = [](int x, int y) {
-            return true;
-        };
-
         auto pos =  m_level->get_random_empty_coords();
         logger::info("Initializing player at (x, y)", pos.x, pos.y);
 
         auto player_sprite = m_sprite_manager->get_sprite("sprites/mage.png");
 
         player->add_component<TransformComponent>(pos);
-        player->add_component<MovementComponent>(can_move_fn);
+        player->add_component<MovementComponent>(get_can_move_fn());
         player->add_component<SpriteComponent>(m_window, player_sprite);
-        player->add_component<SpriteRenderComponent>(visible_fn);
+        player->add_component<SpriteRenderComponent>(get_visible_fn());
         m_player_mvm_cmp = player->get_component<MovementComponent>();
         m_player_pos_cmp = player->get_component<TransformComponent>();
 
-        m_light_map = m_level->generate_light_map();
+        regen_light_map();
 
         m_enemies_group = m_system.add_group();
-        init_enemies();
+        /* init_enemies(); */
 
         m_darkness_group = m_system.add_group();
-        auto darkness = m_darkness_group->add_entity();
+        /* auto darkness = m_darkness_group->add_entity(); */
 
-        auto darkness_sprite = m_sprite_manager->get_sprite("sprites/darkness.png");
-        darkness_sprite->set_blend_mode(SDL_BLENDMODE_BLEND);
+        /* auto darkness_sprite = m_sprite_manager->get_sprite("sprites/darkness.png"); */
+        /* darkness_sprite->set_blend_mode(SDL_BLENDMODE_BLEND); */
 
-        darkness->add_component<SpriteComponent>(m_window, darkness_sprite);
-        darkness->add_component<DarknessComponent>(map_width, map_height, visible_fn, memoized_fn);
+        /* darkness->add_component<SpriteComponent>(m_window, darkness_sprite); */
+        /* darkness->add_component<DarknessComponent>(map_width, map_height, get_visible_fn(), memoized_fn); */
+    }
+
+    VisibleLambda get_visible_fn()
+    {
+        return [this](int x, int y)
+        {
+            return this->visible(x, y);
+        };
+    }
+
+    CanMoveLambda get_can_move_fn()
+    {
+        return [this](Vector2D pos, MovementDirection dir)
+        {
+            return this->can_move(pos, dir);
+        };
+    }
+
+    MemoizedLambda get_memoized_fn() {
+        return [this](int x, int y)
+        {
+            return this->memoized(x, y);
+        };
     }
 
     void init_enemies()
     {
         auto player_sprite = m_sprite_manager->get_sprite("sprites/mage.png");
-
-        auto can_move_fn = [l_cmp](Vector2D pos, MovementDirection dir) {
-            return true;
-        };
-        auto visible_fn = [](int x, int y) {
-            return true;
-        };
 
         int n = rand_int(4, 11) + m_difficulty;
         for (int i = 0; i < n; ++i) {
@@ -115,9 +121,9 @@ public:
             logger::info("Initializing enemy at (x, y)", pos.x, pos.y);
 
             enemy->add_component<TransformComponent>(pos);
-            enemy->add_component<MovementComponent>(can_move_fn);
+            enemy->add_component<MovementComponent>(get_can_move_fn());
             enemy->add_component<SpriteComponent>(m_window, player_sprite);
-            enemy->add_component<SpriteRenderComponent>(visible_fn);
+            enemy->add_component<SpriteRenderComponent>(get_visible_fn());
         }
     }
 
@@ -128,7 +134,7 @@ public:
 
     void attempt_to_go_next_level()
     {
-        auto pos = player_pos_cmp->get_pos();
+        auto pos = m_player_pos_cmp->get_pos();
         if (can_go_downstairs(pos))
         {
             go_down_level();
@@ -165,7 +171,7 @@ public:
                 logger::info("KEY DOWNSTIARS");
                 break;
             case SDLK_ESCAPE:
-                is_running = false;
+                m_is_running = false;
                 logger::info("exiting");
                 break;
             default:
@@ -176,22 +182,22 @@ public:
         if (direction == MovementDirection::None)
             return;
 
-        player_mvm_cmp->move(direction);
-        system.update();
+        m_player_mvm_cmp->move(direction);
+        m_system.update();
         direction = MovementDirection::None;
     }
 
     void loop()
     {
         SDL_Event event;
-        while(is_running)
+        while(m_is_running)
         {
-            system.collect_garbage();
-            window->reset_viewport();
-            window->clear();
+            m_system.collect_garbage();
+            m_window->reset_viewport();
+            m_window->clear();
 
-            system.draw();
-            window->update();
+            m_system.draw();
+            m_window->update();
 
             while (SDL_PollEvent(&event) != 0)
             {
@@ -216,27 +222,27 @@ public:
 
     bool can_move(Vector2D pos, MovementDirection direction) const
     {
-        return level->can_move(pos, direction);
+        return m_level->can_move(pos, direction);
     }
 
     bool can_go_downstairs(Vector2D pos) const
     {
-        return level->at(pos.x, pos.y) == TileType::StairsDown;
+        return m_level->at(pos.x, pos.y) == TileType::StairsDown;
     }
 
     bool visible(int x, int y)
     {
-        return light_map.visible(x, y);
+        return m_light_map->visible(x, y);
     }
 
     bool memoized(int x, int y)
     {
-        return level->memoized(x, y);
+        return m_level->memoized(x, y);
     }
 
     void regen_light_map()
     {
-        auto pos = get_pos_fn();
+        auto pos = m_player_pos_cmp->get_pos();
         m_light_map = m_level->generate_light_map(pos, LIGHT_RADIUS);
     }
 
@@ -251,6 +257,8 @@ public:
 
     void generate_tiles()
     {
+        auto sprite = m_sprite_manager->get_sprite("sprites/surroundings.png");
+
         int sprite_col;
         for (int x = 0; x < m_level->get_w(); ++x)
         {
@@ -258,10 +266,6 @@ public:
             {
                 auto tile = m_level->at(x, y);
                 auto entity = m_tiles_group->add_entity();
-
-                if (visible(x, y)) {
-                    m_level->memoize(x, y);
-                }
 
                 switch (tile)
                 {
@@ -278,6 +282,10 @@ public:
                         break;
                 }
 
+                entity->add_component<TransformComponent>(Vector2D { x, y });
+                entity->add_component<MovementComponent>(get_can_move_fn());
+                entity->add_component<SpriteComponent>(m_window, sprite);
+                entity->add_component<SpriteRenderComponent>(sprite_col, 0, get_visible_fn());
             }
         }
     }
