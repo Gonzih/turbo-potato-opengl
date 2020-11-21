@@ -23,6 +23,9 @@ namespace ecs::components
         {
             auto pos = m_entity->get_component<TransformComponent>()->get_pos();
 
+            // get player coords here
+            // DO SOME MATH OR SOMETHING
+
             if (pos.x > 0) pos.x = 0;
             if (pos.y > 0) pos.y = 0;
             m_entity->get_component<TransformComponent>()->set_pos(pos);
