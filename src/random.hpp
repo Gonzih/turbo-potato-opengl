@@ -3,13 +3,16 @@
 #include <time.h>
 #include <stdlib.h>
 
-inline void rand_init() {
-    struct timespec ts;
-    clock_gettime(CLOCK_MONOTONIC, &ts);
+namespace rng
+{
+    inline void init() {
+        struct timespec ts;
+        clock_gettime(CLOCK_MONOTONIC, &ts);
 
-    srand((time_t)ts.tv_nsec);
-}
+        srand((time_t)ts.tv_nsec);
+    }
 
-inline int rand_int(int lower, int upper) {
-    return rand() % (upper - lower) + lower;
-}
+    inline int gen_int(int lower, int upper) {
+        return rand() % (upper - lower) + lower;
+    }
+};

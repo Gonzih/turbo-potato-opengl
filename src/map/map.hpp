@@ -98,17 +98,17 @@ class Map {
         int width;
         int height;
         std::vector<std::vector<Tile>> map;
-        int nrect = rand_int(12, 26);
+        int nrect = rng::gen_int(12, 26);
         std::vector<Rect> rects;
 
         Rect gen_rect(int size_w_limit, int size_h_limit) {
-            int size_w = rand_int(3, size_w_limit);
-            int size_h = rand_int(3, size_h_limit);
+            int size_w = rng::gen_int(3, size_w_limit);
+            int size_h = rng::gen_int(3, size_h_limit);
             Rect rect;
 
             // start of rect can be anywhere on screen
-            rect.x0 = rand_int(0, width-size_w);
-            rect.y0 = rand_int(0, height-size_h);
+            rect.x0 = rng::gen_int(0, width-size_w);
+            rect.y0 = rng::gen_int(0, height-size_h);
             // add size to starting point
             rect.x1 = rect.x0 + size_w;
             rect.y1 = rect.y0 + size_h;
@@ -128,7 +128,7 @@ class Map {
         void add_tunnel_to_existing(Rect new_rect) {
             if (rects.size() > 0) {
                 // Decide which rectangle to connect to
-                // Rect rect = existing_rects[rand_int(0, existing_rects.size()) - 1]; // FIXATSOMEPOINT: segfaults
+                // Rect rect = existing_rects[rng::gen_int(0, existing_rects.size()) - 1]; // FIXATSOMEPOINT: segfaults
                 Rect rect = rects.back();
 
                 // Calculate centers and sort
@@ -167,7 +167,7 @@ class Map {
             logger::info("Maze number of rectangles is", nrect);
 
             for (int i = 0; i < nrect; ++i) {
-                auto rect = gen_rect(width/4, height/4);
+                auto rect = gen_rect(10, 10);
                 // renders the rectangle on the map
                 render(rect);
                 // connects rectangle to existing rectangles
@@ -197,8 +197,8 @@ class Map {
         {
             int x, y;
             for (;;) {
-                x = rand_int(0, width);
-                y = rand_int(0, height);
+                x = rng::gen_int(0, width);
+                y = rng::gen_int(0, height);
                 if (at(x, y) == TileType::Empty) {
                     return Vector2D(x, y);
                 }

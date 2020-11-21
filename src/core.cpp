@@ -17,7 +17,7 @@ const int SCREEN_HEIGHT = 640;
 int main()
 {
     logger::init("turbo-potato.log");
-    rand_init();
+    rng::init();
 
     sdl::init();
     atexit(SDL_Quit);

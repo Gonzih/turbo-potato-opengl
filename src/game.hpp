@@ -127,7 +127,7 @@ public:
     {
         auto player_sprite = m_sprite_manager->get_sprite("sprites/mage.png");
 
-        int n = rand_int(4, 11) + m_difficulty;
+        int n = rng::gen_int(4, 11) + m_difficulty;
         for (int i = 0; i < n; ++i) {
             auto enemy = m_enemies_group->add_entity();
             auto pos =  m_level->get_random_empty_coords();
