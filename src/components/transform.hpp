@@ -9,7 +9,7 @@ namespace ecs::components
 {
     class TransformComponent : public Component
     {
-    private:
+    protected:
         Vector2D pos;
     public:
         TransformComponent(Vector2D p) : pos { p } {  };

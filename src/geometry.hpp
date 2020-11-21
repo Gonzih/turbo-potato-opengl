@@ -10,12 +10,12 @@ class Vector2D {
         int x, y;
 
         Vector2D() {};
-        explicit Vector2D(int x, int y) : x { x }, y { y } {}
         explicit Vector2D(std::pair<int, int> v) : x { v.first } , y { v.second } {}
+        explicit Vector2D(int x, int y) : x { x }, y { y } {}
         virtual ~Vector2D() {  };
 
-        Vector2D operator-(Vector2D p)  { return Vector2D(x - p.x, y - p.x); }
-        Vector2D operator+(Vector2D p)  { return Vector2D(x + p.x, y + p.x); }
+        Vector2D operator-(Vector2D p) const { return Vector2D(x - p.x, y - p.y); }
+        Vector2D operator+(Vector2D p) const { return Vector2D(x + p.x, y + p.y); }
         bool operator==(const Vector2D& p) const { return (x == p.x) && (y == p.y); }
 };
 

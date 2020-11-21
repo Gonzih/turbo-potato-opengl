@@ -10,25 +10,28 @@
 using namespace ecs;
 using namespace ecs::components;
 
-#define LIGHT_RADIUS 15
-
 class Game
 {
 private:
-    int m_difficulty = 0;
     bool m_is_running = true;
+    int m_difficulty = 0;
     int m_sprite_size = 32;
+    int m_light_radius = 15;
     int m_screen_width;
     int m_screen_height;
+    int m_map_width;
+    int m_map_height;
     std::shared_ptr<sdl::Window> m_window;
     System m_system;
     std::shared_ptr<Group> m_tiles_group;
     std::shared_ptr<Group> m_player_group;
     std::shared_ptr<Group> m_enemies_group;
     std::shared_ptr<Group> m_darkness_group;
-    std::shared_ptr<MovementComponent> m_player_mvm_cmp;
-    std::shared_ptr<TransformComponent> m_player_pos_cmp;
-    std::shared_ptr<TransformComponent> m_player_sprite_pos_cmp;
+
+    std::shared_ptr<Entity> player;
+    std::shared_ptr<Entity> offset;
+    std::shared_ptr<Entity> darkness;
+
     std::unique_ptr<sdl::SpriteManager> m_sprite_manager;
     std::unique_ptr<Map> m_level;
     std::unique_ptr<LightMap> m_light_map;
@@ -37,32 +40,30 @@ public:
     Game(int screen_width, int screen_height) :
         m_screen_width { screen_width },
         m_screen_height { screen_height },
+        m_map_width { m_screen_width/m_sprite_size },
+        m_map_height { m_screen_height/m_sprite_size },
         m_window { std::make_shared<sdl::Window>(screen_width, screen_height) },
         m_sprite_manager { std::make_unique<sdl::SpriteManager>(m_window) }
     { };
 
     void add_map()
     {
-        static int map_width = m_screen_width/m_sprite_size;
-        static int map_height = m_screen_height/m_sprite_size;
-
         auto wall_sprite = m_sprite_manager->get_sprite("sprites/surroundings.png");
         logger::info("Loading levels sprite");
-        m_level = std::make_unique<Map>(map_width, map_height);
+        m_level = std::make_unique<Map>(m_map_width, m_map_height);
     }
 
     void add_darkness()
     {
-        /* static int map_width = m_screen_width/m_sprite_size; */
-        /* static int map_height = m_screen_height/m_sprite_size; */
+        darkness = m_darkness_group->add_entity();
 
-        /* auto darkness = m_darkness_group->add_entity(); */
+        auto darkness_sprite = m_sprite_manager->get_sprite("sprites/darkness.png");
+        darkness_sprite->set_blend_mode(SDL_BLENDMODE_BLEND);
 
-        /* auto darkness_sprite = m_sprite_manager->get_sprite("sprites/darkness.png"); */
-        /* darkness_sprite->set_blend_mode(SDL_BLENDMODE_BLEND); */
-
-        /* darkness->add_component<SpriteComponent>(m_window, darkness_sprite); */
-        /* darkness->add_component<DarknessComponent>(map_width, map_height, get_visible_fn(), get_memoized_fn()); */
+        darkness->add_component<TransformComponent>(Vector2D { 0, 0 });
+        darkness->add_component<MovementComponent>();
+        darkness->add_component<SpriteComponent>(m_window, darkness_sprite);
+        darkness->add_component<DarknessComponent>(m_map_width, m_map_height, get_visible_fn(), get_memoized_fn(), offset);
     }
 
     void init()
@@ -75,25 +76,25 @@ public:
 
         m_tiles_group = m_system.add_group();
         m_player_group = m_system.add_group();
-        auto player = m_player_group->add_entity();
-        auto player_movement = m_player_group->add_entity();
+        player = m_player_group->add_entity();
+        offset = m_player_group->add_entity();
 
         add_map();
         generate_tiles();
 
-        auto pos =  m_level->get_random_empty_coords();
-        logger::info("Initializing player at (x, y)", pos.x, pos.y);
-
         auto player_sprite = m_sprite_manager->get_sprite("sprites/mage.png");
 
         player->add_component<SpriteComponent>(m_window, player_sprite);
-        player->add_component<SpriteRenderComponent>([](int x, int y){ return true; });
-        player->add_component<TransformComponent>(pos);
+        player->add_component<SpriteRenderComponent>([](int x, int y){ return true; }, offset);
+        player->add_component<TransformComponent>(Vector2D { 0, 0 });
+        player->add_component<MovementComponent>();
 
-        player_movement->add_component<TransformComponent>(pos);
-        player_movement->add_component<MovementComponent>();
-        m_player_mvm_cmp = player_movement->get_component<MovementComponent>();
-        m_player_pos_cmp = player_movement->get_component<TransformComponent>();
+        offset->add_component<TransformComponent>(Vector2D { 0, 0 });
+        offset->add_component<MovementComponent>();
+        offset->add_component<OffsetComponent>(Vector2D { m_map_width, m_map_height });
+
+        auto pos =  m_level->get_random_empty_coords();
+        set_centered_player_pos(pos);
 
         regen_light_map();
 
@@ -127,12 +128,11 @@ public:
         for (int i = 0; i < n; ++i) {
             auto enemy = m_enemies_group->add_entity();
             auto pos =  m_level->get_random_empty_coords();
-            logger::info("Initializing enemy at (x, y)", pos.x, pos.y);
 
             enemy->add_component<TransformComponent>(pos);
             enemy->add_component<MovementComponent>();
             enemy->add_component<SpriteComponent>(m_window, player_sprite);
-            enemy->add_component<SpriteRenderComponent>(get_visible_fn());
+            enemy->add_component<SpriteRenderComponent>(get_visible_fn(), offset);
         }
     }
 
@@ -143,7 +143,7 @@ public:
 
     void attempt_to_go_next_level()
     {
-        auto pos = m_player_pos_cmp->get_pos();
+        auto pos = get_real_player_pos();
         if (can_go_downstairs(pos))
         {
             go_down_level();
@@ -205,23 +205,12 @@ public:
 
     void move(MovementDirection direction)
     {
-        auto pos = m_player_pos_cmp->get_pos();
+        auto pos = get_real_player_pos();
 
         if (can_move(pos, direction))
         {
-            m_player_mvm_cmp->move(direction);
-
-            auto opposite = opposite_direction(direction);
-
-            for (auto& e : m_tiles_group->entities())
-            {
-                e->get_component<MovementComponent>()->move(opposite);
-            }
-
-            for (auto& e : m_enemies_group->entities())
-            {
-                e->get_component<MovementComponent>()->move(opposite);
-            }
+            player->get_component<MovementComponent>()->move(direction);
+            offset->get_component<MovementComponent>()->move(opposite_direction(direction));
         }
     }
 
@@ -258,6 +247,40 @@ public:
 
     // LEVELS RELATED TOOLING
 
+
+    Vector2D get_offset_player_pos()
+    {
+        return get_real_player_pos() + get_offset();
+    }
+
+    Vector2D get_real_player_pos()
+    {
+        return player->get_component<TransformComponent>()->get_pos();
+    }
+
+    Vector2D get_offset()
+    {
+        return  offset->get_component<TransformComponent>()->get_pos();
+    }
+
+    void set_centered_player_pos(Vector2D pos)
+    {
+        set_player_pos(pos);
+        set_offset(Vector2D { m_map_width/2, m_map_height/2 } - pos);
+    }
+
+    void set_offset(Vector2D pos)
+    {
+        logger::info("Setting offset at (x, y)", pos.x, pos.y);
+        offset->get_component<TransformComponent>()->set_pos(pos);
+    }
+
+    void set_player_pos(Vector2D pos)
+    {
+        logger::info("Setting player at (x, y)", pos.x, pos.y);
+        player->get_component<TransformComponent>()->set_pos(pos);
+    }
+
     bool can_move(Vector2D pos, MovementDirection direction) const
     {
         return m_level->can_move(pos, direction);
@@ -270,12 +293,11 @@ public:
 
     bool visible(int x, int y)
     {
-        /* bool vis = m_light_map->visible(x, y); */
+        bool vis = m_light_map->visible(x, y);
 
-        /* if (vis) { m_level->memoize(x, y); } */
+        if (vis) { m_level->memoize(x, y); }
 
-        /* return vis; */
-        return true;
+        return vis;
     }
 
     bool memoized(int x, int y)
@@ -285,17 +307,17 @@ public:
 
     void regen_light_map()
     {
-        auto pos = m_player_pos_cmp->get_pos();
-        m_light_map = m_level->generate_light_map(pos, LIGHT_RADIUS);
+        auto pos = get_real_player_pos();
+        m_light_map = m_level->generate_light_map(pos, m_light_radius);
     }
 
     void go_down_level()
     {
         add_map();
         auto pos = m_level->get_random_empty_coords();
-        logger::info("Initializing player at (x, y)", pos.x, pos.y);
-        m_player_pos_cmp->set_pos(pos);
-        m_player_sprite_pos_cmp->set_pos(pos);
+        set_centered_player_pos(pos);
+        set_offset(Vector2D { 0, 0 });
+        regen_light_map();
     }
 
     void generate_tiles()
@@ -326,9 +348,8 @@ public:
                 }
 
                 entity->add_component<TransformComponent>(Vector2D { x, y });
-                entity->add_component<MovementComponent>();
                 entity->add_component<SpriteComponent>(m_window, sprite);
-                entity->add_component<SpriteRenderComponent>(sprite_col, 0, [](int x, int y){ return true; });
+                entity->add_component<SpriteRenderComponent>(sprite_col, 0, [](int x, int y){ return true; }, offset);
             }
         }
     }

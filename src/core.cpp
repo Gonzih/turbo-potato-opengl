@@ -11,8 +11,8 @@
 
 using namespace std;
 
-const int SCREEN_WIDTH = 1280;
-const int SCREEN_HEIGHT = 1280;
+const int SCREEN_WIDTH = 960;
+const int SCREEN_HEIGHT = 960;
 
 int main()
 {

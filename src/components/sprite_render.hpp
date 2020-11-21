@@ -15,11 +15,14 @@ namespace ecs::components
         int m_col;
         int m_row;
         VisibleLambda m_is_visible;
+        std::shared_ptr<Entity> m_offset;
     public:
-        SpriteRenderComponent(VisibleLambda vfn)
-        : m_col { 0 }, m_row { 0 }, m_is_visible { vfn } {  };
-        SpriteRenderComponent(int col, int row, VisibleLambda vfn)
-        : m_col { col }, m_row { row }, m_is_visible { vfn } {  };
+        SpriteRenderComponent(VisibleLambda vfn, std::shared_ptr<Entity> offset)
+        : m_col { 0 }, m_row { 0 }, m_is_visible { vfn }, m_offset { offset }
+        {  };
+        SpriteRenderComponent(int col, int row, VisibleLambda vfn, std::shared_ptr<Entity> offset)
+        : m_col { col }, m_row { row }, m_is_visible { vfn }, m_offset { offset }
+        {  };
 
         virtual ~SpriteRenderComponent() override {  };
 
@@ -37,7 +40,12 @@ namespace ecs::components
             auto h = sprite->get_h();
 
             if (m_is_visible(pos.x, pos.y))
-                sprite->render(window->get_renderer(), m_col, m_row, pos.x*w, pos.y*h, 0, NULL, flip);
+            {
+                auto offset = m_offset->get_component<TransformComponent>()->get_pos();
+                auto render_pos = pos + offset;
+                sprite->render(window->get_renderer(), m_col, m_row, render_pos.x*w, render_pos.y*h, 0, NULL, flip);
+            }
+
         }
     };
 };

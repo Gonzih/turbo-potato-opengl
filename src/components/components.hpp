@@ -47,3 +47,4 @@ namespace ecs::components {
 #include "sprite_render.hpp"
 #include "movement.hpp"
 #include "darkness.hpp"
+#include "offset.hpp"
