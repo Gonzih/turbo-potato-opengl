@@ -249,6 +249,11 @@ public:
 
     // LEVELS RELATED TOOLING
 
+    Vector2D get_real_player_pos()
+    {
+        return player->get_component<TransformComponent>()->get_pos();
+    }
+
     void set_centered_player_pos(Vector2D pos)
     {
         set_player_pos(pos);
