@@ -16,6 +16,8 @@ class Vector2D {
 
         Vector2D operator-(Vector2D p) const { return Vector2D(x - p.x, y - p.y); }
         Vector2D operator+(Vector2D p) const { return Vector2D(x + p.x, y + p.y); }
+        Vector2D operator/(int v) const { return Vector2D(x/v, y/v); }
+        Vector2D operator*(int v) const { return Vector2D(x*v, y*v); }
         bool operator==(const Vector2D& p) const { return (x == p.x) && (y == p.y); }
 };
 

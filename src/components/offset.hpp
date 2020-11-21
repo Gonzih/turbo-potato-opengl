@@ -53,14 +53,6 @@ namespace ecs::components
             auto offset = m_entity->get_component<TransformComponent>()->get_pos();
             auto player = m_player->get_component<TransformComponent>()->get_pos();
 
-            /* auto pos = offset + player; */
-            /* std::cout << "=========================================" << std::endl; */
-            /* std::cout << "Playfield " << m_playfield.x << "," << m_playfield.y << std::endl; */
-            /* std::cout << "Playfield/2 " << m_playfield.x/2 << "," << m_playfield.y/2 << std::endl; */
-            /* std::cout << "Offset " << offset.x << "," << offset.y << std::endl; */
-            /* std::cout << "Player " << player.x << "," << player.y << std::endl; */
-            /* std::cout << "Pos " << pos.x << "," << pos.y << std::endl; */
-
             if (offset.x > 0) {
                 offset.x = 0;
             }
@@ -76,9 +68,6 @@ namespace ecs::components
             if (player.y + m_playfield.y/2 > m_map_size.y) {
                 offset.y = -(m_map_size.y - m_playfield.y);
             }
-
-            /* std::cout << "New Offset " << offset.x << "," << offset.y << std::endl; */
-            /* std::cout << "=========================================" << std::endl; */
 
             m_entity->get_component<TransformComponent>()->set_pos(offset);
         }
