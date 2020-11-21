@@ -99,8 +99,6 @@ public:
         auto pos = m_level->get_random_empty_coords();
         set_centered_player_pos(pos);
 
-        reset_offset();
-
         regen_light_map();
 
         m_enemies_group = m_system.add_group();
@@ -271,11 +269,6 @@ public:
     {
         set_player_pos(pos);
         offset->get_component<OffsetComponent>()->update();
-    }
-
-    void reset_offset()
-    {
-        offset->get_component<OffsetComponent>()->reset();
     }
 
     void set_player_pos(Vector2D pos)
