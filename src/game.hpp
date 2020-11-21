@@ -19,6 +19,8 @@ private:
     int m_light_radius = 15;
     int m_screen_width;
     int m_screen_height;
+    int m_playfield_width;
+    int m_playfield_height;
     int m_map_width;
     int m_map_height;
     std::shared_ptr<sdl::Window> m_window;
@@ -40,8 +42,10 @@ public:
     Game(int screen_width, int screen_height) :
         m_screen_width { screen_width },
         m_screen_height { screen_height },
-        m_map_width { m_screen_width/m_sprite_size },
-        m_map_height { m_screen_height/m_sprite_size },
+        m_playfield_width { m_screen_width / m_sprite_size },
+        m_playfield_height { m_screen_height / m_sprite_size },
+        m_map_width { 100 },
+        m_map_height { 100 },
         m_window { std::make_shared<sdl::Window>(screen_width, screen_height) },
         m_sprite_manager { std::make_unique<sdl::SpriteManager>(m_window) }
     { };
@@ -90,11 +94,12 @@ public:
         player->add_component<MovementComponent>();
 
         offset->add_component<TransformComponent>(Vector2D { 0, 0 });
-        offset->add_component<MovementComponent>();
-        offset->add_component<OffsetComponent>(Vector2D { m_map_width, m_map_height });
+        offset->add_component<OffsetComponent>(Vector2D { m_playfield_width, m_playfield_height }, player);
 
-        auto pos =  m_level->get_random_empty_coords();
+        auto pos = m_level->get_random_empty_coords();
         set_centered_player_pos(pos);
+
+        reset_offset();
 
         regen_light_map();
 
@@ -210,7 +215,7 @@ public:
         if (can_move(pos, direction))
         {
             player->get_component<MovementComponent>()->move(direction);
-            offset->get_component<MovementComponent>()->move(opposite_direction(direction));
+            offset->get_component<OffsetComponent>()->recalculate();
         }
     }
 
@@ -266,13 +271,12 @@ public:
     void set_centered_player_pos(Vector2D pos)
     {
         set_player_pos(pos);
-        set_offset(Vector2D { m_map_width/2, m_map_height/2 } - pos);
+        offset->get_component<OffsetComponent>()->recalculate();
     }
 
-    void set_offset(Vector2D pos)
+    void reset_offset()
     {
-        logger::info("Setting offset at (x, y)", pos.x, pos.y);
-        offset->get_component<TransformComponent>()->set_pos(pos);
+        offset->get_component<OffsetComponent>()->reset();
     }
 
     void set_player_pos(Vector2D pos)
@@ -316,7 +320,6 @@ public:
         add_map();
         auto pos = m_level->get_random_empty_coords();
         set_centered_player_pos(pos);
-        set_offset(Vector2D { 0, 0 });
         regen_light_map();
     }
 

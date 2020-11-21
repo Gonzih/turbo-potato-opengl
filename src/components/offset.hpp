@@ -10,28 +10,57 @@ namespace ecs::components
     class OffsetComponent : public Component
     {
     private:
-        Vector2D m_limit;
+        Vector2D m_playfield;
+        std::shared_ptr<Entity> m_player;
     public:
-        OffsetComponent(Vector2D limit) : m_limit { limit } { };
+        OffsetComponent(Vector2D l, std::shared_ptr<Entity> p) : m_playfield { l }, m_player { p } { };
         virtual ~OffsetComponent() override {  };
 
         void init() override {
             m_entity->assert_component<TransformComponent>("Offset");
         }
 
-        void update() override
+        void reset()
         {
-            auto pos = m_entity->get_component<TransformComponent>()->get_pos();
+            auto offset = m_entity->get_component<TransformComponent>()->get_pos();
+            auto player = m_player->get_component<TransformComponent>()->get_pos();
 
+            offset.x = m_playfield.x/2 - player.x;
+            offset.y = m_playfield.y/2 - player.y;
+
+            m_entity->get_component<TransformComponent>()->set_pos(offset);
+        }
+
+        void recalculate()
+        {
+            reset();
+
+            auto offset = m_entity->get_component<TransformComponent>()->get_pos();
+            auto player = m_player->get_component<TransformComponent>()->get_pos();
+
+            auto pos = offset + player;
+
+            std::cout << "=========================================" << std::endl;
+            std::cout << "Playfield " << m_playfield.x << "," << m_playfield.y << std::endl;
+            std::cout << "Playfield/2 " << m_playfield.x/2 << "," << m_playfield.y/2 << std::endl;
+            std::cout << "Offset " << offset.x << "," << offset.y << std::endl;
+            std::cout << "Player " << player.x << "," << player.y << std::endl;
+            std::cout << "Pos " << pos.x << "," << pos.y << std::endl;
             // get player coords here
             // DO SOME MATH OR SOMETHING
 
-            if (pos.x > 0) pos.x = 0;
-            if (pos.y > 0) pos.y = 0;
-            m_entity->get_component<TransformComponent>()->set_pos(pos);
+            if (offset.x > 0) {
+                offset.x = 0;
+            }
 
-            if (pos.x > m_limit.x) pos.x = m_limit.x;
-            if (pos.y > m_limit.y) pos.y = m_limit.y;
+            if (offset.y > 0) {
+                offset.y = 0;
+            }
+
+            std::cout << "New Offset " << offset.x << "," << offset.y << std::endl;
+            std::cout << "=========================================" << std::endl;
+
+            m_entity->get_component<TransformComponent>()->set_pos(offset);
         }
     };
 };
