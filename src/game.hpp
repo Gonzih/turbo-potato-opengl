@@ -94,7 +94,7 @@ public:
         player->add_component<MovementComponent>();
 
         offset->add_component<TransformComponent>(Vector2D { 0, 0 });
-        offset->add_component<OffsetComponent>(Vector2D { m_playfield_width, m_playfield_height }, player);
+        offset->add_component<OffsetComponent>(Vector2D { m_playfield_width, m_playfield_height }, Vector2D { m_map_width, m_map_height }, player);
 
         auto pos = m_level->get_random_empty_coords();
         set_centered_player_pos(pos);
