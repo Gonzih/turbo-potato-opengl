@@ -6,6 +6,7 @@
 #include "../ecs/ecs.hpp"
 #include "transform.hpp"
 #include "sprite.hpp"
+#include "offset.hpp"
 
 namespace ecs::components
 {
@@ -39,10 +40,12 @@ namespace ecs::components
             auto w = sprite->get_w();
             auto h = sprite->get_h();
 
-            if (m_is_visible(pos.x, pos.y))
+            auto offset = m_offset->get_component<OffsetComponent>();
+
+            if (offset->in_fov(pos) && m_is_visible(pos.x, pos.y))
             {
-                auto offset = m_offset->get_component<TransformComponent>()->get_pos();
-                auto render_pos = pos + offset;
+                auto offset_pos = m_offset->get_component<TransformComponent>()->get_pos();
+                auto render_pos = pos + offset_pos;
                 sprite->render(window->get_renderer(), m_col, m_row, render_pos.x*w, render_pos.y*h, 0, NULL, flip);
             }
 

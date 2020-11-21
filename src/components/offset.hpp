@@ -23,6 +23,18 @@ namespace ecs::components
             m_entity->assert_component<TransformComponent>("Offset");
         }
 
+        bool in_fov(Vector2D pos)
+        {
+            auto offset = m_entity->get_component<TransformComponent>()->get_pos();
+            auto new_pos = pos + offset;
+            return new_pos.x >= 0 && new_pos.y >= 0 && new_pos.x < m_playfield.x && new_pos.y < m_playfield.y;
+        }
+
+        bool in_fov(int x, int y)
+        {
+            return in_fov(Vector2D { x, y });
+        }
+
         void reset()
         {
             auto offset = m_entity->get_component<TransformComponent>()->get_pos();
@@ -34,7 +46,7 @@ namespace ecs::components
             m_entity->get_component<TransformComponent>()->set_pos(offset);
         }
 
-        void recalculate()
+        void update() override
         {
             reset();
 

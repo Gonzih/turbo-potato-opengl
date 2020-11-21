@@ -215,7 +215,6 @@ public:
         if (can_move(pos, direction))
         {
             player->get_component<MovementComponent>()->move(direction);
-            offset->get_component<OffsetComponent>()->recalculate();
         }
     }
 
@@ -271,7 +270,7 @@ public:
     void set_centered_player_pos(Vector2D pos)
     {
         set_player_pos(pos);
-        offset->get_component<OffsetComponent>()->recalculate();
+        offset->get_component<OffsetComponent>()->update();
     }
 
     void reset_offset()

@@ -36,7 +36,8 @@ namespace ecs::components
             auto sprite_w = sprite->get_w();
             auto sprite_h = sprite->get_h();
 
-            auto offset = m_offset->get_component<TransformComponent>()->get_pos();
+            Vector2D offset_pos;
+            auto offset = m_offset->get_component<OffsetComponent>();
 
             int xx, yy;
             for (int x = 0; x < m_width; ++x)
@@ -44,7 +45,9 @@ namespace ecs::components
                 for (int y = 0; y < m_height; ++y)
                 {
 
-                    if (!m_is_visible(x, y)) {
+                    if (offset->in_fov(x, y) && !m_is_visible(x, y)) {
+                        offset_pos = m_offset->get_component<TransformComponent>()->get_pos();
+
                         if (m_is_memoized(x, y)) {
                             sprite->set_alpha(150);
                             sprite->set_alpha(100);
@@ -53,8 +56,8 @@ namespace ecs::components
                             sprite->set_alpha(200);
                         }
 
-                        xx = x + offset.x;
-                        yy = y + offset.y;
+                        xx = x + offset_pos.x;
+                        yy = y + offset_pos.y;
 
                         sprite->render(window->get_renderer(), 0, 0, xx*sprite_w, yy*sprite_h, 0, NULL);
                     }
