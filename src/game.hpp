@@ -205,15 +205,16 @@ public:
             case SDL_KEYUP:
                 switch(event.key.keysym.sym)
                 {
-                    default:
+                    case SDLK_LEFT:
+                    case SDLK_RIGHT:
+                    case SDLK_UP:
+                    case SDLK_DOWN:
                         logger::info("KEY RELEASED", event.key.keysym.sym);
+                        direction = MovementDirection::None;
                         break;
                 }
 
         }
-
-        if (direction == MovementDirection::None)
-            return;
 
         move(direction);
         regen_light_map();
