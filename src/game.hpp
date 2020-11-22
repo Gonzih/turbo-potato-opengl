@@ -165,6 +165,7 @@ public:
     void handle_keypress(SDL_Event &event)
     {
         static MovementDirection direction;
+        static bool shift_pressed = false;
         switch (event.type)
         {
             case SDL_KEYDOWN:
@@ -194,26 +195,37 @@ public:
                         m_is_running = false;
                         logger::info("exiting");
                         break;
-                    case SDLK_COLON:
-                        logger::info("Opening command mode");
+                    case SDLK_LSHIFT:
+                    case SDLK_RSHIFT:
+                        shift_pressed = true;
+                        break;
+                    case SDLK_SEMICOLON:
+                        if (shift_pressed) {
+                            // TODO
+                            logger::info("Opening command mode");
+                        }
                         break;
                     default:
                         logger::info("UNHANDLED KEY", event.key.keysym.sym);
                         break;
                 }
-                break;
+                break; // SDL_KEYDOWN
             case SDL_KEYUP:
+                logger::info("KEY RELEASED", event.key.keysym.sym);
                 switch(event.key.keysym.sym)
                 {
                     case SDLK_LEFT:
                     case SDLK_RIGHT:
                     case SDLK_UP:
                     case SDLK_DOWN:
-                        logger::info("KEY RELEASED", event.key.keysym.sym);
                         direction = MovementDirection::None;
                         break;
+                    case SDLK_LSHIFT:
+                    case SDLK_RSHIFT:
+                        shift_pressed = false;
+                        break;
                 }
-
+                break; // SDL_KEYUP
         }
 
         move(direction);
