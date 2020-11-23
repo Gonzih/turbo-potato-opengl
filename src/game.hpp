@@ -165,39 +165,68 @@ public:
     void handle_keypress(SDL_Event &event)
     {
         static MovementDirection direction;
-        switch(event.key.keysym.sym)
+        static bool shift_pressed = false;
+        switch (event.type)
         {
-            case SDLK_LEFT:
-                direction = MovementDirection::Left;
-                logger::info("KEY LEFT");
-                break;
-            case SDLK_RIGHT:
-                direction = MovementDirection::Right;
-                logger::info("KEY RIGHT");
-                break;
-            case SDLK_UP:
-                direction = MovementDirection::Up;
-                logger::info("KEY UP");
-                break;
-            case SDLK_DOWN:
-                direction = MovementDirection::Down;
-                logger::info("KEY DOWN");
-                break;
-            case SDLK_PERIOD:
-                attempt_to_go_next_level();
-                logger::info("KEY DOWNSTIARS");
-                break;
-            case SDLK_ESCAPE:
-                m_is_running = false;
-                logger::info("exiting");
-                break;
-            default:
-                logger::info("UNHANDLED KEY", event.key.keysym.sym);
-                break;
+            case SDL_KEYDOWN:
+                switch(event.key.keysym.sym)
+                {
+                    case SDLK_LEFT:
+                        direction = MovementDirection::Left;
+                        logger::info("KEY LEFT");
+                        break;
+                    case SDLK_RIGHT:
+                        direction = MovementDirection::Right;
+                        logger::info("KEY RIGHT");
+                        break;
+                    case SDLK_UP:
+                        direction = MovementDirection::Up;
+                        logger::info("KEY UP");
+                        break;
+                    case SDLK_DOWN:
+                        direction = MovementDirection::Down;
+                        logger::info("KEY DOWN");
+                        break;
+                    case SDLK_PERIOD:
+                        attempt_to_go_next_level();
+                        logger::info("KEY DOWNSTIARS");
+                        break;
+                    case SDLK_ESCAPE:
+                        m_is_running = false;
+                        logger::info("exiting");
+                        break;
+                    case SDLK_LSHIFT:
+                    case SDLK_RSHIFT:
+                        shift_pressed = true;
+                        break;
+                    case SDLK_SEMICOLON:
+                        if (shift_pressed) {
+                            // TODO
+                            logger::info("Opening command mode");
+                        }
+                        break;
+                    default:
+                        logger::info("UNHANDLED KEY", event.key.keysym.sym);
+                        break;
+                }
+                break; // SDL_KEYDOWN
+            case SDL_KEYUP:
+                logger::info("KEY RELEASED", event.key.keysym.sym);
+                switch(event.key.keysym.sym)
+                {
+                    case SDLK_LEFT:
+                    case SDLK_RIGHT:
+                    case SDLK_UP:
+                    case SDLK_DOWN:
+                        direction = MovementDirection::None;
+                        break;
+                    case SDLK_LSHIFT:
+                    case SDLK_RSHIFT:
+                        shift_pressed = false;
+                        break;
+                }
+                break; // SDL_KEYUP
         }
-
-        if (direction == MovementDirection::None)
-            return;
 
         move(direction);
         regen_light_map();
@@ -219,6 +248,7 @@ public:
     void loop()
     {
         SDL_Event event;
+        SDL_StartTextInput();
         while(m_is_running)
         {
             m_system.collect_garbage();
@@ -233,9 +263,8 @@ public:
                 switch(event.type)
                 {
                     case SDL_KEYDOWN:
-                        handle_keypress(event);
-                        break;
                     case SDL_KEYUP:
+                        handle_keypress(event);
                         break;
                     case SDL_QUIT:
                         quit();
