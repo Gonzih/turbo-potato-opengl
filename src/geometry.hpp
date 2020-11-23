@@ -3,6 +3,7 @@
 #include <functional>
 #include <utility>
 #include <cstdint>
+#include <string>
 #include <assert.h>
 
 class Vector2D {
@@ -19,6 +20,11 @@ class Vector2D {
         Vector2D operator/(int v) const { return Vector2D(x/v, y/v); }
         Vector2D operator*(int v) const { return Vector2D(x*v, y*v); }
         bool operator==(const Vector2D& p) const { return (x == p.x) && (y == p.y); }
+
+        std::string to_string() const
+        {
+            return "(" + std::to_string(x) + "," + std::to_string(y) + ")";
+        }
 };
 
 class Rect {

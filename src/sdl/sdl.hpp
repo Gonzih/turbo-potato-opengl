@@ -2,6 +2,7 @@
 
 #include <SDL.h>
 #include <SDL_image.h>
+#include <SDL_ttf.h>
 #include <cassert>
 #include <optional>
 #include <memory>
@@ -33,10 +34,19 @@ namespace sdl
         }
     }
 
+    inline void init_ttf()
+    {
+        if (TTF_Init() == -1)
+        {
+            throw std::runtime_error(strcat(strdup("SDL TTF could not be initialize! TTF_Error: "), TTF_GetError()));
+        }
+    }
+
     inline void init()
     {
         init_sdl();
         init_image();
+        init_ttf();
     }
 
     inline void quit()
@@ -48,9 +58,12 @@ namespace sdl
     class RGB
     {
         public:
-            Uint8 r, g, b;
+            Uint8 r, g, b, a;
             RGB(Uint8 r, Uint8 g, Uint8 b)
-            : r { r }, g { g }, b { b } { };
+            : r { r }, g { g }, b { b }, a { 255 } { };
+            RGB(Uint8 r, Uint8 g, Uint8 b, Uint8 a)
+            : r { r }, g { g }, b { b }, a { a } { };
+            operator SDL_Color()   { return SDL_Color { r, g, b, a }; }
     };
 
     class Renderer
@@ -97,8 +110,14 @@ namespace sdl
             }
         public:
             Surface() {}
-            explicit Surface(SDL_Surface* surface): m_surface { surface } {}
-            explicit Surface(SDL_Window* window, std::optional<RGB> ock): m_surface { SDL_GetWindowSurface(window) }, m_auto_free { false }
+            explicit Surface(SDL_Surface* surface)
+            : m_surface { surface }
+            {
+                set_dimensions();
+            }
+
+            explicit Surface(SDL_Window* window, std::optional<RGB> ock)
+            : m_surface { SDL_GetWindowSurface(window) }, m_auto_free { false }
             {
                 if (m_surface == NULL)
                 {
@@ -107,7 +126,9 @@ namespace sdl
                 set_dimensions();
                 set_color_key(ock);
             }
-            explicit Surface(std::string path, std::optional<RGB> ock): m_surface { IMG_Load(path.c_str()) }
+
+            explicit Surface(std::string path, std::optional<RGB> ock)
+            : m_surface { IMG_Load(path.c_str()) }
             {
                 if (m_surface == NULL)
                 {
@@ -123,7 +144,10 @@ namespace sdl
             virtual ~Surface()
             {
                 if (m_surface != NULL && m_auto_free)
-                { SDL_FreeSurface(m_surface); }
+                {
+                    SDL_FreeSurface(m_surface);
+                    m_surface = nullptr;
+                }
             }
 
             SDL_Surface& operator*()  { return *(m_surface); }
@@ -161,6 +185,17 @@ namespace sdl
                 m_width = surface.get_w();
                 m_height = surface.get_h();
             }
+
+            SDL_Rect render_rect(int x, int y)
+            {
+                SDL_Rect rect;
+                rect.x = x;
+                rect.y = y;
+                rect.w = m_width;
+                rect.h = m_height;
+
+                return rect;
+            }
         public:
             Texture() {}
 
@@ -168,7 +203,7 @@ namespace sdl
             : Texture { Surface { path, ock }, renderer }
             { }
 
-            explicit Texture(Surface surface, Renderer& renderer)
+            explicit Texture(Surface&& surface, Renderer& renderer)
             {
                 set_dimensions(surface);
                 m_texture = SDL_CreateTextureFromSurface(renderer, surface);
@@ -180,9 +215,10 @@ namespace sdl
             int get_w() { return m_width; };
             int get_h() { return m_height; };
 
-            void render(SDL_Renderer* renderer, double angle = 0.0, SDL_Point* center = NULL, SDL_RendererFlip flip = SDL_FLIP_NONE)
+            void render(SDL_Renderer* renderer, int x, int y, double angle = 0.0, SDL_Point* center = NULL, SDL_RendererFlip flip = SDL_FLIP_NONE)
             {
-                SDL_RenderCopyEx(renderer, m_texture, NULL, NULL, angle, center, flip);
+                auto renderQuad = render_rect(x, y);
+                SDL_RenderCopyEx(renderer, m_texture, NULL, &renderQuad, angle, center, flip);
             }
 
             void set_color_mod(RGB rgb)
@@ -203,7 +239,10 @@ namespace sdl
             virtual ~Texture()
             {
                 if (m_texture != NULL)
-                { SDL_DestroyTexture(m_texture); }
+                {
+                    SDL_DestroyTexture(m_texture);
+                    m_texture = nullptr;
+                }
             }
     };
 
@@ -286,6 +325,7 @@ namespace sdl
             int m_height;
             SDL_Window* m_window = NULL;
             Renderer m_renderer;
+            TTF_Font* m_font = NULL;
 
         public:
             Window(int w, int h)
@@ -326,6 +366,27 @@ namespace sdl
             {
                 return Texture { path, m_renderer, std::optional<RGB> { ck } };
             }
+
+            std::shared_ptr<Texture> render_text(std::string text, RGB color)
+            {
+                SDL_Surface* sdl_surf = TTF_RenderText_Blended(m_font, text.c_str(), color);
+                if (sdl_surf == NULL)
+                {
+                    throw std::runtime_error("Failed to render text " + text);
+                }
+
+                return std::make_shared<Texture>(Surface { sdl_surf }, m_renderer);
+            }
+
+            void open_font(std::string path, int point_size)
+            {
+                 m_font = TTF_OpenFont(path.c_str(), point_size);
+                 if (m_font == NULL)
+                 {
+                    throw std::runtime_error("Could not load font from " + path);
+                 }
+            }
+
 
             void set_viewport(int x, int y, int w, int h)
             {

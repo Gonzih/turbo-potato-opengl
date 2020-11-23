@@ -73,6 +73,7 @@ public:
     void init()
     {
         m_window->set_resizable(false);
+        m_window->open_font("ttf/terminus.ttf", 24);
 
         m_sprite_manager->preload_sprite("sprites/surroundings.png", 1, 3, m_sprite_size, m_sprite_size);
         m_sprite_manager->preload_sprite("sprites/darkness.png", 1, 1, m_sprite_size, m_sprite_size);
@@ -106,6 +107,18 @@ public:
 
         m_darkness_group = m_system.add_group();
         add_darkness();
+
+        auto text = m_darkness_group->add_entity();
+        text->add_component<TransformComponent>(Vector2D { 0, 0 });
+        text->add_component<TextComponent>(m_window, [this]() { return this->log_debug_info(); }, sdl::RGB { 255, 0, 0 });
+        text->add_component<TextRenderComponent>();
+    }
+
+    std::string log_debug_info()
+    {
+        auto ppos = get_real_player_pos();
+        auto offpos = offset->get_component<TransformComponent>()->get_pos();
+        return "player pos is " + ppos.to_string() + " offset is " + offpos.to_string();
     }
 
     VisibleLambda get_visible_fn()

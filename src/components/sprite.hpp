@@ -17,8 +17,5 @@ namespace ecs::components
         : m_window { w }, m_sprite { sprite }
         {  };
         virtual ~SpriteComponent() override {  };
-
-        void init() override { }
-        void draw() override { }
     };
 };

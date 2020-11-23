@@ -40,6 +40,7 @@ namespace ecs::components {
     using CanMoveLambda = std::function<bool(Vector2D, MovementDirection)>;
     using VisibleLambda = std::function<bool(int, int)>;
     using MemoizedLambda = std::function<bool(int, int)>;
+    using GetTextLambda = std::function<std::string()>;
 };
 
 #include "transform.hpp"
@@ -47,4 +48,6 @@ namespace ecs::components {
 #include "sprite_render.hpp"
 #include "movement.hpp"
 #include "darkness.hpp"
+#include "text.hpp"
+#include "text_render.hpp"
 #include "offset.hpp"
