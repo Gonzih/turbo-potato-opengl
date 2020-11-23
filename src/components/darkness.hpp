@@ -38,26 +38,22 @@ namespace ecs::components
 
             Vector2D offset_pos;
             auto offset = m_offset->get_component<OffsetComponent>();
+            auto [ofx, ofy] = m_offset->get_component<TransformComponent>()->get_pos();
 
             int xx, yy;
             for (int x = 0; x < m_width; ++x)
             {
                 for (int y = 0; y < m_height; ++y)
                 {
-
                     if (offset->in_fov(x, y) && !m_is_visible(x, y)) {
-                        offset_pos = m_offset->get_component<TransformComponent>()->get_pos();
-
                         if (m_is_memoized(x, y)) {
                             sprite->set_alpha(150);
-                            sprite->set_alpha(100);
                         } else {
                             sprite->set_alpha(255);
-                            sprite->set_alpha(200);
                         }
 
-                        xx = x + offset_pos.x;
-                        yy = y + offset_pos.y;
+                        xx = x + ofx;
+                        yy = y + ofy;
 
                         sprite->render(window->get_renderer(), 0, 0, xx*sprite_w, yy*sprite_h, 0, NULL);
                     }
