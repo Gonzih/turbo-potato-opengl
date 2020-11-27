@@ -12,7 +12,7 @@ CXX_TIDY = clang-tidy
 DISTRO=$(shell sh -c "cat /etc/*-release | grep DISTRIB_ID | sed 's/.*=//'")
 CXXFLAGS = -Wall -Werror -g
 LDFLAGS += -std=c++2a
-LDFLAGS += $(shell pkg-config --cflags --libs sdl2 SDL2_image SDL2_ttf SDL2_mixer)
+LDFLAGS += $(shell pkg-config --cflags --libs sdl2 opengl glu glew gl glm)
 
 BIN_NAME = core
 
